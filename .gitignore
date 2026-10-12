@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# 실제 환경 설정
+.env
+.env.*
+!.env.example
+
+# 프런트 의존성과 빌드 결과
+node_modules/
+dist/
+
+# 백엔드 빌드 결과
+target/
+out/
+
+# 로그
+*.log

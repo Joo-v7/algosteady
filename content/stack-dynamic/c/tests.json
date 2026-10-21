@@ -1,0 +1,266 @@
+[
+  {
+    "id": "init-empty",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "초기 용량과 빈 상태",
+    "input": "INIT 0\nTOP 0\nCAPACITY 0\nEMPTY 0\nFULL 0\n",
+    "expected": {
+      "stdout": "TOP -1\nCAPACITY 1\nEMPTY 1\nFULL 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "init-again",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "확장 후 재초기화",
+    "input": "INIT 0\nPUSH 0 10\nPUSH 0 20\nINIT 0\nTOP 0\nCAPACITY 0\nEMPTY 0\nFULL 0\n",
+    "expected": {
+      "stdout": "TOP -1\nCAPACITY 1\nEMPTY 1\nFULL 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "push-one",
+    "criterionId": "push",
+    "public": false,
+    "description": "첫 삽입은 확장 없이 저장",
+    "input": "INIT 0\nPUSH 0 10\nTOP 0\nCAPACITY 0\nDATA 0 0\nFULL 0\n",
+    "expected": {
+      "stdout": "TOP 0\nCAPACITY 1\nDATA 0 10\nFULL 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "push-values",
+    "criterionId": "push",
+    "public": false,
+    "description": "0과 음수 및 입력 범위 경계",
+    "input": "INIT 0\nPUSH 0 0\nPUSH 0 -1000000\nPUSH 0 1000000\nDATA 0 0\nDATA 0 1\nDATA 0 2\nTOP 0\n",
+    "expected": {
+      "stdout": "DATA 0 0\nDATA 1 -1000000\nDATA 2 1000000\nTOP 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "public-example",
+    "criterionId": "growth",
+    "public": true,
+    "description": "용량 확장과 역순 삭제",
+    "input": "INIT 0\nPUSH 0 10\nCAPACITY 0\nPUSH 0 20\nCAPACITY 0\nPUSH 0 30\nCAPACITY 0\nPEEK 0\nPOP 0\nPOP 0\nPOP 0\nEMPTY 0\n",
+    "expected": {
+      "stdout": "CAPACITY 1\nCAPACITY 2\nCAPACITY 4\nPEEK 30\nPOP 30\nPOP 20\nPOP 10\nEMPTY 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "growth-boundaries",
+    "criterionId": "growth",
+    "public": false,
+    "description": "용량 1, 2, 4, 8의 확장 경계",
+    "input": "INIT 0\nPUSH 0 1\nCAPACITY 0\nFULL 0\nPUSH 0 2\nCAPACITY 0\nFULL 0\nPUSH 0 3\nCAPACITY 0\nFULL 0\nPUSH 0 4\nCAPACITY 0\nFULL 0\nPUSH 0 5\nCAPACITY 0\nFULL 0\n",
+    "expected": {
+      "stdout": "CAPACITY 1\nFULL 1\nCAPACITY 2\nFULL 1\nCAPACITY 4\nFULL 0\nCAPACITY 4\nFULL 1\nCAPACITY 8\nFULL 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "growth-preserves-values",
+    "criterionId": "growth",
+    "public": false,
+    "description": "확장 후 모든 값 보존",
+    "input": "INIT 0\nPUSH 0 0\nPUSH 0 1\nPUSH 0 2\nPUSH 0 3\nPUSH 0 4\nPUSH 0 5\nPUSH 0 6\nPUSH 0 7\nPUSH 0 8\nDATA 0 0\nDATA 0 1\nDATA 0 2\nDATA 0 3\nDATA 0 4\nDATA 0 5\nDATA 0 6\nDATA 0 7\nDATA 0 8\nCAPACITY 0\n",
+    "expected": {
+      "stdout": "DATA 0 0\nDATA 1 1\nDATA 2 2\nDATA 3 3\nDATA 4 4\nDATA 5 5\nDATA 6 6\nDATA 7 7\nDATA 8 8\nCAPACITY 16\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "growth-over-100",
+    "criterionId": "growth",
+    "public": false,
+    "description": "100개를 넘는 삽입",
+    "input": "INIT 0\nPUSH 0 0\nPUSH 0 1\nPUSH 0 2\nPUSH 0 3\nPUSH 0 4\nPUSH 0 5\nPUSH 0 6\nPUSH 0 7\nPUSH 0 8\nPUSH 0 9\nPUSH 0 10\nPUSH 0 11\nPUSH 0 12\nPUSH 0 13\nPUSH 0 14\nPUSH 0 15\nPUSH 0 16\nPUSH 0 17\nPUSH 0 18\nPUSH 0 19\nPUSH 0 20\nPUSH 0 21\nPUSH 0 22\nPUSH 0 23\nPUSH 0 24\nPUSH 0 25\nPUSH 0 26\nPUSH 0 27\nPUSH 0 28\nPUSH 0 29\nPUSH 0 30\nPUSH 0 31\nPUSH 0 32\nPUSH 0 33\nPUSH 0 34\nPUSH 0 35\nPUSH 0 36\nPUSH 0 37\nPUSH 0 38\nPUSH 0 39\nPUSH 0 40\nPUSH 0 41\nPUSH 0 42\nPUSH 0 43\nPUSH 0 44\nPUSH 0 45\nPUSH 0 46\nPUSH 0 47\nPUSH 0 48\nPUSH 0 49\nPUSH 0 50\nPUSH 0 51\nPUSH 0 52\nPUSH 0 53\nPUSH 0 54\nPUSH 0 55\nPUSH 0 56\nPUSH 0 57\nPUSH 0 58\nPUSH 0 59\nPUSH 0 60\nPUSH 0 61\nPUSH 0 62\nPUSH 0 63\nPUSH 0 64\nPUSH 0 65\nPUSH 0 66\nPUSH 0 67\nPUSH 0 68\nPUSH 0 69\nPUSH 0 70\nPUSH 0 71\nPUSH 0 72\nPUSH 0 73\nPUSH 0 74\nPUSH 0 75\nPUSH 0 76\nPUSH 0 77\nPUSH 0 78\nPUSH 0 79\nPUSH 0 80\nPUSH 0 81\nPUSH 0 82\nPUSH 0 83\nPUSH 0 84\nPUSH 0 85\nPUSH 0 86\nPUSH 0 87\nPUSH 0 88\nPUSH 0 89\nPUSH 0 90\nPUSH 0 91\nPUSH 0 92\nPUSH 0 93\nPUSH 0 94\nPUSH 0 95\nPUSH 0 96\nPUSH 0 97\nPUSH 0 98\nPUSH 0 99\nPUSH 0 100\nPUSH 0 101\nPUSH 0 102\nPUSH 0 103\nPUSH 0 104\nPUSH 0 105\nPUSH 0 106\nPUSH 0 107\nPUSH 0 108\nPUSH 0 109\nPUSH 0 110\nPUSH 0 111\nPUSH 0 112\nPUSH 0 113\nPUSH 0 114\nPUSH 0 115\nPUSH 0 116\nPUSH 0 117\nPUSH 0 118\nPUSH 0 119\nPUSH 0 120\nPUSH 0 121\nPUSH 0 122\nPUSH 0 123\nPUSH 0 124\nPUSH 0 125\nPUSH 0 126\nPUSH 0 127\nPUSH 0 128\nCAPACITY 0\nTOP 0\nDATA 0 0\nDATA 0 64\nPEEK 0\n",
+    "expected": {
+      "stdout": "CAPACITY 256\nTOP 128\nDATA 0 0\nDATA 64 64\nPEEK 128\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "pop-one",
+    "criterionId": "pop",
+    "public": false,
+    "description": "마지막 값 삭제 후 빈 상태",
+    "input": "INIT 0\nPUSH 0 0\nPOP 0\nTOP 0\nEMPTY 0\nCAPACITY 0\n",
+    "expected": {
+      "stdout": "POP 0\nTOP -1\nEMPTY 1\nCAPACITY 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "pop-lifo",
+    "criterionId": "pop",
+    "public": false,
+    "description": "중복 값과 음수의 역순 삭제",
+    "input": "INIT 0\nPUSH 0 -7\nPUSH 0 20\nPUSH 0 20\nPUSH 0 8\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nEMPTY 0\nCAPACITY 0\n",
+    "expected": {
+      "stdout": "POP 8\nPOP 20\nPOP 20\nPOP -7\nEMPTY 1\nCAPACITY 4\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "peek-one",
+    "criterionId": "peek",
+    "public": false,
+    "description": "한 값을 반복 조회",
+    "input": "INIT 0\nPUSH 0 -12\nPEEK 0\nPEEK 0\nTOP 0\nCAPACITY 0\nPOP 0\n",
+    "expected": {
+      "stdout": "PEEK -12\nPEEK -12\nTOP 0\nCAPACITY 1\nPOP -12\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "peek-after-growth",
+    "criterionId": "peek",
+    "public": false,
+    "description": "확장 후 조회해도 값과 상태 유지",
+    "input": "INIT 0\nPUSH 0 10\nPUSH 0 20\nPUSH 0 30\nPEEK 0\nTOP 0\nCAPACITY 0\nDATA 0 0\nDATA 0 2\nPOP 0\nPEEK 0\n",
+    "expected": {
+      "stdout": "PEEK 30\nTOP 2\nCAPACITY 4\nDATA 0 10\nDATA 2 30\nPOP 30\nPEEK 20\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-pop",
+    "criterionId": "empty",
+    "public": false,
+    "description": "초기 빈 스택의 pop 오류 종료",
+    "input": "INIT 0\nPOP 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-pop-after-drain",
+    "criterionId": "empty",
+    "public": false,
+    "description": "마지막 값 삭제 후 pop 오류 종료",
+    "input": "INIT 0\nPUSH 0 5\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "POP 5\n",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-peek",
+    "criterionId": "empty",
+    "public": false,
+    "description": "초기 빈 스택의 peek 오류 종료",
+    "input": "INIT 0\nPEEK 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-peek-after-drain",
+    "criterionId": "empty",
+    "public": false,
+    "description": "마지막 값 삭제 후 peek 오류 종료",
+    "input": "INIT 0\nPUSH 0 5\nPOP 0\nPEEK 0\n",
+    "expected": {
+      "stdout": "POP 5\n",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "reuse-space",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "삭제로 비운 공간에 재삽입",
+    "input": "INIT 0\nPUSH 0 10\nPUSH 0 20\nPOP 0\nFULL 0\nPUSH 0 30\nCAPACITY 0\nFULL 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "POP 20\nFULL 0\nCAPACITY 2\nFULL 1\nPOP 30\nPOP 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-no-shrink",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "모두 삭제해도 용량을 유지",
+    "input": "INIT 0\nPUSH 0 1\nPUSH 0 2\nPUSH 0 3\nPOP 0\nPOP 0\nPOP 0\nCAPACITY 0\nEMPTY 0\nPUSH 0 9\nCAPACITY 0\nPEEK 0\n",
+    "expected": {
+      "stdout": "POP 3\nPOP 2\nPOP 1\nCAPACITY 4\nEMPTY 1\nCAPACITY 4\nPEEK 9\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-reset",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "재초기화 후 다시 확장",
+    "input": "INIT 0\nPUSH 0 1\nPUSH 0 2\nINIT 0\nPUSH 0 8\nPUSH 0 9\nCAPACITY 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "CAPACITY 2\nPOP 9\nPOP 8\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-growth",
+    "criterionId": "independence",
+    "public": false,
+    "description": "한 스택의 확장은 다른 스택에 영향 없음",
+    "input": "INIT 0\nINIT 1\nPUSH 1 90\nPUSH 0 10\nPUSH 0 20\nPUSH 0 30\nCAPACITY 0\nCAPACITY 1\nPEEK 1\nTOP 1\n",
+    "expected": {
+      "stdout": "CAPACITY 4\nCAPACITY 1\nPEEK 90\nTOP 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-reset",
+    "criterionId": "independence",
+    "public": false,
+    "description": "한 스택을 재초기화해도 다른 값 유지",
+    "input": "INIT 0\nINIT 1\nPUSH 0 10\nPUSH 1 80\nPUSH 1 90\nINIT 0\nEMPTY 0\nCAPACITY 0\nCAPACITY 1\nPOP 1\nPEEK 1\n",
+    "expected": {
+      "stdout": "EMPTY 1\nCAPACITY 1\nCAPACITY 2\nPOP 90\nPEEK 80\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-interleaved",
+    "criterionId": "independence",
+    "public": false,
+    "description": "두 스택의 교차 삽입과 삭제",
+    "input": "INIT 0\nINIT 1\nPUSH 0 1\nPUSH 1 -1\nPUSH 0 2\nPUSH 1 -2\nPOP 0\nPOP 1\nPUSH 0 3\nPUSH 1 -3\nPOP 1\nPOP 0\nPOP 1\nPOP 0\n",
+    "expected": {
+      "stdout": "POP 2\nPOP -2\nPOP -3\nPOP 3\nPOP -1\nPOP 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

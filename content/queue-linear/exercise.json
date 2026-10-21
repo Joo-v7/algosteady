@@ -1,0 +1,303 @@
+{
+  "id": "queue-linear",
+  "version": "1.0.0",
+  "title": "선형 큐",
+  "category": "queue",
+  "kind": "data-structure",
+  "description": "먼저 넣은 값을 먼저 꺼내는 FIFO 자료구조입니다. 고정 배열과 front·rear로 구현하며, 삭제한 앞 공간은 자동으로 재사용하지 않습니다.",
+  "learning": {
+    "concept": {
+      "title": "큐와 FIFO",
+      "paragraphs": [
+        "줄을 서듯이 값을 뒤에 넣고 앞에서 꺼냅니다. 10을 넣은 뒤 20을 넣으면 먼저 꺼내는 값은 10입니다.",
+        "front는 마지막으로 꺼낸 위치, rear는 마지막으로 넣은 위치입니다. 초기값은 모두 -1이고 실제 값은 front + 1부터 rear까지 저장됩니다.",
+        "선형 큐는 두 인덱스가 앞으로만 이동합니다. rear가 배열 끝에 도달하면 앞 공간이 비어 있어도 삽입할 수 없습니다. 이 한계를 원형 큐에서 해결합니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "data",
+        "description": "정수 5개를 저장하는 고정 배열입니다."
+      },
+      {
+        "name": "front",
+        "description": "마지막으로 삭제한 위치입니다. 다음 삭제는 front + 1에서 수행합니다."
+      },
+      {
+        "name": "rear",
+        "description": "마지막으로 삽입한 위치입니다. 다음 삽입은 rear + 1에서 수행합니다."
+      },
+      {
+        "name": "QueueType",
+        "description": "배열과 두 인덱스를 묶어 큐별로 독립적으로 관리합니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "init_queue",
+        "description": "front와 rear를 모두 -1로 설정합니다. 배열을 0으로 채울 필요는 없습니다."
+      },
+      {
+        "function": "is_empty",
+        "description": "front와 rear가 같으면 1, 아니면 0을 반환합니다. 큐를 변경하지 않습니다."
+      },
+      {
+        "function": "is_full",
+        "description": "rear가 MAX_QUEUE_SIZE - 1이면 1, 아니면 0을 반환합니다. 삭제한 앞 공간은 재사용하지 않습니다."
+      },
+      {
+        "function": "enqueue",
+        "description": "포화 여부를 검사한 뒤 rear를 증가시키고 값을 저장합니다. 포화 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "function": "dequeue",
+        "description": "빈 상태를 검사한 뒤 front를 증가시키고 해당 위치의 값을 반환합니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "init_queue",
+        "argument": null,
+        "result": null,
+        "values": [],
+        "front": -1,
+        "rear": -1
+      },
+      {
+        "operation": "enqueue",
+        "argument": 10,
+        "result": null,
+        "values": [
+          10
+        ],
+        "front": -1,
+        "rear": 0
+      },
+      {
+        "operation": "enqueue",
+        "argument": 20,
+        "result": null,
+        "values": [
+          10,
+          20
+        ],
+        "front": -1,
+        "rear": 1
+      },
+      {
+        "operation": "dequeue",
+        "argument": null,
+        "result": 10,
+        "values": [
+          20
+        ],
+        "front": 0,
+        "rear": 1
+      },
+      {
+        "operation": "enqueue",
+        "argument": 30,
+        "result": null,
+        "values": [
+          20,
+          30
+        ],
+        "front": 0,
+        "rear": 2
+      },
+      {
+        "operation": "dequeue",
+        "argument": null,
+        "result": 20,
+        "values": [
+          30
+        ],
+        "front": 1,
+        "rear": 2
+      },
+      {
+        "operation": "dequeue",
+        "argument": null,
+        "result": 30,
+        "values": [],
+        "front": 2,
+        "rear": 2
+      }
+    ]
+  },
+  "contract": {
+    "scope": "제공된 QueueType을 사용해 5개 함수의 정의와 본문 전체를 구현합니다.",
+    "capacity": 5,
+    "valueRange": {
+      "min": -1000000,
+      "max": 1000000
+    },
+    "initialFront": -1,
+    "initialRear": -1,
+    "booleanResult": {
+      "true": 1,
+      "false": 0
+    },
+    "functions": [
+      {
+        "name": "init_queue",
+        "signature": "void init_queue(QueueType *q)",
+        "behavior": "front와 rear를 모두 -1로 설정합니다. 배열을 0으로 채울 필요는 없습니다."
+      },
+      {
+        "name": "is_empty",
+        "signature": "int is_empty(QueueType *q)",
+        "behavior": "front와 rear가 같으면 1, 아니면 0을 반환합니다. 큐를 변경하지 않습니다."
+      },
+      {
+        "name": "is_full",
+        "signature": "int is_full(QueueType *q)",
+        "behavior": "rear가 MAX_QUEUE_SIZE - 1이면 1, 아니면 0을 반환합니다. 삭제한 앞 공간은 재사용하지 않습니다."
+      },
+      {
+        "name": "enqueue",
+        "signature": "void enqueue(QueueType *q, element item)",
+        "behavior": "포화 여부를 검사한 뒤 rear를 증가시키고 값을 저장합니다. 포화 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "name": "dequeue",
+        "signature": "element dequeue(QueueType *q)",
+        "behavior": "빈 상태를 검사한 뒤 front를 증가시키고 해당 위치의 값을 반환합니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      }
+    ],
+    "errorHandling": {
+      "overflow": "stderr에 오류를 출력하고 exit(1)로 종료합니다.",
+      "underflow": "stderr에 오류를 출력하고 exit(1)로 종료합니다.",
+      "exactMessageRequired": false
+    },
+    "requirements": [
+      "상수, 자료형, 구조체 필드와 함수 호출 규격을 유지합니다.",
+      "인덱스를 순환시키거나 값을 앞으로 옮기지 않습니다. 초기화로만 front와 rear를 -1로 되돌립니다.",
+      "각 함수는 전달받은 큐만 조작합니다. 다른 큐에 영향을 주지 않습니다.",
+      "정상 연산은 stdout와 stderr에 출력하지 않습니다. main()과 출력은 테스트 호출 코드가 담당합니다.",
+      "유효한 구조체 포인터와 초기화된 큐를 전달합니다. NULL 포인터 처리는 실습 범위에 포함하지 않습니다."
+    ],
+    "assessmentScope": "출력과 구조체 상태를 검사합니다. 코드 스타일과 시간 복잡도는 정적으로 검사하지 않습니다."
+  },
+  "prerequisites": [],
+  "criteria": [
+    {
+      "id": "initialization",
+      "order": 1,
+      "title": "초기화",
+      "description": "두 인덱스의 초기값과 빈 상태를 확인합니다."
+    },
+    {
+      "id": "enqueue",
+      "order": 2,
+      "title": "삽입",
+      "description": "rear 증가와 배열 저장을 확인합니다."
+    },
+    {
+      "id": "dequeue",
+      "order": 3,
+      "title": "FIFO 삭제",
+      "description": "입력 순서대로 삭제하고 front만 증가하는지 확인합니다."
+    },
+    {
+      "id": "empty",
+      "order": 4,
+      "title": "빈 큐 처리",
+      "description": "초기 및 삭제 후 빈 상태와 오류 종료를 확인합니다."
+    },
+    {
+      "id": "full",
+      "order": 5,
+      "title": "포화 상태 처리",
+      "description": "다섯 칸의 사용과 초과 삽입 오류를 확인합니다."
+    },
+    {
+      "id": "linear",
+      "order": 6,
+      "title": "선형 인덱스",
+      "description": "삭제한 공간을 재사용하거나 인덱스를 되돌리지 않는지 확인합니다."
+    },
+    {
+      "id": "reset",
+      "order": 7,
+      "title": "재초기화",
+      "description": "값이 있거나 모두 삭제한 큐를 다시 초기화합니다."
+    },
+    {
+      "id": "independence",
+      "order": 8,
+      "title": "큐 독립성",
+      "description": "두 큐의 값과 인덱스를 독립적으로 관리합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "init_queue",
+          "description": "front와 rear를 모두 -1로 설정합니다. 배열을 0으로 채울 필요는 없습니다."
+        },
+        {
+          "function": "is_empty",
+          "description": "front와 rear가 같으면 1, 아니면 0을 반환합니다. 큐를 변경하지 않습니다."
+        },
+        {
+          "function": "is_full",
+          "description": "rear가 MAX_QUEUE_SIZE - 1이면 1, 아니면 0을 반환합니다. 삭제한 앞 공간은 재사용하지 않습니다."
+        },
+        {
+          "function": "enqueue",
+          "description": "포화 여부를 검사한 뒤 rear를 증가시키고 값을 저장합니다. 포화 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        },
+        {
+          "function": "dequeue",
+          "description": "빈 상태를 검사한 뒤 front를 증가시키고 해당 위치의 값을 반환합니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "명령과 큐 번호(0 또는 1)를 한 줄씩 입력합니다. 사용 전 INIT으로 초기화합니다. INIT과 ENQUEUE는 출력하지 않습니다. FRONT, REAR, DATA는 테스트용 상태 검사 명령입니다.",
+        "commands": [
+          {
+            "syntax": "INIT <queueId>",
+            "output": null
+          },
+          {
+            "syntax": "ENQUEUE <queueId> <value>",
+            "output": null
+          },
+          {
+            "syntax": "DEQUEUE <queueId>",
+            "output": "DEQUEUE <value>"
+          },
+          {
+            "syntax": "EMPTY <queueId>",
+            "output": "EMPTY <0|1>"
+          },
+          {
+            "syntax": "FULL <queueId>",
+            "output": "FULL <0|1>"
+          },
+          {
+            "syntax": "FRONT <queueId>",
+            "output": "FRONT <index>"
+          },
+          {
+            "syntax": "REAR <queueId>",
+            "output": "REAR <index>"
+          },
+          {
+            "syntax": "DATA <queueId> <index>",
+            "output": "DATA <index> <value>"
+          }
+        ],
+        "harnessErrorExitCode": 2,
+        "harnessErrors": "잘못된 명령, 큐 번호, 누락된 인자와 배열 위치는 호출 코드 입력 오류입니다."
+      }
+    }
+  }
+}

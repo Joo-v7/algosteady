@@ -1,0 +1,317 @@
+{
+  "id": "stack-dynamic",
+  "version": "1.0.0",
+  "title": "동적 배열 스택",
+  "category": "stack",
+  "kind": "data-structure",
+  "description": "고정 크기 대신 동적 배열을 사용합니다. 저장 공간이 가득 차면 용량을 2배로 늘리고, 기존 값을 유지하면서 삽입을 계속합니다.",
+  "learning": {
+    "concept": {
+      "title": "필요할 때 커지는 스택",
+      "paragraphs": [
+        "나중에 넣은 값을 먼저 꺼내는 LIFO 원리는 고정 배열 스택과 같습니다. 차이는 배열을 포인터로 관리하고 실행 중에 저장 공간을 늘린다는 점입니다.",
+        "초기 용량은 1입니다. 공간이 가득 차면 다음 삽입에서 용량을 2배로 늘립니다. 용량은 1, 2, 4, 8 순서로 증가하며 삭제할 때 줄이지 않습니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "data",
+        "description": "malloc으로 확보한 정수 배열을 가리키는 포인터입니다."
+      },
+      {
+        "name": "capacity",
+        "description": "현재 할당된 배열의 칸 수입니다. 저장 개수 top + 1과 구분합니다."
+      },
+      {
+        "name": "top",
+        "description": "맨 위 값의 인덱스입니다. 빈 상태는 -1입니다."
+      },
+      {
+        "name": "StackType",
+        "description": "배열 포인터와 용량, top을 묶어 스택별로 독립적으로 관리합니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "init_stack",
+        "description": "top을 -1, capacity를 1로 설정하고 malloc으로 정수 한 개의 공간을 할당합니다."
+      },
+      {
+        "function": "is_empty",
+        "description": "top이 -1이면 1, 아니면 0을 반환합니다. 스택을 변경하지 않습니다."
+      },
+      {
+        "function": "is_full",
+        "description": "top이 capacity - 1이면 1, 아니면 0을 반환합니다. 현재 할당 공간의 포화 여부이며 추가 삽입을 금지한다는 뜻은 아닙니다."
+      },
+      {
+        "function": "push",
+        "description": "현재 공간이 가득 차면 realloc으로 용량을 2배로 늘리고 기존 값을 보존합니다. top을 증가시킨 뒤 새 값을 저장합니다."
+      },
+      {
+        "function": "pop",
+        "description": "맨 위 값을 반환하고 top을 감소시킵니다. 용량은 줄이지 않습니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "function": "peek",
+        "description": "맨 위 값을 반환하고 값, top, capacity를 유지합니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "init_stack",
+        "argument": null,
+        "result": null,
+        "values": [],
+        "top": -1,
+        "capacity": 1
+      },
+      {
+        "operation": "push",
+        "argument": 10,
+        "result": null,
+        "values": [
+          10
+        ],
+        "top": 0,
+        "capacity": 1
+      },
+      {
+        "operation": "push",
+        "argument": 20,
+        "result": null,
+        "values": [
+          10,
+          20
+        ],
+        "top": 1,
+        "capacity": 2
+      },
+      {
+        "operation": "push",
+        "argument": 30,
+        "result": null,
+        "values": [
+          10,
+          20,
+          30
+        ],
+        "top": 2,
+        "capacity": 4
+      },
+      {
+        "operation": "peek",
+        "argument": null,
+        "result": 30,
+        "values": [
+          10,
+          20,
+          30
+        ],
+        "top": 2,
+        "capacity": 4
+      },
+      {
+        "operation": "pop",
+        "argument": null,
+        "result": 30,
+        "values": [
+          10,
+          20
+        ],
+        "top": 1,
+        "capacity": 4
+      }
+    ]
+  },
+  "contract": {
+    "scope": "제공된 StackType을 사용해 6개 함수의 정의와 본문 전체를 구현합니다.",
+    "valueRange": {
+      "min": -1000000,
+      "max": 1000000
+    },
+    "initialTop": -1,
+    "booleanResult": {
+      "true": 1,
+      "false": 0
+    },
+    "functions": [
+      {
+        "name": "init_stack",
+        "signature": "void init_stack(StackType *s)",
+        "behavior": "top을 -1, capacity를 1로 설정하고 malloc으로 정수 한 개의 공간을 할당합니다."
+      },
+      {
+        "name": "is_empty",
+        "signature": "int is_empty(StackType *s)",
+        "behavior": "top이 -1이면 1, 아니면 0을 반환합니다. 스택을 변경하지 않습니다."
+      },
+      {
+        "name": "is_full",
+        "signature": "int is_full(StackType *s)",
+        "behavior": "top이 capacity - 1이면 1, 아니면 0을 반환합니다. 현재 할당 공간의 포화 여부이며 추가 삽입을 금지한다는 뜻은 아닙니다."
+      },
+      {
+        "name": "push",
+        "signature": "void push(StackType *s, element item)",
+        "behavior": "현재 공간이 가득 차면 realloc으로 용량을 2배로 늘리고 기존 값을 보존합니다. top을 증가시킨 뒤 새 값을 저장합니다."
+      },
+      {
+        "name": "pop",
+        "signature": "element pop(StackType *s)",
+        "behavior": "맨 위 값을 반환하고 top을 감소시킵니다. 용량은 줄이지 않습니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "name": "peek",
+        "signature": "element peek(StackType *s)",
+        "behavior": "맨 위 값을 반환하고 값, top, capacity를 유지합니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      }
+    ],
+    "errorHandling": {
+      "allocationFailure": "메모리 할당에 실패하면 stderr에 오류를 출력하고 exit(1)로 종료합니다. 채점에서는 할당 실패를 강제로 발생시키지 않습니다.",
+      "underflow": "stderr에 오류를 출력하고 exit(1)로 종료합니다.",
+      "exactMessageRequired": false
+    },
+    "requirements": [
+      "제공된 자료형, 구조체 필드와 함수 호출 규격을 유지합니다.",
+      "각 함수는 전달받은 스택을 조작하며 다른 스택에 영향을 주지 않습니다.",
+      "정상 연산은 stdout와 stderr에 출력하지 않습니다. 출력은 호출 코드가 담당합니다.",
+      "main()과 메모리 해제는 테스트 호출 코드가 담당합니다. 재초기화 전에도 기존 배열을 먼저 해제합니다.",
+      "유효한 구조체 포인터와 초기화된 스택을 전달합니다. NULL 포인터 처리와 정수 범위 초과는 실습 범위에 포함하지 않습니다."
+    ],
+    "assessmentScope": "동작과 제공된 구조체 상태를 검사합니다. 코드 스타일, 시간 복잡도와 배열 외 보조 저장소 사용 여부를 정적으로 검사하지 않습니다.",
+    "initialCapacity": 1,
+    "growthFactor": 2
+  },
+  "prerequisites": [
+    "stack-array"
+  ],
+  "criteria": [
+    {
+      "id": "initialization",
+      "order": 1,
+      "title": "초기화",
+      "description": "초기 용량 1과 빈 상태를 확인합니다."
+    },
+    {
+      "id": "push",
+      "order": 2,
+      "title": "삽입",
+      "description": "첫 값과 다양한 정수의 저장을 확인합니다."
+    },
+    {
+      "id": "growth",
+      "order": 3,
+      "title": "용량 확장",
+      "description": "포화 시 2배 확장과 기존 값 보존을 확인합니다."
+    },
+    {
+      "id": "pop",
+      "order": 4,
+      "title": "LIFO 삭제",
+      "description": "역순 삭제와 삭제 후 상태를 확인합니다."
+    },
+    {
+      "id": "peek",
+      "order": 5,
+      "title": "조회",
+      "description": "반복 조회 후에도 값과 상태가 유지되는지 확인합니다."
+    },
+    {
+      "id": "empty",
+      "order": 6,
+      "title": "빈 스택 처리",
+      "description": "빈 pop과 peek의 오류 출력을 확인합니다."
+    },
+    {
+      "id": "reuse",
+      "order": 7,
+      "title": "경계와 재사용",
+      "description": "삭제와 재초기화 후 재사용을 확인합니다."
+    },
+    {
+      "id": "independence",
+      "order": 8,
+      "title": "스택 독립성",
+      "description": "두 스택의 값과 용량이 독립적인지 확인합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "init_stack",
+          "description": "top을 -1, capacity를 1로 설정하고 malloc으로 정수 한 개의 공간을 할당합니다."
+        },
+        {
+          "function": "is_empty",
+          "description": "top이 -1이면 1, 아니면 0을 반환합니다. 스택을 변경하지 않습니다."
+        },
+        {
+          "function": "is_full",
+          "description": "top이 capacity - 1이면 1, 아니면 0을 반환합니다. 현재 할당 공간의 포화 여부이며 추가 삽입을 금지한다는 뜻은 아닙니다."
+        },
+        {
+          "function": "push",
+          "description": "현재 공간이 가득 차면 realloc으로 용량을 2배로 늘리고 기존 값을 보존합니다. top을 증가시킨 뒤 새 값을 저장합니다."
+        },
+        {
+          "function": "pop",
+          "description": "맨 위 값을 반환하고 top을 감소시킵니다. 용량은 줄이지 않습니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        },
+        {
+          "function": "peek",
+          "description": "맨 위 값을 반환하고 값, top, capacity를 유지합니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "명령과 스택 번호(0 또는 1)를 한 줄씩 입력합니다. 사용 전 INIT으로 초기화합니다. INIT과 PUSH는 출력하지 않으며 CAPACITY, TOP, DATA는 테스트용 상태 검사 명령입니다. 재초기화 전과 정상 종료 시 호출 코드가 배열을 해제합니다.",
+        "commands": [
+          {
+            "syntax": "INIT <stackId>",
+            "output": null
+          },
+          {
+            "syntax": "PUSH <stackId> <value>",
+            "output": null
+          },
+          {
+            "syntax": "POP <stackId>",
+            "output": "POP <value>"
+          },
+          {
+            "syntax": "PEEK <stackId>",
+            "output": "PEEK <value>"
+          },
+          {
+            "syntax": "EMPTY <stackId>",
+            "output": "EMPTY <0|1>"
+          },
+          {
+            "syntax": "FULL <stackId>",
+            "output": "FULL <0|1>"
+          },
+          {
+            "syntax": "TOP <stackId>",
+            "output": "TOP <index>"
+          },
+          {
+            "syntax": "DATA <stackId> <index>",
+            "output": "DATA <index> <value>"
+          },
+          {
+            "syntax": "CAPACITY <stackId>",
+            "output": "CAPACITY <capacity>"
+          }
+        ],
+        "harnessErrorExitCode": 2,
+        "harnessErrors": "잘못된 명령, 스택 번호, 누락된 인자 또는 배열 위치는 호출 코드 입력 오류입니다. 과제 테스트 입력의 오류로 구분합니다."
+      }
+    }
+  }
+}

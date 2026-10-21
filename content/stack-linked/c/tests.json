@@ -1,0 +1,338 @@
+[
+  {
+    "id": "init-empty",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "초기 top은 NULL이며 공백",
+    "input": "INIT 0\nEMPTY 0\nSIZE 0\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "EMPTY 1\nSIZE 0\nSTATE\nSTATS 0 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "init-repeat",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "빈 스택을 여러 번 초기화",
+    "input": "INIT 0\nINIT 0\nINIT 0\nEMPTY 0\nFULL 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "EMPTY 1\nFULL 0\nSTATS 0 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "init-both",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "두 스택의 초기 상태",
+    "input": "INIT 0\nINIT 1\nEMPTY 0\nEMPTY 1\nSIZE 1\n",
+    "expected": {
+      "stdout": "EMPTY 1\nEMPTY 1\nSIZE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "push-one",
+    "criterionId": "push",
+    "public": false,
+    "description": "첫 노드 생성과 top 연결",
+    "input": "INIT 0\nPUSH 0 10\nEMPTY 0\nSTATE 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "EMPTY 0\nSTATE 10\nSIZE 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "push-many",
+    "criterionId": "push",
+    "public": false,
+    "description": "기존 노드를 보존하는 연속 삽입",
+    "input": "INIT 0\nPUSH 0 10\nPUSH 0 20\nPUSH 0 30\nSTATE 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "STATE 30 20 10\nSIZE 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "push-values",
+    "criterionId": "push",
+    "public": false,
+    "description": "0과 음수·중복 값 삽입",
+    "input": "INIT 0\nPUSH 0 0\nPUSH 0 -1000000\nPUSH 0 1000000\nPUSH 0 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "STATE 0 1000000 -1000000 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "pop-lifo",
+    "criterionId": "pop",
+    "public": true,
+    "description": "나중에 삽입한 값부터 반환",
+    "input": "INIT 0\nPUSH 0 10\nPUSH 0 20\nPUSH 0 30\nPOP 0\nPOP 0\nPOP 0\nEMPTY 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "POP 30\nPOP 20\nPOP 10\nEMPTY 1\nSIZE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "pop-one",
+    "criterionId": "pop",
+    "public": false,
+    "description": "단일 노드 제거 후 top은 NULL",
+    "input": "INIT 0\nPUSH 0 -5\nPOP 0\nSTATE 0\nEMPTY 0\n",
+    "expected": {
+      "stdout": "POP -5\nSTATE\nEMPTY 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "pop-next",
+    "criterionId": "pop",
+    "public": false,
+    "description": "삭제 후 다음 노드로 top 이동",
+    "input": "INIT 0\nPUSH 0 10\nPUSH 0 20\nPUSH 0 30\nPOP 0\nSTATE 0\nPEEK 0\nPOP 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "POP 30\nSTATE 20 10\nPEEK 20\nPOP 20\nSTATE 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "peek-one",
+    "criterionId": "peek",
+    "public": false,
+    "description": "조회 후 노드와 할당 상태 유지",
+    "input": "INIT 0\nPUSH 0 7\nPEEK 0\nPEEK 0\nSTATE 0\nSTATS 0\nPOP 0\n",
+    "expected": {
+      "stdout": "PEEK 7\nPEEK 7\nSTATE 7\nSTATS 1 0\nPOP 7\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "peek-many",
+    "criterionId": "peek",
+    "public": false,
+    "description": "여러 노드에서 조회 후 삭제",
+    "input": "INIT 0\nPUSH 0 10\nPUSH 0 20\nPUSH 0 30\nPEEK 0\nPEEK 0\nSIZE 0\nSTATE 0\nPOP 0\nPEEK 0\n",
+    "expected": {
+      "stdout": "PEEK 30\nPEEK 30\nSIZE 3\nSTATE 30 20 10\nPOP 30\nPEEK 20\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-pop",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 스택 pop 오류",
+    "input": "INIT 0\nPOP 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-peek",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 스택 peek 오류",
+    "input": "INIT 0\nPEEK 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-pop-after-delete",
+    "criterionId": "empty",
+    "public": false,
+    "description": "마지막 삭제 후 pop 오류",
+    "input": "INIT 0\nPUSH 0 1\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "POP 1\n",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-peek-after-delete",
+    "criterionId": "empty",
+    "public": false,
+    "description": "마지막 삭제 후 peek 오류",
+    "input": "INIT 0\nPUSH 0 2\nPOP 0\nPEEK 0\n",
+    "expected": {
+      "stdout": "POP 2\n",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "full-always-zero",
+    "criterionId": "full",
+    "public": false,
+    "description": "빈 상태·삽입·삭제 후 포화 판정",
+    "input": "INIT 0\nFULL 0\nPUSH 0 1\nFULL 0\nPUSH 0 2\nFULL 0\nPOP 0\nFULL 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "FULL 0\nFULL 0\nFULL 0\nPOP 2\nFULL 0\nSTATE 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "full-many",
+    "criterionId": "full",
+    "public": false,
+    "description": "고정 배열 크기보다 많은 120개 노드",
+    "input": "INIT 0\nPUSH 0 0\nPUSH 0 1\nPUSH 0 2\nPUSH 0 3\nPUSH 0 4\nPUSH 0 5\nPUSH 0 6\nPUSH 0 7\nPUSH 0 8\nPUSH 0 9\nPUSH 0 10\nPUSH 0 11\nPUSH 0 12\nPUSH 0 13\nPUSH 0 14\nPUSH 0 15\nPUSH 0 16\nPUSH 0 17\nPUSH 0 18\nPUSH 0 19\nPUSH 0 20\nPUSH 0 21\nPUSH 0 22\nPUSH 0 23\nPUSH 0 24\nPUSH 0 25\nPUSH 0 26\nPUSH 0 27\nPUSH 0 28\nPUSH 0 29\nPUSH 0 30\nPUSH 0 31\nPUSH 0 32\nPUSH 0 33\nPUSH 0 34\nPUSH 0 35\nPUSH 0 36\nPUSH 0 37\nPUSH 0 38\nPUSH 0 39\nPUSH 0 40\nPUSH 0 41\nPUSH 0 42\nPUSH 0 43\nPUSH 0 44\nPUSH 0 45\nPUSH 0 46\nPUSH 0 47\nPUSH 0 48\nPUSH 0 49\nPUSH 0 50\nPUSH 0 51\nPUSH 0 52\nPUSH 0 53\nPUSH 0 54\nPUSH 0 55\nPUSH 0 56\nPUSH 0 57\nPUSH 0 58\nPUSH 0 59\nPUSH 0 60\nPUSH 0 61\nPUSH 0 62\nPUSH 0 63\nPUSH 0 64\nPUSH 0 65\nPUSH 0 66\nPUSH 0 67\nPUSH 0 68\nPUSH 0 69\nPUSH 0 70\nPUSH 0 71\nPUSH 0 72\nPUSH 0 73\nPUSH 0 74\nPUSH 0 75\nPUSH 0 76\nPUSH 0 77\nPUSH 0 78\nPUSH 0 79\nPUSH 0 80\nPUSH 0 81\nPUSH 0 82\nPUSH 0 83\nPUSH 0 84\nPUSH 0 85\nPUSH 0 86\nPUSH 0 87\nPUSH 0 88\nPUSH 0 89\nPUSH 0 90\nPUSH 0 91\nPUSH 0 92\nPUSH 0 93\nPUSH 0 94\nPUSH 0 95\nPUSH 0 96\nPUSH 0 97\nPUSH 0 98\nPUSH 0 99\nPUSH 0 100\nPUSH 0 101\nPUSH 0 102\nPUSH 0 103\nPUSH 0 104\nPUSH 0 105\nPUSH 0 106\nPUSH 0 107\nPUSH 0 108\nPUSH 0 109\nPUSH 0 110\nPUSH 0 111\nPUSH 0 112\nPUSH 0 113\nPUSH 0 114\nPUSH 0 115\nPUSH 0 116\nPUSH 0 117\nPUSH 0 118\nPUSH 0 119\nFULL 0\nSIZE 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nEMPTY 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "FULL 0\nSIZE 120\nPOP 119\nPOP 118\nPOP 117\nPOP 116\nPOP 115\nPOP 114\nPOP 113\nPOP 112\nPOP 111\nPOP 110\nPOP 109\nPOP 108\nPOP 107\nPOP 106\nPOP 105\nPOP 104\nPOP 103\nPOP 102\nPOP 101\nPOP 100\nPOP 99\nPOP 98\nPOP 97\nPOP 96\nPOP 95\nPOP 94\nPOP 93\nPOP 92\nPOP 91\nPOP 90\nPOP 89\nPOP 88\nPOP 87\nPOP 86\nPOP 85\nPOP 84\nPOP 83\nPOP 82\nPOP 81\nPOP 80\nPOP 79\nPOP 78\nPOP 77\nPOP 76\nPOP 75\nPOP 74\nPOP 73\nPOP 72\nPOP 71\nPOP 70\nPOP 69\nPOP 68\nPOP 67\nPOP 66\nPOP 65\nPOP 64\nPOP 63\nPOP 62\nPOP 61\nPOP 60\nPOP 59\nPOP 58\nPOP 57\nPOP 56\nPOP 55\nPOP 54\nPOP 53\nPOP 52\nPOP 51\nPOP 50\nPOP 49\nPOP 48\nPOP 47\nPOP 46\nPOP 45\nPOP 44\nPOP 43\nPOP 42\nPOP 41\nPOP 40\nPOP 39\nPOP 38\nPOP 37\nPOP 36\nPOP 35\nPOP 34\nPOP 33\nPOP 32\nPOP 31\nPOP 30\nPOP 29\nPOP 28\nPOP 27\nPOP 26\nPOP 25\nPOP 24\nPOP 23\nPOP 22\nPOP 21\nPOP 20\nPOP 19\nPOP 18\nPOP 17\nPOP 16\nPOP 15\nPOP 14\nPOP 13\nPOP 12\nPOP 11\nPOP 10\nPOP 9\nPOP 8\nPOP 7\nPOP 6\nPOP 5\nPOP 4\nPOP 3\nPOP 2\nPOP 1\nPOP 0\nEMPTY 1\nSTATS 120 120\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-empty",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "빈 스택은 NULL 한 줄 출력",
+    "input": "INIT 0\nPRINT 0\n",
+    "expected": {
+      "stdout": "NULL\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-single",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "단일 값 출력 후 상태 유지",
+    "input": "INIT 0\nPUSH 0 0\nPRINT 0\nSIZE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "0->NULL\nSIZE 1\nSTATS 1 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-many",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "top부터 출력하고 연결 보존",
+    "input": "INIT 0\nPUSH 0 10\nPUSH 0 20\nPUSH 0 30\nPRINT 0\nPRINT 0\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "30->20->10->NULL\n30->20->10->NULL\nSTATE 30 20 10\nSTATS 3 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-one",
+    "criterionId": "memory",
+    "public": false,
+    "description": "삽입 한 번·삭제 한 번의 할당과 해제",
+    "input": "INIT 0\nPUSH 0 5\nSTATS 0\nPOP 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATS 1 0\nPOP 5\nSTATS 1 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-all",
+    "criterionId": "memory",
+    "public": false,
+    "description": "모든 노드 해제",
+    "input": "INIT 0\nPUSH 0 10\nPUSH 0 20\nPUSH 0 30\nSTATS 0\nPOP 0\nSTATS 0\nPOP 0\nPOP 0\nSTATS 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "STATS 3 0\nPOP 30\nSTATS 3 1\nPOP 20\nPOP 10\nSTATS 3 3\nSIZE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-observe",
+    "criterionId": "memory",
+    "public": false,
+    "description": "조회와 판정은 할당·해제하지 않음",
+    "input": "INIT 0\nPUSH 0 10\nPUSH 0 20\nPUSH 0 30\nPEEK 0\nEMPTY 0\nFULL 0\nPRINT 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "PEEK 30\nEMPTY 0\nFULL 0\n30->20->10->NULL\nSTATS 3 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-empty",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "전체 삭제 후 재삽입",
+    "input": "INIT 0\nPUSH 0 1\nPOP 0\nPUSH 0 2\nPUSH 0 3\nSTATE 0\nPOP 0\nPOP 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "POP 1\nSTATE 3 2\nPOP 3\nPOP 2\nSTATS 3 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-init",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "남은 노드 정리 후 재초기화",
+    "input": "INIT 0\nPUSH 0 10\nPUSH 0 20\nPUSH 0 30\nINIT 0\nEMPTY 0\nSIZE 0\nSTATS 0\nPUSH 0 99\nPEEK 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "EMPTY 1\nSIZE 0\nSTATS 3 3\nPEEK 99\nSTATE 99\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-repeat",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "삽입·삭제 반복 후 빈 상태",
+    "input": "INIT 0\nPUSH 0 0\nPOP 0\nPUSH 0 1\nPOP 0\nPUSH 0 2\nPOP 0\nPUSH 0 3\nPOP 0\nPUSH 0 4\nPOP 0\nPUSH 0 5\nPOP 0\nPUSH 0 6\nPOP 0\nPUSH 0 7\nPOP 0\nPUSH 0 8\nPOP 0\nPUSH 0 9\nPOP 0\nPUSH 0 10\nPOP 0\nPUSH 0 11\nPOP 0\nEMPTY 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "POP 0\nPOP 1\nPOP 2\nPOP 3\nPOP 4\nPOP 5\nPOP 6\nPOP 7\nPOP 8\nPOP 9\nPOP 10\nPOP 11\nEMPTY 1\nSTATS 12 12\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent",
+    "criterionId": "independence",
+    "public": false,
+    "description": "두 스택의 독립적인 삽입·삭제",
+    "input": "INIT 0\nINIT 1\nPUSH 0 10\nPUSH 1 100\nPUSH 0 20\nPUSH 1 200\nPOP 0\nSTATE 0\nSTATE 1\nPEEK 1\nPOP 1\nPOP 0\nSTATE 1\n",
+    "expected": {
+      "stdout": "POP 20\nSTATE 10\nSTATE 200 100\nPEEK 200\nPOP 200\nPOP 10\nSTATE 100\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-init",
+    "criterionId": "independence",
+    "public": false,
+    "description": "한 스택 초기화가 다른 스택에 영향 없음",
+    "input": "INIT 0\nINIT 1\nPUSH 0 1\nPUSH 1 2\nPUSH 1 3\nINIT 0\nPUSH 0 4\nSTATE 0\nSTATE 1\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATE 4\nSTATE 3 2\nSTATS 4 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

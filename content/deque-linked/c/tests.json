@@ -1,0 +1,422 @@
+[
+  {
+    "id": "init-empty",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "빈 덱의 두 포인터",
+    "input": "INIT 0\nEMPTY 0\nENDS 0\nSTATE 0\nREVERSE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "EMPTY 1\nENDS NULL NULL\nSTATE\nREVERSE\nSTATS 0 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "init-repeat",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "빈 덱의 반복 초기화",
+    "input": "INIT 0\nINIT 0\nINIT 1\nEMPTY 0\nEMPTY 1\nENDS 1\n",
+    "expected": {
+      "stdout": "EMPTY 1\nEMPTY 1\nENDS NULL NULL\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "add-front-one",
+    "criterionId": "add-front",
+    "public": false,
+    "description": "빈 덱 앞 삽입",
+    "input": "INIT 0\nADD_FRONT 0 10\nSTATE 0\nREVERSE 0\nENDS 0\n",
+    "expected": {
+      "stdout": "STATE 10\nREVERSE 10\nENDS 10 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "add-front-many",
+    "criterionId": "add-front",
+    "public": false,
+    "description": "앞 삽입과 기존 링크 보존",
+    "input": "INIT 0\nADD_FRONT 0 10\nADD_FRONT 0 20\nADD_FRONT 0 30\nSTATE 0\nREVERSE 0\nENDS 0\n",
+    "expected": {
+      "stdout": "STATE 30 20 10\nREVERSE 10 20 30\nENDS 30 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "add-front-values",
+    "criterionId": "add-front",
+    "public": false,
+    "description": "0·음수·중복 앞 삽입",
+    "input": "INIT 0\nADD_FRONT 0 0\nADD_FRONT 0 -1000000\nADD_FRONT 0 1000000\nADD_FRONT 0 0\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE 0 1000000 -1000000 0\nREVERSE 0 -1000000 1000000 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "add-rear-one",
+    "criterionId": "add-rear",
+    "public": false,
+    "description": "빈 덱 뒤 삽입",
+    "input": "INIT 0\nADD_REAR 0 7\nSTATE 0\nREVERSE 0\nENDS 0\n",
+    "expected": {
+      "stdout": "STATE 7\nREVERSE 7\nENDS 7 7\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "add-rear-many",
+    "criterionId": "add-rear",
+    "public": false,
+    "description": "뒤 삽입과 기존 링크 보존",
+    "input": "INIT 0\nADD_REAR 0 10\nADD_REAR 0 20\nADD_REAR 0 30\nSTATE 0\nREVERSE 0\nENDS 0\n",
+    "expected": {
+      "stdout": "STATE 10 20 30\nREVERSE 30 20 10\nENDS 10 30\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "add-rear-values",
+    "criterionId": "add-rear",
+    "public": false,
+    "description": "음수·중복 뒤 삽입",
+    "input": "INIT 0\nADD_REAR 0 -7\nADD_REAR 0 0\nADD_REAR 0 -7\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE -7 0 -7\nREVERSE -7 0 -7\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-front-order",
+    "criterionId": "delete-front",
+    "public": true,
+    "description": "앞 삭제의 반환 순서",
+    "input": "INIT 0\nADD_REAR 0 10\nADD_REAR 0 20\nADD_REAR 0 30\nDELETE_FRONT 0\nSTATE 0\nREVERSE 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nENDS 0\n",
+    "expected": {
+      "stdout": "DELETE_FRONT 10\nSTATE 20 30\nREVERSE 30 20\nDELETE_FRONT 20\nDELETE_FRONT 30\nENDS NULL NULL\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-front-only",
+    "criterionId": "delete-front",
+    "public": false,
+    "description": "유일한 노드 앞 삭제",
+    "input": "INIT 0\nADD_REAR 0 9\nDELETE_FRONT 0\nENDS 0\nEMPTY 0\n",
+    "expected": {
+      "stdout": "DELETE_FRONT 9\nENDS NULL NULL\nEMPTY 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-front-links",
+    "criterionId": "delete-front",
+    "public": false,
+    "description": "앞 삭제 후 새 front의 왼쪽 NULL",
+    "input": "INIT 0\nADD_REAR 0 10\nADD_REAR 0 20\nADD_REAR 0 30\nDELETE_FRONT 0\nENDS 0\nREVERSE 0\nADD_FRONT 0 5\nSTATE 0\n",
+    "expected": {
+      "stdout": "DELETE_FRONT 10\nENDS 20 30\nREVERSE 30 20\nSTATE 5 20 30\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-rear-order",
+    "criterionId": "delete-rear",
+    "public": false,
+    "description": "뒤 삭제의 반환 순서",
+    "input": "INIT 0\nADD_REAR 0 10\nADD_REAR 0 20\nADD_REAR 0 30\nDELETE_REAR 0\nSTATE 0\nREVERSE 0\nDELETE_REAR 0\nDELETE_REAR 0\nENDS 0\n",
+    "expected": {
+      "stdout": "DELETE_REAR 30\nSTATE 10 20\nREVERSE 20 10\nDELETE_REAR 20\nDELETE_REAR 10\nENDS NULL NULL\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-rear-only",
+    "criterionId": "delete-rear",
+    "public": false,
+    "description": "유일한 노드 뒤 삭제",
+    "input": "INIT 0\nADD_FRONT 0 -9\nDELETE_REAR 0\nENDS 0\nEMPTY 0\n",
+    "expected": {
+      "stdout": "DELETE_REAR -9\nENDS NULL NULL\nEMPTY 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-rear-links",
+    "criterionId": "delete-rear",
+    "public": false,
+    "description": "뒤 삭제 후 새 rear의 오른쪽 NULL",
+    "input": "INIT 0\nADD_REAR 0 10\nADD_REAR 0 20\nADD_REAR 0 30\nDELETE_REAR 0\nENDS 0\nSTATE 0\nADD_REAR 0 40\nREVERSE 0\n",
+    "expected": {
+      "stdout": "DELETE_REAR 30\nENDS 10 20\nSTATE 10 20\nREVERSE 40 20 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "get-front-preserves",
+    "criterionId": "peek",
+    "public": false,
+    "description": "앞 조회는 상태 유지",
+    "input": "INIT 0\nADD_REAR 0 10\nADD_REAR 0 20\nADD_REAR 0 30\nGET_FRONT 0\nGET_FRONT 0\nSTATE 0\nREVERSE 0\nSTATS 0\nDELETE_FRONT 0\n",
+    "expected": {
+      "stdout": "GET_FRONT 10\nGET_FRONT 10\nSTATE 10 20 30\nREVERSE 30 20 10\nSTATS 3 0\nDELETE_FRONT 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "get-rear-preserves",
+    "criterionId": "peek",
+    "public": false,
+    "description": "뒤 조회는 상태 유지",
+    "input": "INIT 0\nADD_REAR 0 10\nADD_REAR 0 20\nADD_REAR 0 30\nGET_REAR 0\nGET_REAR 0\nSTATE 0\nREVERSE 0\nSTATS 0\nDELETE_REAR 0\n",
+    "expected": {
+      "stdout": "GET_REAR 30\nGET_REAR 30\nSTATE 10 20 30\nREVERSE 30 20 10\nSTATS 3 0\nDELETE_REAR 30\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "get-single",
+    "criterionId": "peek",
+    "public": false,
+    "description": "노드 하나의 양쪽 조회",
+    "input": "INIT 0\nADD_FRONT 0 0\nGET_FRONT 0\nGET_REAR 0\nENDS 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "GET_FRONT 0\nGET_REAR 0\nENDS 0 0\nSTATS 1 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-delete-front",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 덱 DELETE_FRONT",
+    "input": "INIT 0\nDELETE_FRONT 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-delete-rear",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 덱 DELETE_REAR",
+    "input": "INIT 0\nDELETE_REAR 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-get-front",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 덱 GET_FRONT",
+    "input": "INIT 0\nGET_FRONT 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-get-rear",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 덱 GET_REAR",
+    "input": "INIT 0\nGET_REAR 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-after-delete",
+    "criterionId": "empty",
+    "public": false,
+    "description": "마지막 삭제 후 조회 오류",
+    "input": "INIT 0\nADD_REAR 0 8\nDELETE_FRONT 0\nGET_REAR 0\n",
+    "expected": {
+      "stdout": "DELETE_FRONT 8\n",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "full-always-zero",
+    "criterionId": "full",
+    "public": false,
+    "description": "각 상태의 포화 판정",
+    "input": "INIT 0\nFULL 0\nADD_FRONT 0 1\nFULL 0\nADD_REAR 0 2\nFULL 0\nDELETE_REAR 0\nFULL 0\nENDS 0\n",
+    "expected": {
+      "stdout": "FULL 0\nFULL 0\nFULL 0\nDELETE_REAR 2\nFULL 0\nENDS 1 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "full-many",
+    "criterionId": "full",
+    "public": false,
+    "description": "120개 노드 양쪽 삽입 후 해제",
+    "input": "INIT 0\nADD_REAR 0 0\nADD_REAR 0 1\nADD_REAR 0 2\nADD_REAR 0 3\nADD_REAR 0 4\nADD_REAR 0 5\nADD_REAR 0 6\nADD_REAR 0 7\nADD_REAR 0 8\nADD_REAR 0 9\nADD_REAR 0 10\nADD_REAR 0 11\nADD_REAR 0 12\nADD_REAR 0 13\nADD_REAR 0 14\nADD_REAR 0 15\nADD_REAR 0 16\nADD_REAR 0 17\nADD_REAR 0 18\nADD_REAR 0 19\nADD_REAR 0 20\nADD_REAR 0 21\nADD_REAR 0 22\nADD_REAR 0 23\nADD_REAR 0 24\nADD_REAR 0 25\nADD_REAR 0 26\nADD_REAR 0 27\nADD_REAR 0 28\nADD_REAR 0 29\nADD_REAR 0 30\nADD_REAR 0 31\nADD_REAR 0 32\nADD_REAR 0 33\nADD_REAR 0 34\nADD_REAR 0 35\nADD_REAR 0 36\nADD_REAR 0 37\nADD_REAR 0 38\nADD_REAR 0 39\nADD_REAR 0 40\nADD_REAR 0 41\nADD_REAR 0 42\nADD_REAR 0 43\nADD_REAR 0 44\nADD_REAR 0 45\nADD_REAR 0 46\nADD_REAR 0 47\nADD_REAR 0 48\nADD_REAR 0 49\nADD_REAR 0 50\nADD_REAR 0 51\nADD_REAR 0 52\nADD_REAR 0 53\nADD_REAR 0 54\nADD_REAR 0 55\nADD_REAR 0 56\nADD_REAR 0 57\nADD_REAR 0 58\nADD_REAR 0 59\nADD_FRONT 0 -1\nADD_FRONT 0 -2\nADD_FRONT 0 -3\nADD_FRONT 0 -4\nADD_FRONT 0 -5\nADD_FRONT 0 -6\nADD_FRONT 0 -7\nADD_FRONT 0 -8\nADD_FRONT 0 -9\nADD_FRONT 0 -10\nADD_FRONT 0 -11\nADD_FRONT 0 -12\nADD_FRONT 0 -13\nADD_FRONT 0 -14\nADD_FRONT 0 -15\nADD_FRONT 0 -16\nADD_FRONT 0 -17\nADD_FRONT 0 -18\nADD_FRONT 0 -19\nADD_FRONT 0 -20\nADD_FRONT 0 -21\nADD_FRONT 0 -22\nADD_FRONT 0 -23\nADD_FRONT 0 -24\nADD_FRONT 0 -25\nADD_FRONT 0 -26\nADD_FRONT 0 -27\nADD_FRONT 0 -28\nADD_FRONT 0 -29\nADD_FRONT 0 -30\nADD_FRONT 0 -31\nADD_FRONT 0 -32\nADD_FRONT 0 -33\nADD_FRONT 0 -34\nADD_FRONT 0 -35\nADD_FRONT 0 -36\nADD_FRONT 0 -37\nADD_FRONT 0 -38\nADD_FRONT 0 -39\nADD_FRONT 0 -40\nADD_FRONT 0 -41\nADD_FRONT 0 -42\nADD_FRONT 0 -43\nADD_FRONT 0 -44\nADD_FRONT 0 -45\nADD_FRONT 0 -46\nADD_FRONT 0 -47\nADD_FRONT 0 -48\nADD_FRONT 0 -49\nADD_FRONT 0 -50\nADD_FRONT 0 -51\nADD_FRONT 0 -52\nADD_FRONT 0 -53\nADD_FRONT 0 -54\nADD_FRONT 0 -55\nADD_FRONT 0 -56\nADD_FRONT 0 -57\nADD_FRONT 0 -58\nADD_FRONT 0 -59\nADD_FRONT 0 -60\nSIZE 0\nENDS 0\nFULL 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nDELETE_FRONT 0\nENDS 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "SIZE 120\nENDS -60 59\nFULL 0\nDELETE_FRONT -60\nDELETE_FRONT -59\nDELETE_FRONT -58\nDELETE_FRONT -57\nDELETE_FRONT -56\nDELETE_FRONT -55\nDELETE_FRONT -54\nDELETE_FRONT -53\nDELETE_FRONT -52\nDELETE_FRONT -51\nDELETE_FRONT -50\nDELETE_FRONT -49\nDELETE_FRONT -48\nDELETE_FRONT -47\nDELETE_FRONT -46\nDELETE_FRONT -45\nDELETE_FRONT -44\nDELETE_FRONT -43\nDELETE_FRONT -42\nDELETE_FRONT -41\nDELETE_FRONT -40\nDELETE_FRONT -39\nDELETE_FRONT -38\nDELETE_FRONT -37\nDELETE_FRONT -36\nDELETE_FRONT -35\nDELETE_FRONT -34\nDELETE_FRONT -33\nDELETE_FRONT -32\nDELETE_FRONT -31\nDELETE_FRONT -30\nDELETE_FRONT -29\nDELETE_FRONT -28\nDELETE_FRONT -27\nDELETE_FRONT -26\nDELETE_FRONT -25\nDELETE_FRONT -24\nDELETE_FRONT -23\nDELETE_FRONT -22\nDELETE_FRONT -21\nDELETE_FRONT -20\nDELETE_FRONT -19\nDELETE_FRONT -18\nDELETE_FRONT -17\nDELETE_FRONT -16\nDELETE_FRONT -15\nDELETE_FRONT -14\nDELETE_FRONT -13\nDELETE_FRONT -12\nDELETE_FRONT -11\nDELETE_FRONT -10\nDELETE_FRONT -9\nDELETE_FRONT -8\nDELETE_FRONT -7\nDELETE_FRONT -6\nDELETE_FRONT -5\nDELETE_FRONT -4\nDELETE_FRONT -3\nDELETE_FRONT -2\nDELETE_FRONT -1\nDELETE_FRONT 0\nDELETE_FRONT 1\nDELETE_FRONT 2\nDELETE_FRONT 3\nDELETE_FRONT 4\nDELETE_FRONT 5\nDELETE_FRONT 6\nDELETE_FRONT 7\nDELETE_FRONT 8\nDELETE_FRONT 9\nDELETE_FRONT 10\nDELETE_FRONT 11\nDELETE_FRONT 12\nDELETE_FRONT 13\nDELETE_FRONT 14\nDELETE_FRONT 15\nDELETE_FRONT 16\nDELETE_FRONT 17\nDELETE_FRONT 18\nDELETE_FRONT 19\nDELETE_FRONT 20\nDELETE_FRONT 21\nDELETE_FRONT 22\nDELETE_FRONT 23\nDELETE_FRONT 24\nDELETE_FRONT 25\nDELETE_FRONT 26\nDELETE_FRONT 27\nDELETE_FRONT 28\nDELETE_FRONT 29\nDELETE_FRONT 30\nDELETE_FRONT 31\nDELETE_FRONT 32\nDELETE_FRONT 33\nDELETE_FRONT 34\nDELETE_FRONT 35\nDELETE_FRONT 36\nDELETE_FRONT 37\nDELETE_FRONT 38\nDELETE_FRONT 39\nDELETE_FRONT 40\nDELETE_FRONT 41\nDELETE_FRONT 42\nDELETE_FRONT 43\nDELETE_FRONT 44\nDELETE_FRONT 45\nDELETE_FRONT 46\nDELETE_FRONT 47\nDELETE_FRONT 48\nDELETE_FRONT 49\nDELETE_FRONT 50\nDELETE_FRONT 51\nDELETE_FRONT 52\nDELETE_FRONT 53\nDELETE_FRONT 54\nDELETE_FRONT 55\nDELETE_FRONT 56\nDELETE_FRONT 57\nDELETE_FRONT 58\nDELETE_FRONT 59\nENDS NULL NULL\nSTATS 120 120\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "links-mixed",
+    "criterionId": "links",
+    "public": false,
+    "description": "양쪽 연산 후 정방향·역방향 일치",
+    "input": "INIT 0\nADD_FRONT 0 10\nADD_REAR 0 20\nADD_FRONT 0 5\nADD_REAR 0 30\nSTATE 0\nREVERSE 0\nDELETE_FRONT 0\nDELETE_REAR 0\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE 5 10 20 30\nREVERSE 30 20 10 5\nDELETE_FRONT 5\nDELETE_REAR 30\nSTATE 10 20\nREVERSE 20 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "links-single",
+    "criterionId": "links",
+    "public": false,
+    "description": "삭제 후 노드 하나의 두 링크",
+    "input": "INIT 0\nADD_REAR 0 10\nADD_REAR 0 20\nADD_REAR 0 30\nDELETE_REAR 0\nDELETE_FRONT 0\nSTATE 0\nREVERSE 0\nENDS 0\n",
+    "expected": {
+      "stdout": "DELETE_REAR 30\nDELETE_FRONT 10\nSTATE 20\nREVERSE 20\nENDS 20 20\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "links-empty",
+    "criterionId": "links",
+    "public": false,
+    "description": "비워진 양쪽 연결",
+    "input": "INIT 0\nADD_FRONT 0 1\nADD_REAR 0 2\nDELETE_REAR 0\nDELETE_FRONT 0\nSTATE 0\nREVERSE 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "DELETE_REAR 2\nDELETE_FRONT 1\nSTATE\nREVERSE\nSIZE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-front",
+    "criterionId": "memory",
+    "public": false,
+    "description": "앞 삽입·앞 삭제 할당과 해제",
+    "input": "INIT 0\nADD_FRONT 0 5\nSTATS 0\nDELETE_FRONT 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATS 1 0\nDELETE_FRONT 5\nSTATS 1 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-rear",
+    "criterionId": "memory",
+    "public": false,
+    "description": "뒤 삽입·뒤 삭제 할당과 해제",
+    "input": "INIT 0\nADD_REAR 0 5\nSTATS 0\nDELETE_REAR 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATS 1 0\nDELETE_REAR 5\nSTATS 1 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-mixed",
+    "criterionId": "memory",
+    "public": false,
+    "description": "양쪽 삭제 후 모든 노드 해제",
+    "input": "INIT 0\nADD_REAR 0 10\nADD_REAR 0 20\nADD_REAR 0 30\nDELETE_FRONT 0\nSTATS 0\nDELETE_REAR 0\nDELETE_FRONT 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "DELETE_FRONT 10\nSTATS 3 1\nDELETE_REAR 30\nDELETE_FRONT 20\nSTATS 3 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-cross",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "반대쪽 마지막 삭제 후 재삽입",
+    "input": "INIT 0\nADD_FRONT 0 1\nDELETE_REAR 0\nADD_REAR 0 2\nDELETE_FRONT 0\nADD_FRONT 0 3\nENDS 0\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "DELETE_REAR 1\nDELETE_FRONT 2\nENDS 3 3\nSTATE 3\nREVERSE 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-init",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "재초기화와 남은 노드 정리",
+    "input": "INIT 0\nADD_REAR 0 10\nADD_REAR 0 20\nADD_REAR 0 30\nINIT 0\nENDS 0\nSTATS 0\nADD_FRONT 0 99\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "ENDS NULL NULL\nSTATS 3 3\nSTATE 99\nREVERSE 99\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-repeat",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "반복 삽입·삭제 후 빈 상태",
+    "input": "INIT 0\nADD_FRONT 0 0\nDELETE_REAR 0\nADD_FRONT 0 1\nDELETE_REAR 0\nADD_FRONT 0 2\nDELETE_REAR 0\nADD_FRONT 0 3\nDELETE_REAR 0\nADD_FRONT 0 4\nDELETE_REAR 0\nADD_FRONT 0 5\nDELETE_REAR 0\nADD_FRONT 0 6\nDELETE_REAR 0\nADD_FRONT 0 7\nDELETE_REAR 0\nADD_FRONT 0 8\nDELETE_REAR 0\nADD_FRONT 0 9\nDELETE_REAR 0\nADD_FRONT 0 10\nDELETE_REAR 0\nADD_FRONT 0 11\nDELETE_REAR 0\nENDS 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "DELETE_REAR 0\nDELETE_REAR 1\nDELETE_REAR 2\nDELETE_REAR 3\nDELETE_REAR 4\nDELETE_REAR 5\nDELETE_REAR 6\nDELETE_REAR 7\nDELETE_REAR 8\nDELETE_REAR 9\nDELETE_REAR 10\nDELETE_REAR 11\nENDS NULL NULL\nSTATS 12 12\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent",
+    "criterionId": "independence",
+    "public": false,
+    "description": "두 덱 양쪽 연산의 독립성",
+    "input": "INIT 0\nINIT 1\nADD_FRONT 0 1\nADD_REAR 1 10\nADD_REAR 0 2\nADD_FRONT 1 20\nDELETE_FRONT 0\nDELETE_REAR 1\nSTATE 0\nSTATE 1\nREVERSE 1\n",
+    "expected": {
+      "stdout": "DELETE_FRONT 1\nDELETE_REAR 10\nSTATE 2\nSTATE 20\nREVERSE 20\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-init",
+    "criterionId": "independence",
+    "public": false,
+    "description": "한 덱 초기화가 다른 덱에 영향 없음",
+    "input": "INIT 0\nINIT 1\nADD_FRONT 0 1\nADD_REAR 1 10\nADD_REAR 1 20\nINIT 0\nADD_REAR 0 2\nENDS 0\nSTATE 1\nREVERSE 1\nSTATS 0\n",
+    "expected": {
+      "stdout": "ENDS 2 2\nSTATE 10 20\nREVERSE 20 10\nSTATS 4 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

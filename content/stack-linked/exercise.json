@@ -1,0 +1,374 @@
+{
+  "id": "stack-linked",
+  "version": "1.0.0",
+  "title": "연결 리스트 스택",
+  "category": "stack",
+  "kind": "data-structure",
+  "description": "배열 대신 노드를 연결해 구현하는 LIFO 스택입니다. top은 맨 위 노드의 주소이며 삽입 시 할당하고 삭제 시 해제합니다.",
+  "learning": {
+    "concept": {
+      "title": "맨 위 노드를 가리키는 top",
+      "paragraphs": [
+        "나중에 넣은 값을 먼저 꺼내는 LIFO 원리는 배열 스택과 같습니다. top은 인덱스가 아니라 맨 위 StackNode의 주소이며, 빈 스택에서는 NULL입니다.",
+        "push는 새 노드를 맨 앞에 연결하고, pop은 맨 앞 노드를 제거합니다. 노드의 link로 나머지 값을 보존하며 제거한 노드는 free로 해제합니다.",
+        "고정 용량이 없어 메모리를 할당할 수 있는 동안 삽입할 수 있습니다. is_full은 항상 0이며 할당 실패는 push에서 처리합니다. 삽입·삭제·조회는 O(1), 전체 출력은 O(n), 저장 공간은 O(n)입니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "StackNode",
+        "description": "정수 data와 다음 노드의 주소 link를 저장하는 노드입니다."
+      },
+      {
+        "name": "top",
+        "description": "가장 최근에 넣은 노드를 가리킵니다. 빈 스택은 NULL입니다."
+      },
+      {
+        "name": "link",
+        "description": "바로 아래 노드의 주소입니다. 맨 아래 노드에서는 NULL입니다."
+      },
+      {
+        "name": "LinkedStackType",
+        "description": "top을 묶은 구조체로 여러 스택을 독립적으로 관리합니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "init",
+        "description": "top을 NULL로 설정합니다. 남은 노드는 테스트 호출 코드가 정리한 뒤 초기화를 호출합니다."
+      },
+      {
+        "function": "is_empty",
+        "description": "top이 NULL이면 1, 아니면 0을 반환하며 스택을 바꾸지 않습니다."
+      },
+      {
+        "function": "is_full",
+        "description": "고정 용량이 없으므로 항상 0을 반환합니다. 메모리 할당 실패는 push에서 처리합니다."
+      },
+      {
+        "function": "push",
+        "description": "노드 하나를 malloc으로 생성해 item을 저장합니다. link를 기존 top으로 연결한 뒤 top을 새 노드로 바꿉니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "function": "pop",
+        "description": "맨 위 값을 보관하고 top을 다음 노드로 바꾼 뒤 제거한 노드를 free로 해제하고 값을 반환합니다. 빈 스택이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "function": "peek",
+        "description": "맨 위 값만 반환하고 top·연결·할당 상태를 유지합니다. 빈 스택이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "function": "print_stack",
+        "description": "top부터 link를 따라 각 값을 \"%d->\"로 출력하고 마지막에 \"NULL\\n\"을 출력합니다. 빈 스택은 \"NULL\\n\"만 출력하며 스택을 바꾸지 않습니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "init",
+        "argument": null,
+        "result": null,
+        "values": [],
+        "description": "빈 스택의 top은 NULL입니다. 배열과 용량 필드는 없습니다."
+      },
+      {
+        "operation": "push",
+        "argument": 10,
+        "result": null,
+        "values": [
+          10
+        ],
+        "description": "10 노드를 만들고 link를 기존 top인 NULL로 연결한 뒤 top을 바꿉니다."
+      },
+      {
+        "operation": "push",
+        "argument": 20,
+        "result": null,
+        "values": [
+          20,
+          10
+        ],
+        "description": "20의 link가 기존 10 노드를 가리킵니다. top은 20 노드입니다."
+      },
+      {
+        "operation": "push",
+        "argument": 30,
+        "result": null,
+        "values": [
+          30,
+          20,
+          10
+        ],
+        "description": "새 노드를 항상 맨 앞에 연결합니다. 마지막으로 넣은 30이 가장 먼저 나옵니다."
+      },
+      {
+        "operation": "peek",
+        "argument": null,
+        "result": 30,
+        "values": [
+          30,
+          20,
+          10
+        ],
+        "description": "top의 값만 읽습니다. 노드와 연결은 그대로입니다."
+      },
+      {
+        "operation": "pop",
+        "argument": null,
+        "result": 30,
+        "values": [
+          20,
+          10
+        ],
+        "description": "30을 보관하고 top을 20으로 옮긴 뒤 30 노드를 해제합니다."
+      },
+      {
+        "operation": "pop",
+        "argument": null,
+        "result": 20,
+        "values": [
+          10
+        ],
+        "description": "20 노드를 제거하고 해제합니다. top은 10 노드입니다."
+      },
+      {
+        "operation": "pop",
+        "argument": null,
+        "result": 10,
+        "values": [],
+        "description": "마지막 10 노드를 해제하면 top은 NULL이 됩니다."
+      },
+      {
+        "operation": "is_empty",
+        "argument": null,
+        "result": 1,
+        "values": [],
+        "description": "top이 NULL이므로 공백 판정은 1입니다."
+      }
+    ],
+    "notes": [
+      {
+        "title": "top은 노드 주소",
+        "description": "-1이나 배열 인덱스를 사용하지 않습니다. 빈 상태는 top == NULL입니다."
+      },
+      {
+        "title": "연결한 뒤 top 변경",
+        "description": "새 노드의 link에 기존 top을 먼저 저장합니다. top부터 바꾸면 나머지 노드로 가는 연결을 잃을 수 있습니다."
+      },
+      {
+        "title": "반환값을 보관하고 해제",
+        "description": "pop은 값을 보관하고 top을 옮긴 뒤 제거한 노드를 free로 해제합니다. 해제한 노드를 다시 읽지 않습니다."
+      }
+    ]
+  },
+  "contract": {
+    "storage": "linked",
+    "scope": "제공된 StackNode와 LinkedStackType을 사용해 7개 함수의 정의와 본문 전체를 구현합니다.",
+    "valueRange": {
+      "min": -1000000,
+      "max": 1000000
+    },
+    "booleanResult": {
+      "true": 1,
+      "false": 0
+    },
+    "functions": [
+      {
+        "name": "init",
+        "signature": "void init(LinkedStackType *s)",
+        "behavior": "top을 NULL로 설정합니다. 남은 노드는 테스트 호출 코드가 정리한 뒤 초기화를 호출합니다."
+      },
+      {
+        "name": "is_empty",
+        "signature": "int is_empty(LinkedStackType *s)",
+        "behavior": "top이 NULL이면 1, 아니면 0을 반환하며 스택을 바꾸지 않습니다."
+      },
+      {
+        "name": "is_full",
+        "signature": "int is_full(LinkedStackType *s)",
+        "behavior": "고정 용량이 없으므로 항상 0을 반환합니다. 메모리 할당 실패는 push에서 처리합니다."
+      },
+      {
+        "name": "push",
+        "signature": "void push(LinkedStackType *s, element item)",
+        "behavior": "노드 하나를 malloc으로 생성해 item을 저장합니다. link를 기존 top으로 연결한 뒤 top을 새 노드로 바꿉니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "name": "pop",
+        "signature": "element pop(LinkedStackType *s)",
+        "behavior": "맨 위 값을 보관하고 top을 다음 노드로 바꾼 뒤 제거한 노드를 free로 해제하고 값을 반환합니다. 빈 스택이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "name": "peek",
+        "signature": "element peek(LinkedStackType *s)",
+        "behavior": "맨 위 값만 반환하고 top·연결·할당 상태를 유지합니다. 빈 스택이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "name": "print_stack",
+        "signature": "void print_stack(LinkedStackType *s)",
+        "behavior": "top부터 link를 따라 각 값을 \"%d->\"로 출력하고 마지막에 \"NULL\\n\"을 출력합니다. 빈 스택은 \"NULL\\n\"만 출력하며 스택을 바꾸지 않습니다."
+      }
+    ],
+    "errorHandling": {
+      "underflow": "stderr에 오류를 출력하고 exit(1)로 종료합니다.",
+      "allocationFailure": "stderr에 오류를 출력하고 exit(1)로 종료합니다.",
+      "exactMessageRequired": false
+    },
+    "requirements": [
+      "제공된 자료형·구조체 필드·함수 호출 규격을 유지합니다.",
+      "print_stack 외 정상 연산은 출력하지 않습니다.",
+      "유효한 스택 포인터를 전달하며 NULL 포인터 처리는 범위에 포함하지 않습니다.",
+      "재초기화 전과 정상 종료 시 남은 노드는 테스트 호출 코드가 정리합니다. init은 top만 NULL로 설정합니다."
+    ]
+  },
+  "prerequisites": [
+    "stack-array",
+    "list-singly"
+  ],
+  "criteria": [
+    {
+      "id": "initialization",
+      "order": 1,
+      "title": "초기화",
+      "description": "top을 NULL로 설정해 빈 스택을 만듭니다."
+    },
+    {
+      "id": "push",
+      "order": 2,
+      "title": "삽입과 연결",
+      "description": "새 노드를 top에 연결하고 기존 노드를 보존합니다."
+    },
+    {
+      "id": "pop",
+      "order": 3,
+      "title": "LIFO 삭제",
+      "description": "나중에 넣은 값부터 반환하고 top을 다음 노드로 옮깁니다."
+    },
+    {
+      "id": "peek",
+      "order": 4,
+      "title": "조회",
+      "description": "값과 연결을 바꾸지 않고 맨 위 값을 읽습니다."
+    },
+    {
+      "id": "empty",
+      "order": 5,
+      "title": "빈 스택 처리",
+      "description": "빈 pop·peek는 오류를 출력하고 종료 코드 1로 끝납니다."
+    },
+    {
+      "id": "full",
+      "order": 6,
+      "title": "용량 제한 없는 삽입",
+      "description": "포화 판정은 0이며 여러 노드를 계속 삽입합니다."
+    },
+    {
+      "id": "traversal",
+      "order": 7,
+      "title": "순회 출력",
+      "description": "top부터 NULL까지 순서대로 출력합니다."
+    },
+    {
+      "id": "memory",
+      "order": 8,
+      "title": "메모리 해제",
+      "description": "push는 한 노드를 할당하고 pop은 한 노드를 해제합니다."
+    },
+    {
+      "id": "reuse",
+      "order": 9,
+      "title": "삭제 후 재사용",
+      "description": "전체 삭제·재초기화 후 다시 사용합니다."
+    },
+    {
+      "id": "independence",
+      "order": 10,
+      "title": "스택 독립성",
+      "description": "두 스택의 값과 연결을 독립적으로 관리합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "init",
+          "description": "top을 NULL로 설정합니다. 남은 노드는 테스트 호출 코드가 정리한 뒤 초기화를 호출합니다."
+        },
+        {
+          "function": "is_empty",
+          "description": "top이 NULL이면 1, 아니면 0을 반환하며 스택을 바꾸지 않습니다."
+        },
+        {
+          "function": "is_full",
+          "description": "고정 용량이 없으므로 항상 0을 반환합니다. 메모리 할당 실패는 push에서 처리합니다."
+        },
+        {
+          "function": "push",
+          "description": "노드 하나를 malloc으로 생성해 item을 저장합니다. link를 기존 top으로 연결한 뒤 top을 새 노드로 바꿉니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        },
+        {
+          "function": "pop",
+          "description": "맨 위 값을 보관하고 top을 다음 노드로 바꾼 뒤 제거한 노드를 free로 해제하고 값을 반환합니다. 빈 스택이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        },
+        {
+          "function": "peek",
+          "description": "맨 위 값만 반환하고 top·연결·할당 상태를 유지합니다. 빈 스택이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        },
+        {
+          "function": "print_stack",
+          "description": "top부터 link를 따라 각 값을 \"%d->\"로 출력하고 마지막에 \"NULL\\n\"을 출력합니다. 빈 스택은 \"NULL\\n\"만 출력하며 스택을 바꾸지 않습니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "명령과 스택 번호(0 또는 1)를 입력합니다. INIT은 호출 코드가 남은 노드를 해제한 뒤 init을 호출합니다. PRINT는 사용자 출력 함수이며 STATE·SIZE는 호출 코드가 top부터 NULL까지 연결을 검사해 출력합니다. STATE의 값은 맨 위부터 아래 순서입니다. STATS는 두 스택 전체의 누적 malloc·free 호출 수입니다.",
+        "commands": [
+          {
+            "syntax": "INIT <stackId>",
+            "output": null
+          },
+          {
+            "syntax": "PUSH <stackId> <value>",
+            "output": null
+          },
+          {
+            "syntax": "POP <stackId>",
+            "output": "POP <value>"
+          },
+          {
+            "syntax": "PEEK <stackId>",
+            "output": "PEEK <value>"
+          },
+          {
+            "syntax": "EMPTY <stackId>",
+            "output": "EMPTY <0|1>"
+          },
+          {
+            "syntax": "FULL <stackId>",
+            "output": "FULL 0"
+          },
+          {
+            "syntax": "PRINT <stackId>",
+            "output": "<value>->...->NULL"
+          },
+          {
+            "syntax": "STATE <stackId>",
+            "output": "STATE <values>"
+          },
+          {
+            "syntax": "SIZE <stackId>",
+            "output": "SIZE <count>"
+          },
+          {
+            "syntax": "STATS <stackId>",
+            "output": "STATS <allocations> <releases>"
+          }
+        ],
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

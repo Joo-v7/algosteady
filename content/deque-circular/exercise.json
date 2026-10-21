@@ -1,0 +1,419 @@
+{
+  "id": "deque-circular",
+  "version": "1.0.0",
+  "title": "원형 배열 덱",
+  "category": "deque",
+  "kind": "data-structure",
+  "description": "앞과 뒤 양쪽에서 삽입·삭제·조회할 수 있는 자료구조입니다. 원형 배열의 인덱스를 양방향으로 이동시켜 공간을 재사용합니다.",
+  "learning": {
+    "concept": {
+      "title": "양쪽 끝을 모두 사용하는 덱",
+      "paragraphs": [
+        "큐는 뒤에서 넣고 앞에서 꺼냅니다. 덱은 양쪽 끝에서 모두 삽입·삭제·조회할 수 있습니다. 중간 위치에 삽입하거나 삭제하지는 않습니다.",
+        "원형 큐처럼 front는 첫 값의 바로 앞 칸, rear는 마지막 값의 칸입니다. 배열 5칸 중 한 칸을 비워 최대 4개를 저장합니다.",
+        "앞 삽입은 현재 front에 저장한 뒤 front를 감소시키고, 뒤 삭제는 현재 rear의 값을 꺼낸 뒤 rear를 감소시킵니다. 음수 인덱스를 피하려면 감소할 때 배열 크기를 더한 후 나머지 연산을 합니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "data",
+        "description": "인덱스 0~4인 고정 배열입니다. 유효 값은 front 다음 칸부터 rear까지 순환하며 저장됩니다."
+      },
+      {
+        "name": "front",
+        "description": "맨 앞 값의 바로 앞 칸입니다. 앞 삽입 시 감소하고 앞 삭제 시 증가합니다."
+      },
+      {
+        "name": "rear",
+        "description": "맨 뒤 값의 칸입니다. 뒤 삽입 시 증가하고 뒤 삭제 시 감소합니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "init_deque",
+        "description": "front와 rear를 모두 0으로 설정합니다. 배열을 0으로 채울 필요는 없습니다."
+      },
+      {
+        "function": "is_empty",
+        "description": "front와 rear가 같으면 1, 아니면 0을 반환합니다. 덱을 변경하지 않습니다."
+      },
+      {
+        "function": "is_full",
+        "description": "(rear + 1) % MAX_QUEUE_SIZE가 front와 같으면 1, 아니면 0을 반환합니다."
+      },
+      {
+        "function": "add_front",
+        "description": "포화를 검사한 뒤 현재 front 칸에 값을 저장하고 front를 한 칸 역방향으로 이동합니다. (front - 1 + MAX_QUEUE_SIZE) % MAX_QUEUE_SIZE를 사용합니다."
+      },
+      {
+        "function": "add_rear",
+        "description": "포화를 검사한 뒤 rear를 한 칸 정방향으로 이동하고 해당 칸에 저장합니다. (rear + 1) % MAX_QUEUE_SIZE를 사용합니다."
+      },
+      {
+        "function": "delete_front",
+        "description": "공백을 검사한 뒤 front를 한 칸 정방향으로 이동하고 해당 칸의 값을 반환합니다."
+      },
+      {
+        "function": "delete_rear",
+        "description": "공백을 검사한 뒤 현재 rear의 값을 보존하고 rear를 한 칸 역방향으로 이동합니다. 이동 전 값을 반환합니다."
+      },
+      {
+        "function": "get_front",
+        "description": "공백을 검사한 뒤 data[(front + 1) % MAX_QUEUE_SIZE]를 반환합니다. 덱을 변경하지 않습니다."
+      },
+      {
+        "function": "get_rear",
+        "description": "공백을 검사한 뒤 data[rear]를 반환합니다. 덱을 변경하지 않습니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "init_deque",
+        "argument": null,
+        "result": null,
+        "values": [],
+        "front": 0,
+        "rear": 0
+      },
+      {
+        "operation": "add_rear",
+        "argument": 10,
+        "result": null,
+        "values": [
+          10
+        ],
+        "front": 0,
+        "rear": 1
+      },
+      {
+        "operation": "add_front",
+        "argument": 20,
+        "result": null,
+        "values": [
+          20,
+          10
+        ],
+        "front": 4,
+        "rear": 1
+      },
+      {
+        "operation": "add_rear",
+        "argument": 30,
+        "result": null,
+        "values": [
+          20,
+          10,
+          30
+        ],
+        "front": 4,
+        "rear": 2
+      },
+      {
+        "operation": "get_front",
+        "argument": null,
+        "result": 20,
+        "values": [
+          20,
+          10,
+          30
+        ],
+        "front": 4,
+        "rear": 2
+      },
+      {
+        "operation": "get_rear",
+        "argument": null,
+        "result": 30,
+        "values": [
+          20,
+          10,
+          30
+        ],
+        "front": 4,
+        "rear": 2
+      },
+      {
+        "operation": "delete_front",
+        "argument": null,
+        "result": 20,
+        "values": [
+          10,
+          30
+        ],
+        "front": 0,
+        "rear": 2
+      },
+      {
+        "operation": "delete_rear",
+        "argument": null,
+        "result": 30,
+        "values": [
+          10
+        ],
+        "front": 0,
+        "rear": 1
+      },
+      {
+        "operation": "delete_front",
+        "argument": null,
+        "result": 10,
+        "values": [],
+        "front": 1,
+        "rear": 1
+      }
+    ],
+    "notes": [
+      {
+        "title": "앞 삽입은 저장 후 이동",
+        "description": "add_front는 현재 front에 저장하고 감소시킵니다. add_rear는 rear를 증가시킨 다음 저장합니다. 순서를 구분합니다."
+      },
+      {
+        "title": "역방향 이동도 순환합니다",
+        "description": "(index - 1 + MAX_QUEUE_SIZE) % MAX_QUEUE_SIZE로 0에서 4로 돌아갑니다. 공백 삭제·조회와 포화 삽입은 stderr 출력 후 exit(1)로 종료합니다."
+      }
+    ]
+  },
+  "contract": {
+    "scope": "제공된 DequeType을 사용해 9개 함수의 정의와 본문 전체를 구현합니다.",
+    "capacity": 5,
+    "valueRange": {
+      "min": -1000000,
+      "max": 1000000
+    },
+    "initialFront": 0,
+    "initialRear": 0,
+    "booleanResult": {
+      "true": 1,
+      "false": 0
+    },
+    "functions": [
+      {
+        "name": "init_deque",
+        "signature": "void init_deque(DequeType *q)",
+        "behavior": "front와 rear를 모두 0으로 설정합니다. 배열을 0으로 채울 필요는 없습니다."
+      },
+      {
+        "name": "is_empty",
+        "signature": "int is_empty(DequeType *q)",
+        "behavior": "front와 rear가 같으면 1, 아니면 0을 반환합니다. 덱을 변경하지 않습니다."
+      },
+      {
+        "name": "is_full",
+        "signature": "int is_full(DequeType *q)",
+        "behavior": "(rear + 1) % MAX_QUEUE_SIZE가 front와 같으면 1, 아니면 0을 반환합니다."
+      },
+      {
+        "name": "add_front",
+        "signature": "void add_front(DequeType *q, element item)",
+        "behavior": "포화를 검사한 뒤 현재 front 칸에 값을 저장하고 front를 한 칸 역방향으로 이동합니다. (front - 1 + MAX_QUEUE_SIZE) % MAX_QUEUE_SIZE를 사용합니다."
+      },
+      {
+        "name": "add_rear",
+        "signature": "void add_rear(DequeType *q, element item)",
+        "behavior": "포화를 검사한 뒤 rear를 한 칸 정방향으로 이동하고 해당 칸에 저장합니다. (rear + 1) % MAX_QUEUE_SIZE를 사용합니다."
+      },
+      {
+        "name": "delete_front",
+        "signature": "element delete_front(DequeType *q)",
+        "behavior": "공백을 검사한 뒤 front를 한 칸 정방향으로 이동하고 해당 칸의 값을 반환합니다."
+      },
+      {
+        "name": "delete_rear",
+        "signature": "element delete_rear(DequeType *q)",
+        "behavior": "공백을 검사한 뒤 현재 rear의 값을 보존하고 rear를 한 칸 역방향으로 이동합니다. 이동 전 값을 반환합니다."
+      },
+      {
+        "name": "get_front",
+        "signature": "element get_front(DequeType *q)",
+        "behavior": "공백을 검사한 뒤 data[(front + 1) % MAX_QUEUE_SIZE]를 반환합니다. 덱을 변경하지 않습니다."
+      },
+      {
+        "name": "get_rear",
+        "signature": "element get_rear(DequeType *q)",
+        "behavior": "공백을 검사한 뒤 data[rear]를 반환합니다. 덱을 변경하지 않습니다."
+      }
+    ],
+    "errorHandling": {
+      "overflow": "stderr에 오류를 출력하고 exit(1)로 종료합니다.",
+      "underflow": "stderr에 오류를 출력하고 exit(1)로 종료합니다.",
+      "exactMessageRequired": false
+    },
+    "requirements": [
+      "제공된 상수, 자료형, 구조체 필드와 함수 호출 규격을 유지합니다.",
+      "front와 rear는 0~4로 순환하고 배열 값은 앞으로 옮기지 않습니다.",
+      "빈 덱에서 삭제·조회하거나 가득 찬 덱에 삽입하면 stderr에 오류를 출력하고 exit(1)로 종료합니다. 오류 문구는 정확히 일치할 필요가 없습니다.",
+      "각 함수는 전달받은 덱만 조작합니다. 다른 덱에 영향을 주지 않습니다.",
+      "정상 연산은 출력하지 않습니다. main()과 입출력은 테스트 호출 코드가 담당합니다.",
+      "유효한 구조체 포인터와 초기화된 덱을 전달합니다. NULL 포인터 처리는 실습 범위에 포함하지 않습니다."
+    ],
+    "assessmentScope": "출력과 구조체 상태를 검사합니다. 코드 스타일과 시간 복잡도는 정적으로 검사하지 않습니다.",
+    "circular": true,
+    "usableCapacity": 4
+  },
+  "prerequisites": [
+    "queue-circular"
+  ],
+  "criteria": [
+    {
+      "id": "initialization",
+      "order": 1,
+      "title": "초기화",
+      "description": "인덱스 0과 공백 상태를 확인합니다."
+    },
+    {
+      "id": "add-front",
+      "order": 2,
+      "title": "앞 삽입",
+      "description": "저장 후 front 역방향 이동을 확인합니다."
+    },
+    {
+      "id": "add-rear",
+      "order": 3,
+      "title": "뒤 삽입",
+      "description": "rear 정방향 이동 후 저장을 확인합니다."
+    },
+    {
+      "id": "delete-front",
+      "order": 4,
+      "title": "앞 삭제",
+      "description": "front 정방향 이동과 맨 앞 값 반환을 확인합니다."
+    },
+    {
+      "id": "delete-rear",
+      "order": 5,
+      "title": "뒤 삭제",
+      "description": "맨 뒤 값 반환과 rear 역방향 이동을 확인합니다."
+    },
+    {
+      "id": "get-front",
+      "order": 6,
+      "title": "앞 조회",
+      "description": "맨 앞 값을 읽고 상태를 유지하는지 확인합니다."
+    },
+    {
+      "id": "get-rear",
+      "order": 7,
+      "title": "뒤 조회",
+      "description": "맨 뒤 값을 읽고 상태를 유지하는지 확인합니다."
+    },
+    {
+      "id": "errors",
+      "order": 8,
+      "title": "공백과 포화 처리",
+      "description": "빈 삭제·조회와 초과 삽입의 오류 종료를 확인합니다."
+    },
+    {
+      "id": "wrap",
+      "order": 9,
+      "title": "양방향 순환",
+      "description": "인덱스의 정·역방향 순환과 재사용을 확인합니다."
+    },
+    {
+      "id": "independence",
+      "order": 10,
+      "title": "덱 독립성",
+      "description": "두 덱의 값과 인덱스를 독립적으로 관리합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "init_deque",
+          "description": "front와 rear를 모두 0으로 설정합니다. 배열을 0으로 채울 필요는 없습니다."
+        },
+        {
+          "function": "is_empty",
+          "description": "front와 rear가 같으면 1, 아니면 0을 반환합니다. 덱을 변경하지 않습니다."
+        },
+        {
+          "function": "is_full",
+          "description": "(rear + 1) % MAX_QUEUE_SIZE가 front와 같으면 1, 아니면 0을 반환합니다."
+        },
+        {
+          "function": "add_front",
+          "description": "포화를 검사한 뒤 현재 front 칸에 값을 저장하고 front를 한 칸 역방향으로 이동합니다. (front - 1 + MAX_QUEUE_SIZE) % MAX_QUEUE_SIZE를 사용합니다."
+        },
+        {
+          "function": "add_rear",
+          "description": "포화를 검사한 뒤 rear를 한 칸 정방향으로 이동하고 해당 칸에 저장합니다. (rear + 1) % MAX_QUEUE_SIZE를 사용합니다."
+        },
+        {
+          "function": "delete_front",
+          "description": "공백을 검사한 뒤 front를 한 칸 정방향으로 이동하고 해당 칸의 값을 반환합니다."
+        },
+        {
+          "function": "delete_rear",
+          "description": "공백을 검사한 뒤 현재 rear의 값을 보존하고 rear를 한 칸 역방향으로 이동합니다. 이동 전 값을 반환합니다."
+        },
+        {
+          "function": "get_front",
+          "description": "공백을 검사한 뒤 data[(front + 1) % MAX_QUEUE_SIZE]를 반환합니다. 덱을 변경하지 않습니다."
+        },
+        {
+          "function": "get_rear",
+          "description": "공백을 검사한 뒤 data[rear]를 반환합니다. 덱을 변경하지 않습니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "명령과 덱 번호(0 또는 1)를 한 줄씩 입력합니다. INIT으로 초기화합니다. ADD_FRONT·ADD_REAR에는 정수 값을 추가합니다. 초기화·삽입은 출력하지 않으며 조회·삭제·상태 검사는 명령 이름과 결과를 한 줄로 출력합니다. FRONT·REAR·DATA는 테스트용 상태 검사 명령입니다.",
+        "commands": [
+          {
+            "syntax": "INIT <dequeId>",
+            "output": null
+          },
+          {
+            "syntax": "ADD_FRONT <dequeId> <value>",
+            "output": null
+          },
+          {
+            "syntax": "ADD_REAR <dequeId> <value>",
+            "output": null
+          },
+          {
+            "syntax": "DELETE_FRONT <dequeId>",
+            "output": "DELETE_FRONT <value>"
+          },
+          {
+            "syntax": "DELETE_REAR <dequeId>",
+            "output": "DELETE_REAR <value>"
+          },
+          {
+            "syntax": "GET_FRONT <dequeId>",
+            "output": "GET_FRONT <value>"
+          },
+          {
+            "syntax": "GET_REAR <dequeId>",
+            "output": "GET_REAR <value>"
+          },
+          {
+            "syntax": "EMPTY <dequeId>",
+            "output": "EMPTY <0|1>"
+          },
+          {
+            "syntax": "FULL <dequeId>",
+            "output": "FULL <0|1>"
+          },
+          {
+            "syntax": "FRONT <dequeId>",
+            "output": "FRONT <index>"
+          },
+          {
+            "syntax": "REAR <dequeId>",
+            "output": "REAR <index>"
+          },
+          {
+            "syntax": "DATA <dequeId> <index>",
+            "output": "DATA <index> <value>"
+          }
+        ],
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

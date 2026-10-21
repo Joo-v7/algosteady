@@ -1,0 +1,161 @@
+{
+  "id": "recursion-power",
+  "version": "1.0.0",
+  "title": "거듭제곱",
+  "category": "recursion",
+  "kind": "algorithm",
+  "description": "지수를 절반으로 줄이며 x의 n제곱을 계산합니다. 지수의 짝수·홀수에 따라 재귀 호출과 곱셈을 조합합니다.",
+  "learning": {
+    "concept": {
+      "title": "짝수·홀수 지수로 나누기",
+      "paragraphs": [
+        "지수가 0이면 1입니다. 짝수이면 밑을 제곱하고 지수를 절반으로 줄입니다. 홀수이면 밑을 한 번 더 곱합니다.",
+        "매번 지수가 절반으로 줄어 시간과 추가 공간은 O(log n)입니다. 이진 분할을 사용하는 분할 정복의 예이기도 합니다."
+      ]
+    },
+    "operations": [
+      {
+        "function": "power",
+        "description": "지수를 절반으로 줄이며 x의 n제곱을 계산합니다. 지수의 짝수·홀수에 따라 재귀 호출과 곱셈을 조합합니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "power",
+        "argument": "2, 5",
+        "result": null,
+        "trace": [
+          "power(2, 5)",
+          "= 2 × power(4, 2)"
+        ],
+        "description": "홀수 지수이므로 2를 곱할 수 있도록 남깁니다."
+      },
+      {
+        "operation": "power",
+        "argument": "4, 2",
+        "result": null,
+        "trace": [
+          "power(4, 2)",
+          "= power(16, 1)"
+        ],
+        "description": "짝수 지수는 밑의 제곱과 절반의 지수로 바꿉니다."
+      },
+      {
+        "operation": "power",
+        "argument": "16, 1",
+        "result": null,
+        "trace": [
+          "power(16, 1)",
+          "= 16 × power(256, 0)"
+        ],
+        "description": "지수가 1이어도 홀수 규칙으로 종료 조건에 도달합니다."
+      },
+      {
+        "operation": "power",
+        "argument": "256, 0",
+        "result": 1,
+        "trace": [
+          "power(256, 0) = 1"
+        ],
+        "description": "지수 0에서 1을 반환합니다."
+      },
+      {
+        "operation": "power",
+        "argument": "2, 5",
+        "result": 32,
+        "trace": [
+          "power(16, 1) = 16",
+          "power(4, 2) = 16",
+          "power(2, 5) = 2 × 16 = 32"
+        ],
+        "description": "남겨 둔 곱셈을 계산하며 돌아옵니다."
+      }
+    ],
+    "notes": [
+      {
+        "title": "지수가 0이면 1",
+        "description": "이 실습에서는 0의 0제곱도 종료 조건에 따라 1로 정의합니다."
+      },
+      {
+        "title": "밑은 double입니다",
+        "description": "밑은 -10~10, 지수는 0~12입니다. 결과는 호출 코드가 소수점 아래 6자리로 출력합니다."
+      }
+    ]
+  },
+  "contract": {
+    "scope": "double power(double x, int n) 함수의 정의와 본문 전체를 구현합니다.",
+    "functions": [
+      {
+        "name": "power",
+        "signature": "double power(double x, int n)",
+        "behavior": "-10~10의 실수 x와 0~12의 정수 n에 대해 x의 n제곱을 double로 반환합니다. n이 0이면 1이며 0의 0제곱도 1로 정의합니다."
+      }
+    ],
+    "requirements": [
+      "음수 지수는 입력하지 않습니다. 함수에서는 출력하지 않으며 출력 형식은 호출 코드가 담당합니다.",
+      "사용자 main()은 작성하지 않습니다. 입력 처리와 함수 호출은 테스트 호출 코드가 담당합니다.",
+      "재귀 호출로 구현하는 것을 학습 목표로 합니다."
+    ],
+    "assessmentScope": "반환값과 출력을 검사합니다. 재귀 사용 여부, 코드 스타일과 시간 복잡도는 정적으로 검사하지 않습니다."
+  },
+  "prerequisites": [
+    "recursion-factorial"
+  ],
+  "criteria": [
+    {
+      "id": "base",
+      "order": 1,
+      "title": "종료 조건",
+      "description": "가장 작은 입력에서 올바르게 종료하는지 확인합니다."
+    },
+    {
+      "id": "calculation",
+      "order": 2,
+      "title": "계산",
+      "description": "일반 입력의 반환값을 확인합니다."
+    },
+    {
+      "id": "sign",
+      "order": 3,
+      "title": "0과 음수",
+      "description": "밑이 0이거나 음수일 때 값과 부호를 확인합니다."
+    },
+    {
+      "id": "fraction",
+      "order": 4,
+      "title": "소수 밑",
+      "description": "double 값을 정수로 잘라 계산하지 않는지 확인합니다."
+    },
+    {
+      "id": "boundary",
+      "order": 5,
+      "title": "입력 경계",
+      "description": "허용 범위의 큰 입력을 확인합니다."
+    },
+    {
+      "id": "repeated",
+      "order": 6,
+      "title": "반복 호출",
+      "description": "호출 사이에 이전 상태가 남지 않는지 확인합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "power",
+          "description": "-10~10의 실수 x와 0~12의 정수 n에 대해 x의 n제곱을 double로 반환합니다. n이 0이면 1이며 0의 0제곱도 1로 정의합니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "각 줄에 x와 n을 입력합니다. power(x, n)의 반환값을 소수점 아래 6자리로 출력합니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

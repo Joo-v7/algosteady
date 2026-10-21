@@ -1,0 +1,110 @@
+[
+  {
+    "id": "base-zero",
+    "criterionId": "base",
+    "public": false,
+    "description": "F(0)은 0",
+    "input": "0\n",
+    "expected": {
+      "stdout": "0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "base-one",
+    "criterionId": "base",
+    "public": false,
+    "description": "F(1)은 1",
+    "input": "1\n",
+    "expected": {
+      "stdout": "1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "public-example",
+    "criterionId": "calculation",
+    "public": true,
+    "description": "F(6) 계산",
+    "input": "6\n",
+    "expected": {
+      "stdout": "8\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "small-values",
+    "criterionId": "calculation",
+    "public": false,
+    "description": "초기 수열",
+    "input": "2\n3\n4\n5\n",
+    "expected": {
+      "stdout": "1\n2\n3\n5\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "middle-values",
+    "criterionId": "calculation",
+    "public": false,
+    "description": "중간 수열",
+    "input": "10\n15\n20\n",
+    "expected": {
+      "stdout": "55\n610\n6765\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "upper-bound",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "F(30) 계산",
+    "input": "30\n",
+    "expected": {
+      "stdout": "832040\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "near-bound",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "F(29) 계산",
+    "input": "29\n",
+    "expected": {
+      "stdout": "514229\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "repeated-input",
+    "criterionId": "repeated",
+    "public": false,
+    "description": "같은 값 반복",
+    "input": "8\n8\n8\n",
+    "expected": {
+      "stdout": "21\n21\n21\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "mixed-input",
+    "criterionId": "repeated",
+    "public": false,
+    "description": "종료 조건과 일반 값 교차",
+    "input": "12\n0\n1\n7\n",
+    "expected": {
+      "stdout": "144\n0\n1\n13\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

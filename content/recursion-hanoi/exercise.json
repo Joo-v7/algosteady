@@ -1,0 +1,147 @@
+{
+  "id": "recursion-hanoi",
+  "version": "1.0.0",
+  "title": "하노이탑",
+  "category": "recursion",
+  "kind": "algorithm",
+  "description": "작은 원판 묶음을 보조 막대로 옮긴 뒤 가장 큰 원판을 옮기고, 작은 묶음을 목적 막대로 옮깁니다. 같은 규칙을 작은 문제에 적용합니다.",
+  "learning": {
+    "concept": {
+      "title": "이동 전후의 작은 문제",
+      "paragraphs": [
+        "원판은 한 번에 하나씩 옮기며 큰 원판을 작은 원판 위에 놓을 수 없습니다. n은 원판 수, from은 출발, tmp는 보조, to는 목적 막대입니다.",
+        "n - 1개를 보조 막대로 이동 → 가장 큰 원판 이동 → 보조 막대의 n - 1개를 목적 막대로 이동 순서입니다.",
+        "이동 횟수는 2^n - 1, 시간은 O(2^n), 추가 공간은 O(n)입니다."
+      ]
+    },
+    "operations": [
+      {
+        "function": "hanoi_tower",
+        "description": "작은 원판 묶음을 보조 막대로 옮긴 뒤 가장 큰 원판을 옮기고, 작은 묶음을 목적 막대로 옮깁니다. 같은 규칙을 작은 문제에 적용합니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "hanoi_tower",
+        "argument": "2, A, B, C",
+        "result": null,
+        "trace": [
+          "hanoi_tower(2, A, B, C)",
+          "먼저 원판 1개를 A → B로 이동"
+        ],
+        "description": "보조 막대로 작은 원판을 옮길 때 C가 보조 역할을 합니다."
+      },
+      {
+        "operation": "hanoi_tower",
+        "argument": "1, A, C, B",
+        "result": null,
+        "trace": [
+          "원판 1을 A에서 B으로 옮긴다."
+        ],
+        "description": "한 원판의 이동은 즉시 출력하고 반환합니다."
+      },
+      {
+        "operation": "hanoi_tower",
+        "argument": "2, A, B, C",
+        "result": null,
+        "trace": [
+          "원판 1을 A에서 B으로 옮긴다.",
+          "원판 2을 A에서 C으로 옮긴다."
+        ],
+        "description": "가장 큰 원판을 원래 목적 막대로 옮깁니다."
+      },
+      {
+        "operation": "hanoi_tower",
+        "argument": "1, B, A, C",
+        "result": null,
+        "trace": [
+          "원판 1을 A에서 B으로 옮긴다.",
+          "원판 2을 A에서 C으로 옮긴다.",
+          "원판 1을 B에서 C으로 옮긴다."
+        ],
+        "description": "남은 작은 원판을 B에서 C로 옮깁니다."
+      }
+    ],
+    "notes": [
+      {
+        "title": "막대의 역할이 바뀝니다",
+        "description": "재귀 호출마다 from·tmp·to의 순서가 바뀝니다. 항상 A에서 C로 옮긴다고 가정하지 않습니다."
+      },
+      {
+        "title": "이번 함수는 직접 출력합니다",
+        "description": "원판 수는 1~8입니다. 이동마다 원판 번호와 출발·목적 막대를 정해진 형식으로 출력합니다."
+      }
+    ]
+  },
+  "contract": {
+    "scope": "void hanoi_tower(int n, char from, char tmp, char to) 함수의 정의와 본문 전체를 구현합니다.",
+    "functions": [
+      {
+        "name": "hanoi_tower",
+        "signature": "void hanoi_tower(int n, char from, char tmp, char to)",
+        "behavior": "1~8개의 원판을 from에서 tmp를 이용해 to로 옮기는 최소 이동 순서를 출력합니다. 막대는 서로 다른 A, B, C입니다."
+      }
+    ],
+    "requirements": [
+      "각 이동은 printf(\"원판 %d을 %c에서 %c으로 옮긴다.\\n\", 원판번호, 출발막대, 목적막대) 형식으로 출력합니다. 원판 번호는 작은 원판부터 1입니다.",
+      "이동 출력 외의 안내문과 빈 줄은 출력하지 않습니다.",
+      "사용자 main()은 작성하지 않습니다. 입력 처리와 함수 호출은 테스트 호출 코드가 담당합니다.",
+      "재귀 호출로 구현하는 것을 학습 목표로 합니다."
+    ],
+    "assessmentScope": "반환값과 출력을 검사합니다. 재귀 사용 여부, 코드 스타일과 시간 복잡도는 정적으로 검사하지 않습니다."
+  },
+  "prerequisites": [
+    "recursion-factorial"
+  ],
+  "criteria": [
+    {
+      "id": "base",
+      "order": 1,
+      "title": "한 원판 이동",
+      "description": "재귀 종료 조건의 이동을 확인합니다."
+    },
+    {
+      "id": "sequence",
+      "order": 2,
+      "title": "이동 순서",
+      "description": "작은 원판 이동·큰 원판 이동·나머지 이동 순서를 확인합니다."
+    },
+    {
+      "id": "roles",
+      "order": 3,
+      "title": "막대 역할",
+      "description": "출발·보조·목적 막대가 바뀌어도 올바르게 이동합니다."
+    },
+    {
+      "id": "boundary",
+      "order": 4,
+      "title": "원판 수 경계",
+      "description": "큰 입력에서 모든 이동을 빠짐없이 출력합니다."
+    },
+    {
+      "id": "repeated",
+      "order": 5,
+      "title": "반복 호출",
+      "description": "다른 원판 수를 연속 호출합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "hanoi_tower",
+          "description": "1~8개의 원판을 from에서 tmp를 이용해 to로 옮기는 최소 이동 순서를 출력합니다. 막대는 서로 다른 A, B, C입니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "각 줄에 n from tmp to를 입력합니다. hanoi_tower가 이동 순서를 직접 출력하며 호출 코드는 별도의 결과를 덧붙이지 않습니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

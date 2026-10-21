@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// 차후에 스택이 필요하면 여기만 복사하여 붙인다.
 // ===== 스택 코드의 시작 =====
 #define MAX_STACK_SIZE 100
 

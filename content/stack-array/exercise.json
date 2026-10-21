@@ -1,6 +1,6 @@
 {
   "id": "stack-array",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "title": "고정 배열 스택",
   "category": "stack",
   "kind": "data-structure",

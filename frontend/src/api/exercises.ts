@@ -18,7 +18,15 @@ export interface ExerciseSummary {
     description: string
     category: string
     languages: string[]
-    contract: { capacity: number }
+    contract: {
+        capacity?: number
+        circular?: boolean
+        doubly?: boolean
+        storage?: 'array' | 'linked'
+        usableCapacity?: number
+        initialCapacity?: number
+        growthFactor?: number
+    }
     criteria: {
         id: string
         title: string
@@ -47,14 +55,32 @@ export interface ExerciseDetails {
         }[]
         steps: {
             operation: string
-            argument: number | null
-            result: number | null
-            values: number[]
-            top: number
+            argument: number | string | null
+            result: number | string | null
+            values?: number[]
+            tree?: (number | null)[]
+            activeNode?: number
+            visited?: number[]
+            trace?: string[]
+            description?: string
+            top?: number
+            front?: number
+            rear?: number
+            capacity?: number
+        }[]
+        notes?: {
+            title: string
+            description: string
         }[]
     }
     contract: {
-        capacity: number
+        capacity?: number
+        circular?: boolean
+        doubly?: boolean
+        storage?: 'array' | 'linked'
+        usableCapacity?: number
+        initialCapacity?: number
+        growthFactor?: number
         scope: string
         functions: {
             name: string

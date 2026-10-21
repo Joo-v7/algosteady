@@ -3,15 +3,9 @@ import { Link, useParams, useSearchParams } from 'react-router'
 import { getSubmission } from '../api/submissions'
 import type { SubmissionDetails } from '../api/submissions'
 
-const jobLabels = {
-    QUEUED: '대기',
-    RUNNING: '채점 중',
-    COMPLETED: '채점 완료',
-    FAILED: '작업 실패'
-}
 const criterionLabels = {
     PENDING: '대기',
-    RUNNING: '판정 중',
+    RUNNING: '채점 중',
     PASSED: '통과',
     FAILED: '실패',
     UNAVAILABLE: '검사 불가'
@@ -68,6 +62,31 @@ function SubmissionDetailsPage() {
 
     const job = submission.job
 
+    const resultPending = job.status === 'QUEUED' || job.status === 'RUNNING'
+    const preparation = job.preparation
+    const compilationFailed = preparation != null && preparation.status !== 'SUCCEEDED'
+    const resultTests = job.tests.filter(test => test.actual.status !== 'NOT_EXECUTED')
+    const resultFailed = job.criteria.some(criterion => criterion.status === 'FAILED') || resultTests.some(test => !test.passed)
+    const resultError = job.status === 'FAILED' || compilationFailed || job.criteria.some(criterion => criterion.status === 'UNAVAILABLE')
+    const resultStatus = resultPending ? 'pending' : resultError || resultFailed ? 'failed' : 'passed'
+    let resultLabel = '모든 기준 통과'
+
+    if (resultPending) {
+        resultLabel = '채점 중…'
+    } else if (job.status === 'FAILED' || preparation?.status === 'ENVIRONMENT_ERROR') {
+        resultLabel = '채점 오류'
+    } else if (compilationFailed) {
+        resultLabel = '컴파일 오류'
+    } else if (resultFailed) {
+        resultLabel = '일부 기준 실패'
+    } else if (resultError) {
+        resultLabel = '채점 오류'
+    }
+
+    const measuredTests = resultTests.filter(test => test.actual.executionTimeNanos != null)
+    const executionSeconds = measuredTests.length > 0
+        ? measuredTests.reduce((total, test) => total + (test.actual.executionTimeNanos ?? 0), 0) / 1000000000 : null
+
     return (
         <main className="workspace">
             <div className="breadcrumb">
@@ -78,49 +97,82 @@ function SubmissionDetailsPage() {
                 <div>
                     <div className="eyebrow">SUBMISSION DETAILS</div>
                     <h1>{job.exerciseTitle} · 제출 상세</h1>
-                    <p><time dateTime={submission.submittedAt}>{new Date(submission.submittedAt).toLocaleString('ko-KR')}</time> · {submission.language.toUpperCase()} · 버전 {submission.contentVersion}</p>
+                    <p><time dateTime={submission.submittedAt}>{new Date(submission.submittedAt).toLocaleString('ko-KR')}</time> · {submission.language.toUpperCase()}</p>
                 </div>
-                <span className="language-badge">{jobLabels[job.status]}</span>
             </section>
             <section className="panel history-panel">
-                <h2>제출 당시 코드</h2>
-                <p>기준 코드 {submission.referenceViewed ? '열람' : '미열람'} · 제출 ID {submission.submissionId}</p>
+                <h2>제출 코드</h2>
                 <pre className="submission-code">{submission.code}</pre>
             </section>
-            <section className="panel history-panel execution-result">
-                <h2>채점 결과 · {jobLabels[job.status]}</h2>
-                <p>통과 {job.criteria.filter(item => item.status === 'PASSED').length} / {job.criteria.length}</p>
-                {job.message && <p>{job.message}</p>}
-                {job.preparation && (
-                    <div>
-                        <h3>컴파일 · {job.preparation.status}</h3>
-                        <pre>{job.preparation.stdout}{job.preparation.stderr}</pre>
-                        <p>종료 코드: {job.preparation.exitCode ?? '—'} · {job.preparation.message}</p>
-                    </div>
+            <section className="panel history-panel execution-result history-result" aria-live="polite" aria-busy={resultPending}>
+                <div className="result-heading">
+                    <h2>제출 결과 <span className="result-status" data-status={resultStatus}>{resultLabel}</span></h2>
+                    <span className="result-time" title="테스트 실행 시간 합계">{executionSeconds == null ? '— s' : `${executionSeconds.toFixed(3)} s`}</span>
+                </div>
+                {resultPending && <p>전체 테스트를 채점하고 있습니다.</p>}
+                {job.message && <pre>{job.message}</pre>}
+                {compilationFailed && preparation && (
+                    <pre>{preparation.stderr || preparation.stdout || preparation.message || '컴파일하지 못했습니다.'}</pre>
                 )}
-                {job.criteria.map(criterion => (
-                    <details className="criterion-detail" key={criterion.criterionId}>
-                        <summary>{criterion.title} · {criterionLabels[criterion.status]} · {criterion.passedTests} / {criterion.totalTests}</summary>
-                        <p>{criterion.description}</p>
-                        {criterion.status === 'UNAVAILABLE' && <p>컴파일 실패, 실행 환경 장애 또는 작업 중단으로 검사를 완료하지 못했습니다.</p>}
-                        {job.tests.filter(test => test.criterionId === criterion.criterionId).map(test => (
-                            <div className="failed-test" key={test.testId}>
-                                <h3>{test.description} · {test.passed ? '통과' : test.actual.status}</h3>
-                                <h3>입력</h3>
-                                <pre>{test.input || '(입력 없음)'}</pre>
-                                <h3>기대 출력</h3>
-                                <pre>{test.expected.stdout || '(출력 없음)'}</pre>
-                                <p>기대 종료 코드: {test.expected.exitCode} · stderr: {test.expected.stderrRequired ? '출력 필요' : '출력 없음'}</p>
-                                <h3>실제 출력</h3>
-                                <pre>{test.actual.stdout || '(출력 없음)'}</pre>
-                                <h3>stderr</h3>
-                                <pre>{test.actual.stderr || '(출력 없음)'}</pre>
-                                <p>종료 코드: {test.actual.exitCode ?? '—'} · 실행 시간: {test.actual.executionTimeNanos == null ? '—' : `${(test.actual.executionTimeNanos / 1000000).toFixed(3)} ms`}</p>
-                                {test.actual.message && <p>{test.actual.message}</p>}
-                            </div>
-                        ))}
-                    </details>
-                ))}
+            </section>
+            <section className="panel history-panel">
+                <h2>기준별 상세</h2>
+                <ol className="criteria-list history-criteria">
+                    {job.criteria.map(criterion => {
+                        const criterionTests = job.tests.filter(test => test.criterionId === criterion.criterionId)
+                        return (
+                            <li key={criterion.criterionId} data-status={criterion.status}>
+                                <details className="criterion-detail">
+                                    <summary>
+                                        <span className="criterion-circle" />
+                                        <strong>{criterion.title}</strong>
+                                        <span className="waiting-label">{criterionLabels[criterion.status]}</span>
+                                        <span className="criterion-count">{criterion.passedTests} / {criterion.totalTests} 테스트 통과</span>
+                                    </summary>
+                                    <p className="criterion-description">{criterion.description}</p>
+                                    {criterionTests.length === 0 && (
+                                        <p className="history-test-note">{criterion.status === 'UNAVAILABLE' ? '검사를 완료하지 못했습니다.' : '아직 실행 결과가 없습니다.'}</p>
+                                    )}
+                                    {criterionTests.map(test => (
+                                        <details className="history-test" key={test.testId}>
+                                            <summary>
+                                                <span>{test.description}</span>
+                                                <span className="result-status" data-status={test.passed ? 'passed' : 'failed'}>
+                                                    {test.actual.status === 'NOT_EXECUTED' ? '미실행' : test.passed ? '통과' : '실패'}
+                                                </span>
+                                                <span className="result-time">{test.actual.executionTimeNanos == null ? '— s' : `${(test.actual.executionTimeNanos / 1000000000).toFixed(3)} s`}</span>
+                                            </summary>
+                                            {test.actual.status === 'NOT_EXECUTED' ? (
+                                                <p className="history-test-note">이 테스트는 실행되지 않았습니다.</p>
+                                            ) : (
+                                                <div className="test-comparison">
+                                                    <div className="test-input">
+                                                        <h3>입력</h3>
+                                                        <pre>{test.input || '(입력 없음)'}</pre>
+                                                    </div>
+                                                    <div>
+                                                        <h3>기대 출력</h3>
+                                                        <pre>{test.expected.stdout || '(출력 없음)'}</pre>
+                                                    </div>
+                                                    <div>
+                                                        <h3>실제 출력</h3>
+                                                        <pre>{test.actual.stdout || '(출력 없음)'}</pre>
+                                                    </div>
+                                                    {(test.actual.stderr || test.actual.message || !test.passed && test.actual.exitCode !== test.expected.exitCode) && (
+                                                        <div className="test-error">
+                                                            <h3>오류</h3>
+                                                            <pre>{test.actual.stderr || test.actual.message || '프로그램이 예상과 다르게 종료되었습니다.'}</pre>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </details>
+                                    ))}
+                                </details>
+                            </li>
+                        )
+                    })}
+                </ol>
             </section>
         </main>
     )

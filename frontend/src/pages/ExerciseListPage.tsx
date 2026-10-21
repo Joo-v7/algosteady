@@ -25,8 +25,8 @@ function ExerciseListPage() {
         <main className="workspace">
             <section className="exercise-heading">
                 <div>
-                    <div className="eyebrow">DATA STRUCTURES</div>
-                    <h1>자료구조 구현</h1>
+                    <div className="eyebrow">DATA STRUCTURES &amp; ALGORITHMS</div>
+                    <h1>자료구조·알고리즘 구현</h1>
                     <p>원리를 배우고, 직접 구현하면서 기본기를 쌓아보세요.</p>
                 </div>
                 <span className="language-badge">C17</span>
@@ -37,17 +37,22 @@ function ExerciseListPage() {
                 {error && <p role="alert">{error}</p>}
                 {exercises.map(exercise => (
                     <article className="panel exercise-card" key={exercise.id}>
-                        <div className="section-label">스택 · 기본 구현</div>
+                        <div className="section-label">{exercise.category === 'tree' ? '트리' : exercise.category === 'recursion' ? '재귀' : exercise.category === 'linked-list' ? '연결 리스트' : exercise.category === 'deque' ? '덱' : exercise.category === 'queue' ? '큐' : '스택'} · 기본 구현</div>
                         <h2>{exercise.title}</h2>
                         <p>{exercise.description}</p>
                         <div className="concept-tags">
                             <span>{exercise.languages.join(' · ').toUpperCase()}</span>
-                            <span>고정 배열 · 용량 {exercise.contract.capacity}</span>
+                            <span>
+                                {exercise.category === 'tree' ? '이진 트리 · 자식 포인터' : exercise.category === 'recursion' ? '종료 조건 · 재귀 호출' : exercise.contract.storage === 'linked' ? '연결 리스트 · 동적 메모리' : exercise.category === 'linked-list' ? exercise.contract.doubly ? '양방향 연결 · 헤드 노드' : exercise.contract.circular ? '원형 연결 · 동적 메모리' : '노드 · 동적 메모리' : exercise.contract.circular
+                                    ? `원형 배열 · 저장 ${exercise.contract.usableCapacity}개` : exercise.contract.initialCapacity !== undefined
+                                    ? `동적 배열 · 초기 용량 ${exercise.contract.initialCapacity}`
+                                    : `고정 배열 · 용량 ${exercise.contract.capacity}`}
+                            </span>
                             <span>채점 기준 {exercise.criteria.length}개</span>
                         </div>
                         <div className="exercise-card-actions">
-                            <Link className="secondary-button" to={`/exercises/${exercise.id}`}>학습하기</Link>
-                            <Link className="primary-button" to={`/exercises/${exercise.id}?tab=training`}>바로 구현하기 →</Link>
+                            <Link className="secondary-button" to={`/exercises/${exercise.id}`}>학습</Link>
+                            <Link className="primary-button" to={`/exercises/${exercise.id}?tab=training`}>실습</Link>
                         </div>
                     </article>
                 ))}
@@ -55,7 +60,7 @@ function ExerciseListPage() {
 
             <footer className="workspace-footer">
                 <span>매일이 쌓여, 단단한 기본기가 됩니다.</span>
-                <span>Algosteady · C 자료구조 훈련</span>
+                <span>Algosteady · C 구현 실습</span>
             </footer>
         </main>
     )

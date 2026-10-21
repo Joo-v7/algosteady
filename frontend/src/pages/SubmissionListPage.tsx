@@ -80,9 +80,9 @@ function SubmissionListPage() {
                 <div>
                     <div className="eyebrow">SUBMISSION HISTORY</div>
                     <h1>{exercise?.title ?? '과제'} · 제출 기록</h1>
-                    <p>C · 제출 당시 코드와 채점 결과를 확인합니다.</p>
+                    <p>C · 제출 코드와 채점 결과를 확인합니다.</p>
                 </div>
-                <Link className="primary-button" to={`/exercises/${exerciseId}?tab=training`}>구현 훈련으로</Link>
+                <Link className="primary-button" to={`/exercises/${exerciseId}?tab=training`}>실습하기로</Link>
             </section>
             <section className="panel history-panel" aria-busy={loading}>
                 {error ? <p role="alert">{error}</p> : loading ? <p role="status">제출 기록을 불러오는 중입니다.</p> : submissions && (
@@ -94,10 +94,8 @@ function SubmissionListPage() {
                                     <thead>
                                         <tr>
                                             <th>제출 시각</th>
-                                            <th>버전</th>
-                                            <th>작업 상태</th>
+                                            <th>상태</th>
                                             <th>통과 기준</th>
-                                            <th>기준 코드</th>
                                             <th>상세</th>
                                         </tr>
                                     </thead>
@@ -105,10 +103,8 @@ function SubmissionListPage() {
                                         {submissions.content.map(submission => (
                                             <tr key={submission.submissionId}>
                                                 <td><time dateTime={submission.submittedAt}>{new Date(submission.submittedAt).toLocaleString('ko-KR')}</time></td>
-                                                <td>{submission.contentVersion}</td>
                                                 <td>{jobLabels[submission.job.status]}</td>
                                                 <td>{submission.job.passedCriteria} / {submission.job.totalCriteria}</td>
-                                                <td>{submission.referenceViewed ? '열람' : '미열람'}</td>
                                                 <td><Link to={`/submissions/${submission.submissionId}?page=${submissions.page}`}>상세 보기</Link></td>
                                             </tr>
                                         ))}

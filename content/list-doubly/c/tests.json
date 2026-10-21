@@ -1,0 +1,338 @@
+[
+  {
+    "id": "init-empty",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "빈 헤드의 양방향 자기 연결",
+    "input": "INIT 0\nSTATE 0\nREVERSE 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "STATE\nREVERSE\nSIZE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "init-repeat",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "빈 리스트를 여러 번 초기화",
+    "input": "INIT 0\nINIT 0\nINIT 0\nSIZE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "SIZE 0\nSTATS 0 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "init-both",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "두 헤드의 초기 상태",
+    "input": "INIT 0\nINIT 1\nSIZE 0\nSIZE 1\nREVERSE 1\n",
+    "expected": {
+      "stdout": "SIZE 0\nSIZE 0\nREVERSE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-head",
+    "criterionId": "insertion",
+    "public": false,
+    "description": "헤드 오른쪽에 반복 삽입",
+    "input": "INIT 0\nINSERT 0 -1 10\nINSERT 0 -1 20\nINSERT 0 -1 30\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE 30 20 10\nREVERSE 10 20 30\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-middle",
+    "criterionId": "insertion",
+    "public": true,
+    "description": "중간 노드 오른쪽에 삽입",
+    "input": "INIT 0\nINSERT 0 -1 10\nINSERT 0 -1 20\nINSERT 0 0 15\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE 20 15 10\nREVERSE 10 15 20\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-last",
+    "criterionId": "insertion",
+    "public": false,
+    "description": "마지막 노드 오른쪽에 삽입",
+    "input": "INIT 0\nINSERT 0 -1 10\nINSERT 0 0 20\nINSERT 0 1 30\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE 10 20 30\nREVERSE 30 20 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "links-one",
+    "criterionId": "links",
+    "public": false,
+    "description": "단일 데이터 노드의 두 방향",
+    "input": "INIT 0\nINSERT 0 -1 7\nSTATE 0\nREVERSE 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "STATE 7\nREVERSE 7\nSIZE 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "links-values",
+    "criterionId": "links",
+    "public": false,
+    "description": "0과 음수·중복 값의 양방향 연결",
+    "input": "INIT 0\nINSERT 0 -1 0\nINSERT 0 0 -7\nINSERT 0 1 0\nINSERT 0 1 1000000\nINSERT 0 -1 -1000000\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE -1000000 0 -7 1000000 0\nREVERSE 0 1000000 -7 0 -1000000\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "links-after-delete",
+    "criterionId": "links",
+    "public": false,
+    "description": "삭제 후 양방향 링크 일치",
+    "input": "INIT 0\nINSERT 0 -1 1\nINSERT 0 0 2\nINSERT 0 1 3\nDELETE 0 1\nSTATE 0\nREVERSE 0\nINSERT 0 0 4\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE 1 3\nREVERSE 3 1\nSTATE 1 4 3\nREVERSE 3 4 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "links-many",
+    "criterionId": "links",
+    "public": false,
+    "description": "40개 데이터 노드의 연결",
+    "input": "INIT 0\nINSERT 0 -1 0\nINSERT 0 0 1\nINSERT 0 1 2\nINSERT 0 2 3\nINSERT 0 3 4\nINSERT 0 4 5\nINSERT 0 5 6\nINSERT 0 6 7\nINSERT 0 7 8\nINSERT 0 8 9\nINSERT 0 9 10\nINSERT 0 10 11\nINSERT 0 11 12\nINSERT 0 12 13\nINSERT 0 13 14\nINSERT 0 14 15\nINSERT 0 15 16\nINSERT 0 16 17\nINSERT 0 17 18\nINSERT 0 18 19\nINSERT 0 19 20\nINSERT 0 20 21\nINSERT 0 21 22\nINSERT 0 22 23\nINSERT 0 23 24\nINSERT 0 24 25\nINSERT 0 25 26\nINSERT 0 26 27\nINSERT 0 27 28\nINSERT 0 28 29\nINSERT 0 29 30\nINSERT 0 30 31\nINSERT 0 31 32\nINSERT 0 32 33\nINSERT 0 33 34\nINSERT 0 34 35\nINSERT 0 35 36\nINSERT 0 36 37\nINSERT 0 37 38\nINSERT 0 38 39\nSTATE 0\nREVERSE 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "STATE 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39\nREVERSE 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0\nSIZE 40\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-first",
+    "criterionId": "deletion",
+    "public": false,
+    "description": "첫 데이터 노드 삭제",
+    "input": "INIT 0\nINSERT 0 -1 10\nINSERT 0 0 20\nINSERT 0 1 30\nDELETE 0 0\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE 20 30\nREVERSE 30 20\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-middle",
+    "criterionId": "deletion",
+    "public": false,
+    "description": "중간 데이터 노드 삭제",
+    "input": "INIT 0\nINSERT 0 -1 10\nINSERT 0 0 20\nINSERT 0 1 30\nDELETE 0 1\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE 10 30\nREVERSE 30 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-last",
+    "criterionId": "deletion",
+    "public": false,
+    "description": "마지막 데이터 노드 삭제",
+    "input": "INIT 0\nINSERT 0 -1 10\nINSERT 0 0 20\nINSERT 0 1 30\nDELETE 0 2\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE 10 20\nREVERSE 20 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-only",
+    "criterionId": "deletion",
+    "public": false,
+    "description": "유일한 데이터 노드 삭제",
+    "input": "INIT 0\nINSERT 0 -1 9\nDELETE 0 0\nSTATE 0\nREVERSE 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "STATE\nREVERSE\nSIZE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "head-empty",
+    "criterionId": "head",
+    "public": false,
+    "description": "빈 헤드는 삭제하지 않음",
+    "input": "INIT 0\nDELETE 0 -1\nDELETE 0 -1\nSIZE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "SIZE 0\nSTATS 0 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "head-preserves",
+    "criterionId": "head",
+    "public": false,
+    "description": "데이터가 있어도 헤드는 유지",
+    "input": "INIT 0\nINSERT 0 -1 10\nINSERT 0 0 20\nINSERT 0 1 30\nDELETE 0 -1\nSTATE 0\nREVERSE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATE 10 20 30\nREVERSE 30 20 10\nSTATS 3 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "head-after-clear",
+    "criterionId": "head",
+    "public": false,
+    "description": "전체 삭제 후 헤드 보호",
+    "input": "INIT 0\nINSERT 0 -1 1\nDELETE 0 0\nDELETE 0 -1\nINSERT 0 -1 2\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE 2\nREVERSE 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-empty",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "빈 리스트는 줄바꿈만 출력",
+    "input": "INIT 0\nPRINT 0\n",
+    "expected": {
+      "stdout": "\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-single",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "헤드를 제외한 단일 값 출력",
+    "input": "INIT 0\nINSERT 0 -1 -5\nPRINT 0\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "<-| -5 |-> \nSTATE -5\nREVERSE -5\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-many",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "한 바퀴 출력 후 연결 유지",
+    "input": "INIT 0\nINSERT 0 -1 10\nINSERT 0 0 20\nINSERT 0 1 30\nPRINT 0\nPRINT 0\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "<-| 10 |-> <-| 20 |-> <-| 30 |-> \n<-| 10 |-> <-| 20 |-> <-| 30 |-> \nSTATE 10 20 30\nREVERSE 30 20 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-one",
+    "criterionId": "memory",
+    "public": false,
+    "description": "삽입 한 번·삭제 한 번의 할당과 해제",
+    "input": "INIT 0\nINSERT 0 -1 5\nSTATS 0\nDELETE 0 0\nSTATS 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "STATS 1 0\nSTATS 1 1\nSIZE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-all",
+    "criterionId": "memory",
+    "public": false,
+    "description": "모든 데이터 노드 해제",
+    "input": "INIT 0\nINSERT 0 -1 10\nINSERT 0 0 20\nINSERT 0 1 30\nDELETE 0 1\nSTATS 0\nDELETE 0 0\nDELETE 0 0\nSTATS 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "STATS 3 1\nSTATS 3 3\nSIZE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-head",
+    "criterionId": "memory",
+    "public": false,
+    "description": "헤드 보호는 추가 할당·해제 없음",
+    "input": "INIT 0\nINSERT 0 -1 7\nDELETE 0 -1\nPRINT 0\nSTATS 0\nDELETE 0 0\nDELETE 0 -1\nSTATS 0\n",
+    "expected": {
+      "stdout": "<-| 7 |-> \nSTATS 1 0\nSTATS 1 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-empty",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "전체 삭제 후 재삽입",
+    "input": "INIT 0\nINSERT 0 -1 10\nINSERT 0 0 20\nINSERT 0 1 30\nDELETE 0 0\nDELETE 0 0\nDELETE 0 0\nINSERT 0 -1 40\nINSERT 0 0 50\nSTATE 0\nREVERSE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATE 40 50\nREVERSE 50 40\nSTATS 5 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-init",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "재초기화 전 남은 데이터 정리",
+    "input": "INIT 0\nINSERT 0 -1 10\nINSERT 0 0 20\nINSERT 0 1 30\nINIT 0\nSTATE 0\nSTATS 0\nINSERT 0 -1 99\nSTATE 0\nREVERSE 0\n",
+    "expected": {
+      "stdout": "STATE\nSTATS 3 3\nSTATE 99\nREVERSE 99\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-repeat",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "삽입·삭제 반복 후 빈 고리 유지",
+    "input": "INIT 0\nINSERT 0 -1 0\nDELETE 0 0\nINSERT 0 -1 1\nDELETE 0 0\nINSERT 0 -1 2\nDELETE 0 0\nINSERT 0 -1 3\nDELETE 0 0\nINSERT 0 -1 4\nDELETE 0 0\nINSERT 0 -1 5\nDELETE 0 0\nINSERT 0 -1 6\nDELETE 0 0\nINSERT 0 -1 7\nDELETE 0 0\nINSERT 0 -1 8\nDELETE 0 0\nINSERT 0 -1 9\nDELETE 0 0\nINSERT 0 -1 10\nDELETE 0 0\nINSERT 0 -1 11\nDELETE 0 0\nSIZE 0\nSTATE 0\nREVERSE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "SIZE 0\nSTATE\nREVERSE\nSTATS 12 12\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent",
+    "criterionId": "independence",
+    "public": false,
+    "description": "두 리스트에서 서로 다른 삽입과 삭제",
+    "input": "INIT 0\nINIT 1\nINSERT 0 -1 10\nINSERT 1 -1 100\nINSERT 0 0 20\nINSERT 1 -1 200\nDELETE 0 0\nSTATE 0\nREVERSE 0\nSTATE 1\nREVERSE 1\n",
+    "expected": {
+      "stdout": "STATE 20\nREVERSE 20\nSTATE 200 100\nREVERSE 100 200\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-init",
+    "criterionId": "independence",
+    "public": false,
+    "description": "한 리스트 재초기화가 다른 고리에 영향 없음",
+    "input": "INIT 0\nINIT 1\nINSERT 0 -1 1\nINSERT 1 -1 2\nINSERT 1 0 3\nINIT 0\nINSERT 0 -1 4\nDELETE 1 -1\nSTATE 0\nSTATE 1\nREVERSE 1\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATE 4\nSTATE 2 3\nREVERSE 3 2\nSTATS 4 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

@@ -44,17 +44,20 @@ class JudgingQueryServiceTests {
     @Spy
     private JsonMapper jsonMapper = JsonMapper.builder().build();
 
-    private final ExecutionJob executionJob = ExecutionJob.createGrading("stack-array", "1.0.0", "c", "code");
+    private ExecutionJob executionJob;
     private final List<ExecutionTestResult> storedResults = new ArrayList<>();
     private JsonNode testContents;
+    private JsonNode exerciseMetadata;
 
     @BeforeEach
     void setUp() throws Exception {
         ObjectNode snapshot = jsonMapper.createObjectNode();
-        snapshot.set("exercise", jsonMapper.readTree(new ClassPathResource("content/stack-array/exercise.json").getContentAsString(StandardCharsets.UTF_8)));
+        exerciseMetadata = jsonMapper.readTree(new ClassPathResource("content/stack-array/exercise.json").getContentAsString(StandardCharsets.UTF_8));
+        executionJob = ExecutionJob.createGrading(exerciseMetadata.path("id").asString(), exerciseMetadata.path("version").asString(), "c", "code");
+        snapshot.set("exercise", exerciseMetadata);
         testContents = jsonMapper.readTree(new ClassPathResource("content/stack-array/c/tests.json").getContentAsString(StandardCharsets.UTF_8));
         snapshot.putObject("sources").putObject("c").set("tests", testContents);
-        Mockito.when(exerciseQueryService.findSnapshot("stack-array", "1.0.0", "c")).thenReturn(snapshot);
+        Mockito.when(exerciseQueryService.findSnapshot(executionJob.getExerciseId(), executionJob.getContentVersion(), "c")).thenReturn(snapshot);
         Mockito.when(executionJobRepository.findById(executionJob.getId())).thenReturn(Optional.of(executionJob));
         Mockito.when(executionTestResultRepository.findAllByJobId(executionJob.getId())).thenReturn(storedResults);
     }
@@ -72,8 +75,8 @@ class JudgingQueryServiceTests {
         JobResponseDto response = judgingQueryService.findById(executionJob.getId());
 
         // then
-        Assertions.assertEquals(22, response.getTests().size());
-        Assertions.assertEquals(8, response.getCriteria().size());
+        Assertions.assertEquals(testContents.size(), response.getTests().size());
+        Assertions.assertEquals(exerciseMetadata.path("criteria").size(), response.getCriteria().size());
         Assertions.assertTrue(response.getCriteria().stream()
                 .allMatch(criterion -> criterion.getStatus().equals("PASSED")));
         for (int index = 0; index < testContents.size(); index++) {

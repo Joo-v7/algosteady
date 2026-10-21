@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -84,22 +86,25 @@ class JudgingApiPostgresTests {
     private PlatformTransactionManager transactionManager;
 
     private MockMvc mockMvc;
+    private String stackContentVersion;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        stackContentVersion = exerciseQueryService.findDetails("stack-array", "c").getVersion();
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("com.algosteady.support.ExerciseContentSource#exercises")
     @DisplayName("JSON 실행 요청을 저장하고 DB에서 결과와 원본을 재조회합니다.")
-    void register_success_andReloadResults() throws Exception {
+    void register_success_andReloadResults(String exerciseId, String contentVersion) throws Exception {
         // given
-        JsonNode detail = jsonMapper.readTree(mockMvc.perform(get("/api/exercises/stack-array?language=c")).andReturn().getResponse().getContentAsString());
+        JsonNode detail = jsonMapper.readTree(mockMvc.perform(get("/api/exercises/" + exerciseId + "?language=c")).andReturn().getResponse().getContentAsString());
         String exampleId = detail.path("publicExamples").get(0).path("id").asString();
         String code = "invalid code;";
         RunRequestDto request = RunRequestDto.builder()
-                .exerciseId("stack-array")
-                .contentVersion("1.0.0")
+                .exerciseId(exerciseId)
+                .contentVersion(contentVersion)
                 .language("c")
                 .code(code)
                 .exampleId(exampleId)
@@ -141,8 +146,8 @@ class JudgingApiPostgresTests {
     void register_fail_withInvalidInput() throws Exception {
         // given
         String privateExampleRequest = """
-                {"exerciseId":"stack-array","contentVersion":"1.0.0","language":"c","code":"x","exampleId":"private"}
-                """;
+                {"exerciseId":"stack-array","contentVersion":"%s","language":"c","code":"x","exampleId":"private"}
+                """.formatted(stackContentVersion);
 
         // when
         ResultActions missingFields = mockMvc.perform(post("/api/runs").contentType(MediaType.APPLICATION_JSON).content("{}"));
@@ -170,10 +175,10 @@ class JudgingApiPostgresTests {
     @DisplayName("재시작 복구는 실행 중인 작업만 실패로 바꾸고 대기 작업을 보존합니다.")
     void recover_success_onlyRunningJobs() {
         // given
-        ExecutionJob running = ExecutionJob.createGrading("stack-array", "1.0.0", "c", "code");
+        ExecutionJob running = ExecutionJob.createGrading("stack-array", stackContentVersion, "c", "code");
         running.markRunning();
         executionJobRepository.save(running);
-        ExecutionJob queued = executionJobRepository.save(ExecutionJob.createGrading("stack-array", "1.0.0", "c", "code"));
+        ExecutionJob queued = executionJobRepository.save(ExecutionJob.createGrading("stack-array", stackContentVersion, "c", "code"));
         entityManager.flush();
         entityManager.clear();
 
@@ -187,13 +192,14 @@ class JudgingApiPostgresTests {
         Assertions.assertEquals(ExecutionJob.Status.QUEUED, executionJobRepository.findById(queued.getId()).orElseThrow().getStatus());
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("com.algosteady.support.ExerciseContentSource#exercises")
     @DisplayName("매번 새 제출과 전체 채점 작업을 저장하고 기준별 결과를 재조회합니다.")
-    void submit_success_withOriginalAndFullGrading() throws Exception {
+    void submit_success_withOriginalAndFullGrading(String exerciseId, String contentVersion) throws Exception {
         // given
         SubmissionRequestDto request = SubmissionRequestDto.builder()
-                .exerciseId("stack-array")
-                .contentVersion("1.0.0")
+                .exerciseId(exerciseId)
+                .contentVersion(contentVersion)
                 .language("c")
                 .code("original code")
                 .referenceViewed(true)
@@ -221,12 +227,12 @@ class JudgingApiPostgresTests {
 
         // then
         JsonNode queuedResponse = jsonMapper.readTree(queuedJob.andReturn().getResponse().getContentAsString());
-        Assertions.assertEquals(8, queuedResponse.path("criteria").size());
+        JsonNode snapshot = exerciseQueryService.findSnapshot(exerciseId, contentVersion, "c");
+        Assertions.assertEquals(snapshot.path("exercise").path("criteria").size(), queuedResponse.path("criteria").size());
         Assertions.assertTrue(queuedResponse.path("tests").isEmpty());
         Assertions.assertNull(executionJobRepository.findById(jobId).orElseThrow().getExampleId());
 
         // given
-        JsonNode snapshot = exerciseQueryService.findSnapshot("stack-array", "1.0.0", "c");
         ArrayList<TestExecutionResult> actualResults = new ArrayList<>();
         for (JsonNode test : snapshot.path("sources").path("c").path("tests")) {
             JsonNode expected = test.path("expected");
@@ -244,7 +250,7 @@ class JudgingApiPostgresTests {
 
         // then
         JsonNode completedResponse = jsonMapper.readTree(completedJob.andReturn().getResponse().getContentAsString());
-        Assertions.assertEquals(22, completedResponse.path("tests").size());
+        Assertions.assertEquals(snapshot.path("sources").path("c").path("tests").size(), completedResponse.path("tests").size());
         for (JsonNode criterion : completedResponse.path("criteria")) {
             Assertions.assertEquals("PASSED", criterion.path("status").asString());
         }
@@ -268,7 +274,7 @@ class JudgingApiPostgresTests {
         AtomicReference<UUID> jobId = new AtomicReference<>();
         SubmissionRequestDto request = SubmissionRequestDto.builder()
                 .exerciseId("stack-array")
-                .contentVersion("1.0.0")
+                .contentVersion(stackContentVersion)
                 .language("c")
                 .code("original")
                 .referenceViewed(false)
@@ -292,11 +298,11 @@ class JudgingApiPostgresTests {
         // given
         long jobsBefore = executionJobRepository.count();
         String missingReferenceViewedRequest = """
-                {"exerciseId":"stack-array","contentVersion":"1.0.0","language":"c","code":"x"}
-                """;
+                {"exerciseId":"stack-array","contentVersion":"%s","language":"c","code":"x"}
+                """.formatted(stackContentVersion);
         String invalidLanguageRequest = """
-                {"exerciseId":"stack-array","contentVersion":"1.0.0","language":"java","code":"x","referenceViewed":false}
-                """;
+                {"exerciseId":"stack-array","contentVersion":"%s","language":"java","code":"x","referenceViewed":false}
+                """.formatted(stackContentVersion);
         String missingVersionRequest = """
                 {"exerciseId":"stack-array","contentVersion":"missing","language":"c","code":"x","referenceViewed":false}
                 """;

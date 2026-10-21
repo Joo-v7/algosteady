@@ -75,15 +75,17 @@ class SubmissionQueryPostgresTests {
 
     private MockMvc mockMvc;
     private String exerciseId;
+    private String contentVersion;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
         exerciseId = "history-" + UUID.randomUUID();
-        ExerciseContent original = exerciseContentRepository.findByExerciseIdAndContentVersion("stack-array", "1.0.0").orElseThrow();
+        ExerciseContent original = exerciseContentRepository.findFirstByExerciseIdOrderByIdDesc("stack-array").orElseThrow();
+        contentVersion = original.getContentVersion();
         JsonNode snapshot = jsonMapper.readTree(original.getSnapshot());
         ((ObjectNode) snapshot.path("exercise")).put("id", exerciseId);
-        exerciseContentRepository.saveAndFlush(ExerciseContent.create(exerciseId, "1.0.0", jsonMapper.writeValueAsString(snapshot)));
+        exerciseContentRepository.saveAndFlush(ExerciseContent.create(exerciseId, contentVersion, jsonMapper.writeValueAsString(snapshot)));
     }
 
     @Test
@@ -92,7 +94,7 @@ class SubmissionQueryPostgresTests {
         // given
         SubmissionResponseDto older = registerSubmission("older original", false);
         SubmissionResponseDto latest = registerSubmission("latest original", true);
-        JsonNode snapshot = exerciseQueryService.findSnapshot(exerciseId, "1.0.0", "c");
+        JsonNode snapshot = exerciseQueryService.findSnapshot(exerciseId, contentVersion, "c");
         ArrayList<TestExecutionResult> testResults = new ArrayList<>();
         for (JsonNode test : snapshot.path("sources").path("c").path("tests")) {
             JsonNode expected = test.path("expected");
@@ -116,7 +118,7 @@ class SubmissionQueryPostgresTests {
                 .andExpect(jsonPath("$.totalPages").value(2))
                 .andExpect(jsonPath("$.content[0].submissionId").value(latest.getSubmissionId().toString()))
                 .andExpect(jsonPath("$.content[0].job.status").value("COMPLETED"))
-                .andExpect(jsonPath("$.content[0].job.passedCriteria").value(8))
+                .andExpect(jsonPath("$.content[0].job.passedCriteria").value(snapshot.path("exercise").path("criteria").size()))
                 .andExpect(jsonPath("$.content[0].code").doesNotExist())
                 .andExpect(jsonPath("$.content[0].job.tests").doesNotExist());
         secondPage.andExpect(status().isOk())
@@ -126,9 +128,9 @@ class SubmissionQueryPostgresTests {
         details.andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("latest original"))
                 .andExpect(jsonPath("$.referenceViewed").value(true))
-                .andExpect(jsonPath("$.contentVersion").value("1.0.0"))
+                .andExpect(jsonPath("$.contentVersion").value(contentVersion))
                 .andExpect(jsonPath("$.job.jobId").value(latest.getJobId().toString()))
-                .andExpect(jsonPath("$.job.tests.length()").value(22));
+                .andExpect(jsonPath("$.job.tests.length()").value(snapshot.path("sources").path("c").path("tests").size()));
         Assertions.assertThat(submissionRepository.findById(older.getSubmissionId()).orElseThrow().getCode()).isEqualTo("older original");
         Assertions.assertThat(submissionRepository.findById(latest.getSubmissionId()).orElseThrow().getCode()).isEqualTo("latest original");
     }
@@ -183,7 +185,7 @@ class SubmissionQueryPostgresTests {
     private SubmissionResponseDto registerSubmission(String code, boolean referenceViewed) {
         return submissionCommandService.register(SubmissionRequestDto.builder()
                 .exerciseId(exerciseId)
-                .contentVersion("1.0.0")
+                .contentVersion(contentVersion)
                 .language("c")
                 .code(code)
                 .referenceViewed(referenceViewed)

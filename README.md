@@ -83,6 +83,7 @@ Vite가 `/api` 요청을 API 서버로 전달한다. 종료할 때 각 서버를
 ```bash
 npm run build
 npm run lint
+npm test
 ```
 
 백엔드는 환경변수를 전달한 터미널에서 실행한다. 기본 테스트는 PostgreSQL이 필요하고, Docker 테스트는 실행 이미지도 필요하다.
@@ -90,7 +91,7 @@ npm run lint
 ```bash
 ./mvnw test
 ./mvnw '-Dtest=JudgingApiPostgresTests,SubmissionQueryPostgresTests' -Dalgosteady.postgres.tests=true test
-./mvnw '-Dtest=CodeExecutionDockerTests' -Dalgosteady.docker.tests=true test
+./mvnw '-Dtest=CodeExecutionDockerTests,ExerciseContentDockerTests' -Dalgosteady.docker.tests=true test
 ./mvnw -DskipTests package
 ```
 

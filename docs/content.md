@@ -39,7 +39,7 @@ content/<과제-id>/
 | 테스트 보완 | 등록·공개 범위·실제 실행·대표 오답·저장 흐름 중 변경 영향을 받는 동작 검증 |
 | 문서 갱신 | 학습 목록의 항목·완료 상태 갱신. API나 공통 규격이 바뀌면 해당 문서 수정 |
 
-테스트 참고 위치는 [콘텐츠 등록·조회](../backend/src/test/java/com/algosteady/exercise/ExerciseContentTests.java), [API·PostgreSQL 저장](../backend/src/test/java/com/algosteady/judging/JudgingApiPostgresTests.java), [Docker 실제 실행](../backend/src/test/java/com/algosteady/judging/runner/service/CodeExecutionDockerTests.java)이다. 과제마다 이 세 파일을 모두 수정하는 규칙은 아니며, 변경 영향에 맞춰 선택한다.
+테스트 참고 위치는 [콘텐츠 등록·조회](../backend/src/test/java/com/algosteady/exercise/ExerciseContentTests.java), [API·PostgreSQL 저장](../backend/src/test/java/com/algosteady/judging/JudgingApiPostgresTests.java), [Docker 실제 실행](../backend/src/test/java/com/algosteady/judging/runner/service/ExerciseContentDockerTests.java)이다. 과제마다 이 세 파일을 모두 수정하는 규칙은 아니며, 변경 영향에 맞춰 선택한다.
 
 공통 테스트 대상·버전·개수는 [ExerciseContentSource](../backend/src/test/java/com/algosteady/support/ExerciseContentSource.java)가 콘텐츠 파일에서 읽는다. 새 과제를 추가할 때 전체 목록을 수정하지 않으며, 과제별 오답·특수 동작 검증이 필요한 경우에만 테스트를 보완한다.
 
@@ -56,6 +56,8 @@ content/<과제-id>/
 | `languages` | 언어별 표준·시작 코드·기준 코드·호출 코드·테스트 경로 |
 
 공통 최상위 항목을 유지하고, `learning`에는 학습 내용과 시각화에 필요한 상태를, `contract`에는 구현할 함수와 동작 규격을 담는다. 구체적인 함수명·상태 필드·수치와 의미는 각 과제의 원본에서 관리한다. 세부 항목은 모든 과제에 공통으로 요구하지 않는다.
+
+학습 단계는 비어 있을 수 없으며, 시각화별 필수 필드·인덱스와 부모 연결의 순환 여부를 등록 시 검증한다.
 
 새로운 상태나 표현이 필요하면 해당 콘텐츠와 화면 타입·표시 로직을 함께 맞춘다. 콘텐츠에 필드를 추가하는 것만으로 새로운 시각화가 자동 지원되지는 않는다. 이 문서는 공통 파일 구성·등록·검증 규칙이 바뀔 때 수정한다.
 

@@ -1,0 +1,227 @@
+{
+  "id": "tree-binary",
+  "version": "1.0.0",
+  "title": "이진 트리 구성",
+  "category": "tree",
+  "kind": "data-structure",
+  "description": "각 노드가 왼쪽과 오른쪽 자식의 주소를 저장합니다. 노드를 동적으로 생성하고 기존 서브트리를 연결해 이진 트리를 구성합니다.",
+  "learning": {
+    "concept": {
+      "title": "노드 하나에 두 개의 자식 링크",
+      "paragraphs": [
+        "이진 트리의 노드는 자식을 최대 두 개 가집니다. left는 왼쪽 자식, right는 오른쪽 자식의 주소입니다. 자식이 없는 쪽은 NULL이며, 두 자식이 모두 없는 노드를 단말 노드라고 합니다.",
+        "루트는 트리의 맨 위 노드입니다. 단말 노드를 먼저 만든 뒤 그 주소를 부모 노드에 연결하면 작은 서브트리부터 전체 트리를 구성할 수 있습니다. 빈 트리의 루트는 NULL입니다.",
+        "이진 트리는 왼쪽과 오른쪽의 위치를 구분합니다. 여기서는 값의 크기로 자식을 정하지 않습니다. 이진 탐색 트리의 정렬 규칙과 구분합니다. 노드 한 개 생성은 O(1), n개 노드 구성과 저장 공간은 O(n)입니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "TreeNode",
+        "description": "정수 data와 두 자식의 주소를 저장하는 노드입니다."
+      },
+      {
+        "name": "left",
+        "description": "왼쪽 자식 노드의 주소입니다. 왼쪽 자식이 없으면 NULL입니다."
+      },
+      {
+        "name": "right",
+        "description": "오른쪽 자식 노드의 주소입니다. 오른쪽 자식이 없으면 NULL입니다."
+      },
+      {
+        "name": "root",
+        "description": "트리의 시작 노드 주소입니다. 빈 트리는 NULL입니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "create_node",
+        "description": "malloc으로 TreeNode 한 개를 생성하고 data를 저장합니다. left와 right에는 전달받은 자식 주소를 그대로 저장하고 새 노드 주소를 반환합니다. 자식을 복제·변경·해제하지 않습니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "root",
+        "argument": null,
+        "result": "NULL",
+        "tree": [],
+        "description": "처음에는 루트가 NULL인 빈 트리입니다."
+      },
+      {
+        "operation": "create_node",
+        "argument": "20, NULL, NULL",
+        "result": "n20",
+        "tree": [
+          20
+        ],
+        "description": "자식이 없는 20 노드를 만듭니다. left와 right는 모두 NULL입니다."
+      },
+      {
+        "operation": "create_node",
+        "argument": "30, NULL, NULL",
+        "result": "n30",
+        "tree": [
+          30
+        ],
+        "description": "별도의 30 노드를 만듭니다. 먼저 만든 20 노드는 그대로 남습니다."
+      },
+      {
+        "operation": "create_node",
+        "argument": "10, n20, n30",
+        "result": "root",
+        "tree": [
+          10,
+          20,
+          30
+        ],
+        "description": "10 노드를 루트로 만들고 기존 20·30 노드의 주소를 왼쪽·오른쪽에 연결합니다."
+      },
+      {
+        "operation": "create_node",
+        "argument": "40, root, NULL",
+        "result": "new_root",
+        "tree": [
+          40,
+          10,
+          null,
+          20,
+          30
+        ],
+        "description": "기존 트리를 왼쪽 서브트리로 연결합니다. 40의 오른쪽은 NULL이며 기존 노드의 연결은 유지됩니다."
+      }
+    ],
+    "notes": [
+      {
+        "title": "왼쪽과 오른쪽을 구분",
+        "description": "값을 비교해 정렬하지 않습니다. 같은 값도 서로 다른 노드이며 전달받은 자식의 주소와 위치를 유지합니다."
+      },
+      {
+        "title": "자식은 기존 노드의 주소",
+        "description": "부모를 만들 때 자식을 새로 복제하거나 해제하지 않습니다. 자식의 값과 연결도 바꾸지 않습니다."
+      },
+      {
+        "title": "메모리 정리는 호출 코드에서",
+        "description": "이번 실습은 노드 생성과 연결에 집중합니다. 순회 함수는 다음 과제에서 구현하며, 생성된 노드의 최종 해제는 호출 코드가 담당합니다."
+      }
+    ]
+  },
+  "contract": {
+    "storage": "linked",
+    "scope": "제공된 TreeNode를 사용해 create_node 함수의 정의와 본문 전체를 구현합니다.",
+    "valueRange": {
+      "min": -1000000,
+      "max": 1000000
+    },
+    "functions": [
+      {
+        "name": "create_node",
+        "signature": "TreeNode *create_node(int data, TreeNode *left, TreeNode *right)",
+        "behavior": "malloc으로 TreeNode 한 개를 생성하고 data를 저장합니다. left와 right에는 전달받은 자식 주소를 그대로 저장하고 새 노드 주소를 반환합니다. 자식을 복제·변경·해제하지 않습니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      }
+    ],
+    "errorHandling": {
+      "allocationFailure": "stderr에 오류를 출력하고 exit(1)로 종료합니다.",
+      "exactMessageRequired": false
+    },
+    "requirements": [
+      "정상 연산은 출력하지 않으며 출력은 호출 코드가 담당합니다.",
+      "자식은 NULL 또는 이미 생성된 유효한 노드의 주소입니다.",
+      "한 노드를 여러 부모가 공유하거나 순환하는 입력은 전달하지 않습니다.",
+      "노드 한 개를 malloc으로 할당하고 기존 자식 노드를 변경·복제·해제하지 않습니다.",
+      "생성된 모든 노드는 테스트 호출 코드가 정리합니다."
+    ]
+  },
+  "prerequisites": [
+    "list-singly"
+  ],
+  "criteria": [
+    {
+      "id": "leaf",
+      "order": 1,
+      "title": "단말 노드",
+      "description": "두 자식이 NULL인 노드를 생성합니다."
+    },
+    {
+      "id": "left",
+      "order": 2,
+      "title": "왼쪽 자식",
+      "description": "전달한 왼쪽 자식의 주소를 유지합니다."
+    },
+    {
+      "id": "right",
+      "order": 3,
+      "title": "오른쪽 자식",
+      "description": "전달한 오른쪽 자식의 주소를 유지합니다."
+    },
+    {
+      "id": "both",
+      "order": 4,
+      "title": "두 서브트리 연결",
+      "description": "좌우 위치를 구분해 서브트리를 연결합니다."
+    },
+    {
+      "id": "preservation",
+      "order": 5,
+      "title": "기존 노드 보존",
+      "description": "자식의 값과 연결을 바꾸지 않습니다."
+    },
+    {
+      "id": "memory",
+      "order": 6,
+      "title": "노드 할당",
+      "description": "호출마다 새 노드 하나만 할당합니다."
+    },
+    {
+      "id": "independence",
+      "order": 7,
+      "title": "트리 독립성",
+      "description": "별개 트리와 같은 값의 노드를 구분합니다."
+    },
+    {
+      "id": "reuse",
+      "order": 8,
+      "title": "정리 후 재사용",
+      "description": "메모리 정리 후 다시 트리를 구성합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "create_node",
+          "description": "malloc으로 TreeNode 한 개를 생성하고 data를 저장합니다. left와 right에는 전달받은 자식 주소를 그대로 저장하고 새 노드 주소를 반환합니다. 자식을 복제·변경·해제하지 않습니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "NODE는 미사용 ID(0~127)에 새 노드를 저장합니다. 자식 ID -1은 NULL이며 그 외는 먼저 생성한 노드입니다. SHAPE는 값(왼쪽,오른쪽) 형식으로 구조를 출력하고 빈 링크를 #으로 표시합니다. LINKS는 실제 자식 주소에 대응하는 ID를 출력해 같은 값의 노드도 구분합니다. 출력은 사용자 순회 함수가 아닌 호출 코드의 구조 검사입니다. CLEAR는 모든 노드와 ID를 정리하며 STATS는 누적 malloc·free 호출 수입니다.",
+        "commands": [
+          {
+            "syntax": "NODE <id> <data> <leftId> <rightId>",
+            "output": null
+          },
+          {
+            "syntax": "SHAPE <id>",
+            "output": "SHAPE <value>(<left>,<right>)"
+          },
+          {
+            "syntax": "LINKS <id>",
+            "output": "LINKS <leftId> <rightId>"
+          },
+          {
+            "syntax": "CLEAR",
+            "output": null
+          },
+          {
+            "syntax": "STATS",
+            "output": "STATS <allocations> <releases>"
+          }
+        ],
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

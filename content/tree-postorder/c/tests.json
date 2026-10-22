@@ -1,0 +1,194 @@
+[
+  {
+    "id": "empty-zero",
+    "criterionId": "empty",
+    "public": false,
+    "description": "슬롯이 없는 빈 트리",
+    "input": "1 0\n",
+    "expected": {
+      "stdout": "\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-null",
+    "criterionId": "empty",
+    "public": false,
+    "description": "루트가 NULL인 트리",
+    "input": "1 1 #\n",
+    "expected": {
+      "stdout": "\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "leaf-one",
+    "criterionId": "leaf",
+    "public": false,
+    "description": "단일 노드",
+    "input": "1 1 7\n",
+    "expected": {
+      "stdout": "[7] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "leaf-zero",
+    "criterionId": "leaf",
+    "public": false,
+    "description": "0도 실제 노드의 값",
+    "input": "1 1 0\n",
+    "expected": {
+      "stdout": "[0] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "root-example",
+    "criterionId": "root-last",
+    "public": true,
+    "description": "왼쪽·오른쪽·현재 순서의 대표 트리",
+    "input": "1 7 15 4 20 1 # 16 25\n",
+    "expected": {
+      "stdout": "[1] [4] [16] [25] [20] [15] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "root-three",
+    "criterionId": "root-last",
+    "public": false,
+    "description": "두 자식 이후에 부모 방문",
+    "input": "1 3 10 20 30\n",
+    "expected": {
+      "stdout": "[20] [30] [10] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "left-subtree",
+    "criterionId": "left-first",
+    "public": false,
+    "description": "왼쪽 전체·오른쪽 전체 이후 루트 방문",
+    "input": "1 7 1 2 3 4 5 6 7\n",
+    "expected": {
+      "stdout": "[4] [5] [2] [6] [7] [3] [1] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "left-deep",
+    "criterionId": "left-first",
+    "public": false,
+    "description": "깊은 왼쪽 가지에서 자식 이후 부모 방문",
+    "input": "1 9 1 2 3 4 # # # 5 6\n",
+    "expected": {
+      "stdout": "[5] [6] [4] [2] [3] [1] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "sparse-left",
+    "criterionId": "sparse",
+    "public": false,
+    "description": "왼쪽 경사 트리",
+    "input": "1 8 1 2 # 3 # # # 4\n",
+    "expected": {
+      "stdout": "[4] [3] [2] [1] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "sparse-right",
+    "criterionId": "sparse",
+    "public": false,
+    "description": "오른쪽 경사 트리",
+    "input": "1 15 1 # 2 # # # 3 # # # # # # # 4\n",
+    "expected": {
+      "stdout": "[4] [3] [2] [1] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "sparse-values",
+    "criterionId": "sparse",
+    "public": false,
+    "description": "중복·음수·경계 값",
+    "input": "1 7 0 -1000000 1000000 0 # -7 0\n",
+    "expected": {
+      "stdout": "[0] [-1000000] [-7] [0] [1000000] [0] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "preserve-both",
+    "criterionId": "preservation",
+    "public": false,
+    "description": "순회 후 좌우 연결 유지",
+    "input": "2 7 1 2 3 4 5 6 7\n",
+    "expected": {
+      "stdout": "[4] [5] [2] [6] [7] [3] [1] \n[4] [5] [2] [6] [7] [3] [1] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "preserve-shape",
+    "criterionId": "preservation",
+    "public": false,
+    "description": "비대칭 트리 값과 연결 유지",
+    "input": "2 7 10 # 20 # # 15 25\n",
+    "expected": {
+      "stdout": "[15] [25] [20] [10] \n[15] [25] [20] [10] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "repeat-three",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "같은 트리 세 번 독립 순회",
+    "input": "3 3 1 2 3\n",
+    "expected": {
+      "stdout": "[2] [3] [1] \n[2] [3] [1] \n[2] [3] [1] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-multiple",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "서로 다른 트리를 연속 순회",
+    "input": "1 3 10 20 30\n1 0\n1 1 -5\n",
+    "expected": {
+      "stdout": "[20] [30] [10] \n\n[-5] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-many",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "완전 트리의 모든 노드 방문",
+    "input": "1 15 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14\n",
+    "expected": {
+      "stdout": "[7] [8] [3] [9] [10] [4] [1] [11] [12] [5] [13] [14] [6] [2] [0] \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

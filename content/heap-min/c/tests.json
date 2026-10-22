@@ -1,0 +1,302 @@
+[
+  {
+    "id": "init-empty",
+    "criterionId": "init",
+    "public": false,
+    "description": "초기화한 힙의 크기와 빈 루트",
+    "input": "SIZE 0\nROOT 0\n",
+    "expected": {
+      "stdout": "SIZE 0\nROOT EMPTY\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "init-reset",
+    "criterionId": "init",
+    "public": false,
+    "description": "원소가 있는 힙 재초기화",
+    "input": "PUSH 0 4\nPUSH 0 2\nPUSH 0 6\nINIT 0\nSIZE 0\nROOT 0\nPUSH 0 8\nPOP 0\n",
+    "expected": {
+      "stdout": "SIZE 0\nROOT EMPTY\nPOP 8\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-example",
+    "criterionId": "insert",
+    "public": true,
+    "description": "대표 삽입과 전체 삭제",
+    "input": "PUSH 0 20\nPUSH 0 30\nPUSH 0 10\nPUSH 0 40\nPUSH 0 25\nPUSH 0 15\nPUSH 0 5\nROOT 0\nSIZE 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "ROOT 5\nSIZE 7\nPOP 5\nPOP 10\nPOP 15\nPOP 20\nPOP 25\nPOP 30\nPOP 40\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-rise",
+    "criterionId": "insert",
+    "public": false,
+    "description": "여러 부모를 넘어 루트까지 상향 이동",
+    "input": "PUSH 0 15\nPUSH 0 14\nPUSH 0 13\nPUSH 0 12\nPUSH 0 11\nPUSH 0 10\nPUSH 0 9\nPUSH 0 8\nPUSH 0 7\nPUSH 0 6\nPUSH 0 5\nPUSH 0 4\nPUSH 0 3\nPUSH 0 2\nPUSH 0 1\nROOT 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "ROOT 1\nPOP 1\nPOP 2\nPOP 3\nPOP 4\nPOP 5\nPOP 6\nPOP 7\nPOP 8\nPOP 9\nPOP 10\nPOP 11\nPOP 12\nPOP 13\nPOP 14\nPOP 15\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-stay",
+    "criterionId": "insert",
+    "public": false,
+    "description": "부모보다 우선하지 않으면 제자리 유지",
+    "input": "PUSH 0 1\nPUSH 0 2\nPUSH 0 3\nPUSH 0 4\nPUSH 0 5\nPUSH 0 6\nPUSH 0 7\nPUSH 0 8\nPUSH 0 9\nPUSH 0 10\nPUSH 0 11\nPUSH 0 12\nPUSH 0 13\nPUSH 0 14\nPUSH 0 15\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "POP 1\nPOP 2\nPOP 3\nPOP 4\nPOP 5\nPOP 6\nPOP 7\nPOP 8\nPOP 9\nPOP 10\nPOP 11\nPOP 12\nPOP 13\nPOP 14\nPOP 15\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-single",
+    "criterionId": "delete",
+    "public": false,
+    "description": "마지막 한 원소 삭제",
+    "input": "PUSH 0 7\nPOP 0\nSIZE 0\nROOT 0\n",
+    "expected": {
+      "stdout": "POP 7\nSIZE 0\nROOT EMPTY\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-many",
+    "criterionId": "delete",
+    "public": false,
+    "description": "삭제마다 여러 단계 하향 이동",
+    "input": "PUSH 0 9\nPUSH 0 3\nPUSH 0 17\nPUSH 0 6\nPUSH 0 12\nPUSH 0 5\nPUSH 0 20\nPUSH 0 1\nPUSH 0 15\nPUSH 0 8\nPUSH 0 11\nPUSH 0 4\nPUSH 0 19\nPUSH 0 2\nPUSH 0 18\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "POP 1\nPOP 2\nPOP 3\nPOP 4\nPOP 5\nPOP 6\nPOP 8\nPOP 9\nPOP 11\nPOP 12\nPOP 15\nPOP 17\nPOP 18\nPOP 19\nPOP 20\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-size",
+    "criterionId": "delete",
+    "public": false,
+    "description": "삭제는 크기를 한 번만 감소",
+    "input": "PUSH 0 4\nPUSH 0 9\nPUSH 0 2\nPUSH 0 7\nPOP 0\nSIZE 0\nPOP 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "POP 2\nSIZE 3\nPOP 4\nSIZE 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "child-right",
+    "criterionId": "children",
+    "public": false,
+    "description": "더 우선하는 오른쪽 자식 선택",
+    "input": "PUSH 0 -100\nPUSH 0 -70\nPUSH 0 -90\nPUSH 0 -10\nPUSH 0 -20\nPUSH 0 -80\nPUSH 0 -85\nPUSH 0 -5\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "POP -100\nPOP -90\nPOP -85\nPOP -80\nPOP -70\nPOP -20\nPOP -10\nPOP -5\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "child-left-only",
+    "criterionId": "children",
+    "public": false,
+    "description": "왼쪽 자식만 남은 경계",
+    "input": "PUSH 0 -10\nPUSH 0 -8\nPUSH 0 -7\nPOP 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "POP -10\nPOP -8\nPOP -7\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "child-deep",
+    "criterionId": "children",
+    "public": false,
+    "description": "깊은 자식 선택과 마지막 원소 제자리",
+    "input": "PUSH 0 -90\nPUSH 0 -70\nPUSH 0 -80\nPUSH 0 -50\nPUSH 0 -60\nPUSH 0 -75\nPUSH 0 -78\nPUSH 0 -10\nPUSH 0 -20\nPUSH 0 -30\nPUSH 0 -40\nPUSH 0 -72\nPUSH 0 -74\nPUSH 0 -76\nPUSH 0 -77\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "POP -90\nPOP -80\nPOP -78\nPOP -77\nPOP -76\nPOP -75\nPOP -74\nPOP -72\nPOP -70\nPOP -60\nPOP -50\nPOP -40\nPOP -30\nPOP -20\nPOP -10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "duplicate",
+    "criterionId": "values",
+    "public": false,
+    "description": "중복 키를 모두 저장·삭제",
+    "input": "PUSH 0 5\nPUSH 0 5\nPUSH 0 5\nPUSH 0 3\nPUSH 0 3\nPUSH 0 7\nPUSH 0 7\nPUSH 0 5\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "POP 3\nPOP 3\nPOP 5\nPOP 5\nPOP 5\nPOP 5\nPOP 7\nPOP 7\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "zero-negative",
+    "criterionId": "values",
+    "public": false,
+    "description": "0과 음수·양수 혼합",
+    "input": "PUSH 0 0\nPUSH 0 -4\nPUSH 0 3\nPUSH 0 0\nPUSH 0 -9\nPUSH 0 2\nPUSH 0 -4\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "POP -9\nPOP -4\nPOP -4\nPOP 0\nPOP 0\nPOP 2\nPOP 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "boundaries",
+    "criterionId": "values",
+    "public": false,
+    "description": "키 범위 양 끝값",
+    "input": "PUSH 0 -1000000\nPUSH 0 1000000\nPUSH 0 0\nPUSH 0 -1000000\nPUSH 0 1000000\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "POP -1000000\nPOP -1000000\nPOP 0\nPOP 1000000\nPOP 1000000\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-initial",
+    "criterionId": "empty",
+    "public": false,
+    "description": "처음부터 빈 힙 삭제",
+    "input": "POP 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-after-delete",
+    "criterionId": "empty",
+    "public": false,
+    "description": "전체 삭제 뒤 추가 삭제",
+    "input": "PUSH 0 1\nPUSH 0 2\nPOP 0\nPOP 0\nPOP 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "POP 1\nPOP 2\n",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-after-init",
+    "criterionId": "empty",
+    "public": false,
+    "description": "재초기화 후 빈 힙 삭제",
+    "input": "PUSH 0 1\nINIT 0\nPOP 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "full-boundary",
+    "criterionId": "full",
+    "public": false,
+    "description": "199개까지 정상 저장·전체 삭제",
+    "input": "PUSH 0 0\nPUSH 0 1\nPUSH 0 2\nPUSH 0 3\nPUSH 0 4\nPUSH 0 5\nPUSH 0 6\nPUSH 0 7\nPUSH 0 8\nPUSH 0 9\nPUSH 0 10\nPUSH 0 11\nPUSH 0 12\nPUSH 0 13\nPUSH 0 14\nPUSH 0 15\nPUSH 0 16\nPUSH 0 17\nPUSH 0 18\nPUSH 0 19\nPUSH 0 20\nPUSH 0 21\nPUSH 0 22\nPUSH 0 23\nPUSH 0 24\nPUSH 0 25\nPUSH 0 26\nPUSH 0 27\nPUSH 0 28\nPUSH 0 29\nPUSH 0 30\nPUSH 0 31\nPUSH 0 32\nPUSH 0 33\nPUSH 0 34\nPUSH 0 35\nPUSH 0 36\nPUSH 0 37\nPUSH 0 38\nPUSH 0 39\nPUSH 0 40\nPUSH 0 41\nPUSH 0 42\nPUSH 0 43\nPUSH 0 44\nPUSH 0 45\nPUSH 0 46\nPUSH 0 47\nPUSH 0 48\nPUSH 0 49\nPUSH 0 50\nPUSH 0 51\nPUSH 0 52\nPUSH 0 53\nPUSH 0 54\nPUSH 0 55\nPUSH 0 56\nPUSH 0 57\nPUSH 0 58\nPUSH 0 59\nPUSH 0 60\nPUSH 0 61\nPUSH 0 62\nPUSH 0 63\nPUSH 0 64\nPUSH 0 65\nPUSH 0 66\nPUSH 0 67\nPUSH 0 68\nPUSH 0 69\nPUSH 0 70\nPUSH 0 71\nPUSH 0 72\nPUSH 0 73\nPUSH 0 74\nPUSH 0 75\nPUSH 0 76\nPUSH 0 77\nPUSH 0 78\nPUSH 0 79\nPUSH 0 80\nPUSH 0 81\nPUSH 0 82\nPUSH 0 83\nPUSH 0 84\nPUSH 0 85\nPUSH 0 86\nPUSH 0 87\nPUSH 0 88\nPUSH 0 89\nPUSH 0 90\nPUSH 0 91\nPUSH 0 92\nPUSH 0 93\nPUSH 0 94\nPUSH 0 95\nPUSH 0 96\nPUSH 0 97\nPUSH 0 98\nPUSH 0 99\nPUSH 0 100\nPUSH 0 101\nPUSH 0 102\nPUSH 0 103\nPUSH 0 104\nPUSH 0 105\nPUSH 0 106\nPUSH 0 107\nPUSH 0 108\nPUSH 0 109\nPUSH 0 110\nPUSH 0 111\nPUSH 0 112\nPUSH 0 113\nPUSH 0 114\nPUSH 0 115\nPUSH 0 116\nPUSH 0 117\nPUSH 0 118\nPUSH 0 119\nPUSH 0 120\nPUSH 0 121\nPUSH 0 122\nPUSH 0 123\nPUSH 0 124\nPUSH 0 125\nPUSH 0 126\nPUSH 0 127\nPUSH 0 128\nPUSH 0 129\nPUSH 0 130\nPUSH 0 131\nPUSH 0 132\nPUSH 0 133\nPUSH 0 134\nPUSH 0 135\nPUSH 0 136\nPUSH 0 137\nPUSH 0 138\nPUSH 0 139\nPUSH 0 140\nPUSH 0 141\nPUSH 0 142\nPUSH 0 143\nPUSH 0 144\nPUSH 0 145\nPUSH 0 146\nPUSH 0 147\nPUSH 0 148\nPUSH 0 149\nPUSH 0 150\nPUSH 0 151\nPUSH 0 152\nPUSH 0 153\nPUSH 0 154\nPUSH 0 155\nPUSH 0 156\nPUSH 0 157\nPUSH 0 158\nPUSH 0 159\nPUSH 0 160\nPUSH 0 161\nPUSH 0 162\nPUSH 0 163\nPUSH 0 164\nPUSH 0 165\nPUSH 0 166\nPUSH 0 167\nPUSH 0 168\nPUSH 0 169\nPUSH 0 170\nPUSH 0 171\nPUSH 0 172\nPUSH 0 173\nPUSH 0 174\nPUSH 0 175\nPUSH 0 176\nPUSH 0 177\nPUSH 0 178\nPUSH 0 179\nPUSH 0 180\nPUSH 0 181\nPUSH 0 182\nPUSH 0 183\nPUSH 0 184\nPUSH 0 185\nPUSH 0 186\nPUSH 0 187\nPUSH 0 188\nPUSH 0 189\nPUSH 0 190\nPUSH 0 191\nPUSH 0 192\nPUSH 0 193\nPUSH 0 194\nPUSH 0 195\nPUSH 0 196\nPUSH 0 197\nPUSH 0 198\nSIZE 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\n",
+    "expected": {
+      "stdout": "SIZE 199\nPOP 0\nPOP 1\nPOP 2\nPOP 3\nPOP 4\nPOP 5\nPOP 6\nPOP 7\nPOP 8\nPOP 9\nPOP 10\nPOP 11\nPOP 12\nPOP 13\nPOP 14\nPOP 15\nPOP 16\nPOP 17\nPOP 18\nPOP 19\nPOP 20\nPOP 21\nPOP 22\nPOP 23\nPOP 24\nPOP 25\nPOP 26\nPOP 27\nPOP 28\nPOP 29\nPOP 30\nPOP 31\nPOP 32\nPOP 33\nPOP 34\nPOP 35\nPOP 36\nPOP 37\nPOP 38\nPOP 39\nPOP 40\nPOP 41\nPOP 42\nPOP 43\nPOP 44\nPOP 45\nPOP 46\nPOP 47\nPOP 48\nPOP 49\nPOP 50\nPOP 51\nPOP 52\nPOP 53\nPOP 54\nPOP 55\nPOP 56\nPOP 57\nPOP 58\nPOP 59\nPOP 60\nPOP 61\nPOP 62\nPOP 63\nPOP 64\nPOP 65\nPOP 66\nPOP 67\nPOP 68\nPOP 69\nPOP 70\nPOP 71\nPOP 72\nPOP 73\nPOP 74\nPOP 75\nPOP 76\nPOP 77\nPOP 78\nPOP 79\nPOP 80\nPOP 81\nPOP 82\nPOP 83\nPOP 84\nPOP 85\nPOP 86\nPOP 87\nPOP 88\nPOP 89\nPOP 90\nPOP 91\nPOP 92\nPOP 93\nPOP 94\nPOP 95\nPOP 96\nPOP 97\nPOP 98\nPOP 99\nPOP 100\nPOP 101\nPOP 102\nPOP 103\nPOP 104\nPOP 105\nPOP 106\nPOP 107\nPOP 108\nPOP 109\nPOP 110\nPOP 111\nPOP 112\nPOP 113\nPOP 114\nPOP 115\nPOP 116\nPOP 117\nPOP 118\nPOP 119\nPOP 120\nPOP 121\nPOP 122\nPOP 123\nPOP 124\nPOP 125\nPOP 126\nPOP 127\nPOP 128\nPOP 129\nPOP 130\nPOP 131\nPOP 132\nPOP 133\nPOP 134\nPOP 135\nPOP 136\nPOP 137\nPOP 138\nPOP 139\nPOP 140\nPOP 141\nPOP 142\nPOP 143\nPOP 144\nPOP 145\nPOP 146\nPOP 147\nPOP 148\nPOP 149\nPOP 150\nPOP 151\nPOP 152\nPOP 153\nPOP 154\nPOP 155\nPOP 156\nPOP 157\nPOP 158\nPOP 159\nPOP 160\nPOP 161\nPOP 162\nPOP 163\nPOP 164\nPOP 165\nPOP 166\nPOP 167\nPOP 168\nPOP 169\nPOP 170\nPOP 171\nPOP 172\nPOP 173\nPOP 174\nPOP 175\nPOP 176\nPOP 177\nPOP 178\nPOP 179\nPOP 180\nPOP 181\nPOP 182\nPOP 183\nPOP 184\nPOP 185\nPOP 186\nPOP 187\nPOP 188\nPOP 189\nPOP 190\nPOP 191\nPOP 192\nPOP 193\nPOP 194\nPOP 195\nPOP 196\nPOP 197\nPOP 198\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "full-overflow",
+    "criterionId": "full",
+    "public": false,
+    "description": "200번째 삽입은 오류 종료",
+    "input": "PUSH 0 0\nPUSH 0 1\nPUSH 0 2\nPUSH 0 3\nPUSH 0 4\nPUSH 0 5\nPUSH 0 6\nPUSH 0 7\nPUSH 0 8\nPUSH 0 9\nPUSH 0 10\nPUSH 0 11\nPUSH 0 12\nPUSH 0 13\nPUSH 0 14\nPUSH 0 15\nPUSH 0 16\nPUSH 0 17\nPUSH 0 18\nPUSH 0 19\nPUSH 0 20\nPUSH 0 21\nPUSH 0 22\nPUSH 0 23\nPUSH 0 24\nPUSH 0 25\nPUSH 0 26\nPUSH 0 27\nPUSH 0 28\nPUSH 0 29\nPUSH 0 30\nPUSH 0 31\nPUSH 0 32\nPUSH 0 33\nPUSH 0 34\nPUSH 0 35\nPUSH 0 36\nPUSH 0 37\nPUSH 0 38\nPUSH 0 39\nPUSH 0 40\nPUSH 0 41\nPUSH 0 42\nPUSH 0 43\nPUSH 0 44\nPUSH 0 45\nPUSH 0 46\nPUSH 0 47\nPUSH 0 48\nPUSH 0 49\nPUSH 0 50\nPUSH 0 51\nPUSH 0 52\nPUSH 0 53\nPUSH 0 54\nPUSH 0 55\nPUSH 0 56\nPUSH 0 57\nPUSH 0 58\nPUSH 0 59\nPUSH 0 60\nPUSH 0 61\nPUSH 0 62\nPUSH 0 63\nPUSH 0 64\nPUSH 0 65\nPUSH 0 66\nPUSH 0 67\nPUSH 0 68\nPUSH 0 69\nPUSH 0 70\nPUSH 0 71\nPUSH 0 72\nPUSH 0 73\nPUSH 0 74\nPUSH 0 75\nPUSH 0 76\nPUSH 0 77\nPUSH 0 78\nPUSH 0 79\nPUSH 0 80\nPUSH 0 81\nPUSH 0 82\nPUSH 0 83\nPUSH 0 84\nPUSH 0 85\nPUSH 0 86\nPUSH 0 87\nPUSH 0 88\nPUSH 0 89\nPUSH 0 90\nPUSH 0 91\nPUSH 0 92\nPUSH 0 93\nPUSH 0 94\nPUSH 0 95\nPUSH 0 96\nPUSH 0 97\nPUSH 0 98\nPUSH 0 99\nPUSH 0 100\nPUSH 0 101\nPUSH 0 102\nPUSH 0 103\nPUSH 0 104\nPUSH 0 105\nPUSH 0 106\nPUSH 0 107\nPUSH 0 108\nPUSH 0 109\nPUSH 0 110\nPUSH 0 111\nPUSH 0 112\nPUSH 0 113\nPUSH 0 114\nPUSH 0 115\nPUSH 0 116\nPUSH 0 117\nPUSH 0 118\nPUSH 0 119\nPUSH 0 120\nPUSH 0 121\nPUSH 0 122\nPUSH 0 123\nPUSH 0 124\nPUSH 0 125\nPUSH 0 126\nPUSH 0 127\nPUSH 0 128\nPUSH 0 129\nPUSH 0 130\nPUSH 0 131\nPUSH 0 132\nPUSH 0 133\nPUSH 0 134\nPUSH 0 135\nPUSH 0 136\nPUSH 0 137\nPUSH 0 138\nPUSH 0 139\nPUSH 0 140\nPUSH 0 141\nPUSH 0 142\nPUSH 0 143\nPUSH 0 144\nPUSH 0 145\nPUSH 0 146\nPUSH 0 147\nPUSH 0 148\nPUSH 0 149\nPUSH 0 150\nPUSH 0 151\nPUSH 0 152\nPUSH 0 153\nPUSH 0 154\nPUSH 0 155\nPUSH 0 156\nPUSH 0 157\nPUSH 0 158\nPUSH 0 159\nPUSH 0 160\nPUSH 0 161\nPUSH 0 162\nPUSH 0 163\nPUSH 0 164\nPUSH 0 165\nPUSH 0 166\nPUSH 0 167\nPUSH 0 168\nPUSH 0 169\nPUSH 0 170\nPUSH 0 171\nPUSH 0 172\nPUSH 0 173\nPUSH 0 174\nPUSH 0 175\nPUSH 0 176\nPUSH 0 177\nPUSH 0 178\nPUSH 0 179\nPUSH 0 180\nPUSH 0 181\nPUSH 0 182\nPUSH 0 183\nPUSH 0 184\nPUSH 0 185\nPUSH 0 186\nPUSH 0 187\nPUSH 0 188\nPUSH 0 189\nPUSH 0 190\nPUSH 0 191\nPUSH 0 192\nPUSH 0 193\nPUSH 0 194\nPUSH 0 195\nPUSH 0 196\nPUSH 0 197\nPUSH 0 198\nPUSH 0 199\nSIZE 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "full-duplicates",
+    "criterionId": "full",
+    "public": false,
+    "description": "중복도 용량을 차지",
+    "input": "PUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nPUSH 0 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "reuse-empty",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "전체 삭제 후 다시 사용",
+    "input": "PUSH 0 8\nPUSH 0 3\nPUSH 0 9\nPOP 0\nPOP 0\nPOP 0\nPUSH 0 -2\nPUSH 0 0\nPUSH 0 4\nPOP 0\nPOP 0\nPOP 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "POP 3\nPOP 8\nPOP 9\nPOP -2\nPOP 0\nPOP 4\nSIZE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-full",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "포화 상태에서 삭제 후 재삽입",
+    "input": "PUSH 0 0\nPUSH 0 1\nPUSH 0 2\nPUSH 0 3\nPUSH 0 4\nPUSH 0 5\nPUSH 0 6\nPUSH 0 7\nPUSH 0 8\nPUSH 0 9\nPUSH 0 10\nPUSH 0 11\nPUSH 0 12\nPUSH 0 13\nPUSH 0 14\nPUSH 0 15\nPUSH 0 16\nPUSH 0 17\nPUSH 0 18\nPUSH 0 19\nPUSH 0 20\nPUSH 0 21\nPUSH 0 22\nPUSH 0 23\nPUSH 0 24\nPUSH 0 25\nPUSH 0 26\nPUSH 0 27\nPUSH 0 28\nPUSH 0 29\nPUSH 0 30\nPUSH 0 31\nPUSH 0 32\nPUSH 0 33\nPUSH 0 34\nPUSH 0 35\nPUSH 0 36\nPUSH 0 37\nPUSH 0 38\nPUSH 0 39\nPUSH 0 40\nPUSH 0 41\nPUSH 0 42\nPUSH 0 43\nPUSH 0 44\nPUSH 0 45\nPUSH 0 46\nPUSH 0 47\nPUSH 0 48\nPUSH 0 49\nPUSH 0 50\nPUSH 0 51\nPUSH 0 52\nPUSH 0 53\nPUSH 0 54\nPUSH 0 55\nPUSH 0 56\nPUSH 0 57\nPUSH 0 58\nPUSH 0 59\nPUSH 0 60\nPUSH 0 61\nPUSH 0 62\nPUSH 0 63\nPUSH 0 64\nPUSH 0 65\nPUSH 0 66\nPUSH 0 67\nPUSH 0 68\nPUSH 0 69\nPUSH 0 70\nPUSH 0 71\nPUSH 0 72\nPUSH 0 73\nPUSH 0 74\nPUSH 0 75\nPUSH 0 76\nPUSH 0 77\nPUSH 0 78\nPUSH 0 79\nPUSH 0 80\nPUSH 0 81\nPUSH 0 82\nPUSH 0 83\nPUSH 0 84\nPUSH 0 85\nPUSH 0 86\nPUSH 0 87\nPUSH 0 88\nPUSH 0 89\nPUSH 0 90\nPUSH 0 91\nPUSH 0 92\nPUSH 0 93\nPUSH 0 94\nPUSH 0 95\nPUSH 0 96\nPUSH 0 97\nPUSH 0 98\nPUSH 0 99\nPUSH 0 100\nPUSH 0 101\nPUSH 0 102\nPUSH 0 103\nPUSH 0 104\nPUSH 0 105\nPUSH 0 106\nPUSH 0 107\nPUSH 0 108\nPUSH 0 109\nPUSH 0 110\nPUSH 0 111\nPUSH 0 112\nPUSH 0 113\nPUSH 0 114\nPUSH 0 115\nPUSH 0 116\nPUSH 0 117\nPUSH 0 118\nPUSH 0 119\nPUSH 0 120\nPUSH 0 121\nPUSH 0 122\nPUSH 0 123\nPUSH 0 124\nPUSH 0 125\nPUSH 0 126\nPUSH 0 127\nPUSH 0 128\nPUSH 0 129\nPUSH 0 130\nPUSH 0 131\nPUSH 0 132\nPUSH 0 133\nPUSH 0 134\nPUSH 0 135\nPUSH 0 136\nPUSH 0 137\nPUSH 0 138\nPUSH 0 139\nPUSH 0 140\nPUSH 0 141\nPUSH 0 142\nPUSH 0 143\nPUSH 0 144\nPUSH 0 145\nPUSH 0 146\nPUSH 0 147\nPUSH 0 148\nPUSH 0 149\nPUSH 0 150\nPUSH 0 151\nPUSH 0 152\nPUSH 0 153\nPUSH 0 154\nPUSH 0 155\nPUSH 0 156\nPUSH 0 157\nPUSH 0 158\nPUSH 0 159\nPUSH 0 160\nPUSH 0 161\nPUSH 0 162\nPUSH 0 163\nPUSH 0 164\nPUSH 0 165\nPUSH 0 166\nPUSH 0 167\nPUSH 0 168\nPUSH 0 169\nPUSH 0 170\nPUSH 0 171\nPUSH 0 172\nPUSH 0 173\nPUSH 0 174\nPUSH 0 175\nPUSH 0 176\nPUSH 0 177\nPUSH 0 178\nPUSH 0 179\nPUSH 0 180\nPUSH 0 181\nPUSH 0 182\nPUSH 0 183\nPUSH 0 184\nPUSH 0 185\nPUSH 0 186\nPUSH 0 187\nPUSH 0 188\nPUSH 0 189\nPUSH 0 190\nPUSH 0 191\nPUSH 0 192\nPUSH 0 193\nPUSH 0 194\nPUSH 0 195\nPUSH 0 196\nPUSH 0 197\nPUSH 0 198\nPOP 0\nPUSH 0 -1000000\nSIZE 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nROOT 0\n",
+    "expected": {
+      "stdout": "POP 0\nSIZE 199\nPOP -1000000\nPOP 1\nPOP 2\nPOP 3\nPOP 4\nPOP 5\nPOP 6\nPOP 7\nPOP 8\nPOP 9\nPOP 10\nPOP 11\nPOP 12\nPOP 13\nPOP 14\nPOP 15\nPOP 16\nPOP 17\nPOP 18\nPOP 19\nPOP 20\nPOP 21\nPOP 22\nPOP 23\nPOP 24\nPOP 25\nPOP 26\nPOP 27\nPOP 28\nPOP 29\nPOP 30\nPOP 31\nPOP 32\nPOP 33\nPOP 34\nPOP 35\nPOP 36\nPOP 37\nPOP 38\nPOP 39\nPOP 40\nPOP 41\nPOP 42\nPOP 43\nPOP 44\nPOP 45\nPOP 46\nPOP 47\nPOP 48\nPOP 49\nPOP 50\nPOP 51\nPOP 52\nPOP 53\nPOP 54\nPOP 55\nPOP 56\nPOP 57\nPOP 58\nPOP 59\nPOP 60\nPOP 61\nPOP 62\nPOP 63\nPOP 64\nPOP 65\nPOP 66\nPOP 67\nPOP 68\nPOP 69\nPOP 70\nPOP 71\nPOP 72\nPOP 73\nPOP 74\nPOP 75\nPOP 76\nPOP 77\nPOP 78\nPOP 79\nPOP 80\nPOP 81\nPOP 82\nPOP 83\nPOP 84\nPOP 85\nPOP 86\nPOP 87\nPOP 88\nPOP 89\nPOP 90\nPOP 91\nPOP 92\nPOP 93\nPOP 94\nPOP 95\nPOP 96\nPOP 97\nPOP 98\nPOP 99\nPOP 100\nPOP 101\nPOP 102\nPOP 103\nPOP 104\nPOP 105\nPOP 106\nPOP 107\nPOP 108\nPOP 109\nPOP 110\nPOP 111\nPOP 112\nPOP 113\nPOP 114\nPOP 115\nPOP 116\nPOP 117\nPOP 118\nPOP 119\nPOP 120\nPOP 121\nPOP 122\nPOP 123\nPOP 124\nPOP 125\nPOP 126\nPOP 127\nPOP 128\nPOP 129\nPOP 130\nPOP 131\nPOP 132\nPOP 133\nPOP 134\nPOP 135\nPOP 136\nPOP 137\nPOP 138\nPOP 139\nPOP 140\nPOP 141\nPOP 142\nPOP 143\nPOP 144\nPOP 145\nPOP 146\nPOP 147\nPOP 148\nPOP 149\nPOP 150\nPOP 151\nPOP 152\nPOP 153\nPOP 154\nPOP 155\nPOP 156\nPOP 157\nPOP 158\nPOP 159\nPOP 160\nPOP 161\nPOP 162\nPOP 163\nPOP 164\nPOP 165\nPOP 166\nPOP 167\nPOP 168\nPOP 169\nPOP 170\nPOP 171\nPOP 172\nPOP 173\nPOP 174\nPOP 175\nPOP 176\nPOP 177\nPOP 178\nPOP 179\nPOP 180\nPOP 181\nPOP 182\nPOP 183\nPOP 184\nPOP 185\nPOP 186\nPOP 187\nPOP 188\nPOP 189\nPOP 190\nPOP 191\nPOP 192\nPOP 193\nPOP 194\nPOP 195\nPOP 196\nPOP 197\nPOP 198\nROOT EMPTY\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-interleave",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "삽입·삭제 교차 반복",
+    "input": "PUSH 0 4\nPUSH 0 1\nPUSH 0 7\nPOP 0\nPUSH 0 9\nPUSH 0 0\nPOP 0\nPOP 0\nPUSH 0 3\nPUSH 0 8\nPOP 0\nPOP 0\nPOP 0\nPOP 0\nROOT 0\n",
+    "expected": {
+      "stdout": "POP 1\nPOP 0\nPOP 4\nPOP 3\nPOP 7\nPOP 8\nPOP 9\nROOT EMPTY\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent",
+    "criterionId": "independence",
+    "public": false,
+    "description": "두 힙 독립 삽입·삭제",
+    "input": "PUSH 0 8\nPUSH 0 2\nPUSH 0 6\nPUSH 1 3\nPUSH 1 9\nPUSH 1 1\nPOP 0\nROOT 1\nINIT 0\nSIZE 1\nPOP 1\nPOP 1\nPOP 1\nROOT 0\n",
+    "expected": {
+      "stdout": "POP 2\nROOT 1\nSIZE 3\nPOP 1\nPOP 3\nPOP 9\nROOT EMPTY\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-full",
+    "criterionId": "independence",
+    "public": false,
+    "description": "한 힙 포화 상태에서 다른 힙 유지",
+    "input": "PUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 0 1\nPUSH 1 0\nPUSH 1 -2\nPUSH 1 5\nPOP 1\nPOP 1\nPOP 1\nSIZE 0\nROOT 0\n",
+    "expected": {
+      "stdout": "POP -2\nPOP 0\nPOP 5\nSIZE 199\nROOT 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

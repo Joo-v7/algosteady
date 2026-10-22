@@ -2,6 +2,7 @@ package com.algosteady.judging.service;
 
 import com.algosteady.exercise.service.ExerciseQueryService;
 import com.algosteady.judging.domain.ExecutionJob;
+import com.algosteady.judging.domain.CriterionProgress;
 import com.algosteady.judging.domain.ExecutionTestResult;
 import com.algosteady.judging.repository.*;
 import com.algosteady.judging.dto.response.*;
@@ -51,6 +52,12 @@ public class JudgingQueryService {
 
         Map<String, ExecutionTestResult> storedResults = executionTestResultRepository.findAllByJobId(jobId).stream()
                 .collect(Collectors.toMap(com.algosteady.judging.domain.ExecutionTestResult::getTestId, Function.identity()));
+        Set<String> passedTestIds = storedResults.values().stream()
+                .filter(ExecutionTestResult::isPassed)
+                .map(ExecutionTestResult::getTestId)
+                .collect(Collectors.toSet());
+        Map<String, JsonNode> actualResults = storedResults.values().stream()
+                .collect(Collectors.toMap(ExecutionTestResult::getTestId, result -> jsonMapper.readTree(result.getResult())));
         List<TestResultResponseDto> tests = new ArrayList<>();
         String pendingCriterionId = null;
 
@@ -69,7 +76,7 @@ public class JudgingQueryService {
                     .description(test.path("description").asString())
                     .input(test.path("input").asString())
                     .expected(test.path("expected"))
-                    .actual(jsonMapper.readTree(result.getResult()))
+                    .actual(actualResults.get(result.getTestId()))
                     .passed(result.isPassed())
                     .build());
         }
@@ -80,25 +87,20 @@ public class JudgingQueryService {
         if (grading) {
             for (JsonNode criterion : snapshot.path("exercise").path("criteria")) {
                 String criterionId = criterion.path("id").asString();
-                int totalTests = (int) selectedTests.stream()
-                        .filter(test -> criterionId.equals(test.path("criterionId").asString()))
-                        .count();
-                List<TestResultResponseDto> criterionTests = tests.stream()
-                        .filter(test -> criterionId.equals(test.getCriterionId()))
+                CriterionProgress progress = CriterionProgress.calculate(criterionId, selectedTests, passedTestIds);
+                List<ExecutionTestResult> criterionTests = storedResults.values().stream()
+                        .filter(result -> progress.testIds().contains(result.getTestId()))
                         .toList();
-                int passedTests = (int) criterionTests.stream()
-                        .filter(TestResultResponseDto::isPassed)
-                        .count();
                 boolean unavailable = criterionTests.stream()
-                        .anyMatch(test -> Set.of("NOT_EXECUTED", "ENVIRONMENT_ERROR").contains(test.getActual().path("status").asString()));
+                        .anyMatch(result -> Set.of("NOT_EXECUTED", "ENVIRONMENT_ERROR").contains(actualResults.get(result.getTestId()).path("status").asString()));
                 boolean failed = criterionTests.stream()
-                        .anyMatch(test -> !test.isPassed()
-                                && !Set.of("NOT_EXECUTED", "ENVIRONMENT_ERROR").contains(test.getActual().path("status").asString()));
+                        .anyMatch(result -> !result.isPassed()
+                                && !Set.of("NOT_EXECUTED", "ENVIRONMENT_ERROR").contains(actualResults.get(result.getTestId()).path("status").asString()));
                 String status;
 
                 if (failed) {
                     status = "FAILED";
-                } else if (passedTests == totalTests) {
+                } else if (progress.isPassed()) {
                     status = "PASSED";
                 } else if (unavailable || job.getStatus() == ExecutionJob.Status.FAILED || job.getStatus() == ExecutionJob.Status.COMPLETED) {
                     status = "UNAVAILABLE";
@@ -112,9 +114,9 @@ public class JudgingQueryService {
                         .title(criterion.path("title").asString())
                         .description(criterion.path("description").asString())
                         .status(status)
-                        .totalTests(totalTests)
+                        .totalTests(progress.testIds().size())
                         .completedTests(criterionTests.size())
-                        .passedTests(passedTests)
+                        .passedTests(progress.passedTests())
                         .build());
             }
         }
@@ -170,15 +172,9 @@ public class JudgingQueryService {
             JsonNode criteria = snapshot.path("exercise").path("criteria");
 
             for (JsonNode criterion : criteria) {
-                Set<String> requiredTestIds = new HashSet<>();
-
-                for (JsonNode test : snapshot.path("sources").path(job.getLanguage()).path("tests")) {
-                    if (criterion.path("id").asString().equals(test.path("criterionId").asString())) {
-                        requiredTestIds.add(test.path("id").asString());
-                    }
-                }
-
-                if (passedTestIds.containsAll(requiredTestIds)) {
+                CriterionProgress progress = CriterionProgress.calculate(criterion.path("id").asString(),
+                        snapshot.path("sources").path(job.getLanguage()).path("tests"), passedTestIds);
+                if (progress.isPassed()) {
                     passedCriteria++;
                 }
             }

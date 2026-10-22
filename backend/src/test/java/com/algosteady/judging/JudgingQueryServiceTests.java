@@ -4,6 +4,7 @@ import com.algosteady.exercise.service.ExerciseQueryService;
 import com.algosteady.judging.domain.ExecutionJob;
 import com.algosteady.judging.domain.ExecutionTestResult;
 import com.algosteady.judging.dto.response.JobResponseDto;
+import com.algosteady.judging.dto.response.JobSummaryResponseDto;
 import com.algosteady.judging.repository.*;
 import com.algosteady.judging.runner.model.TestExecutionResult;
 import com.algosteady.judging.service.JudgingQueryService;
@@ -169,6 +170,39 @@ class JudgingQueryServiceTests {
         Assertions.assertTrue(response.getCriteria().stream()
                 .skip(1)
                 .allMatch(criterion -> criterion.getStatus().equals("UNAVAILABLE")));
+    }
+
+    @Test
+    @DisplayName("중단된 작업도 상세와 기록 요약에서 같은 통과 기준 수를 반환합니다.")
+    void findSummariesByIds_success_matchesDetailsAfterInterruption() {
+        // given
+        storedResults.add(createStoredResult(testContents.get(0), TestExecutionResult.Status.COMPLETED, true));
+        storedResults.add(createStoredResult(testContents.get(1), TestExecutionResult.Status.COMPLETED, true));
+        storedResults.add(createStoredResult(testContents.get(2), TestExecutionResult.Status.COMPLETED, true));
+        storedResults.add(createStoredResult(testContents.get(3), TestExecutionResult.Status.TIME_LIMIT_EXCEEDED, false));
+        executionJob.markFailed("서버 중단");
+        List<ExecutionTestSummary> testSummaries = new ArrayList<>();
+        for (ExecutionTestResult result : storedResults) {
+            ExecutionTestSummary summary = Mockito.mock(ExecutionTestSummary.class);
+            Mockito.when(summary.getPassed()).thenReturn(result.isPassed());
+            if (result.isPassed()) {
+                Mockito.when(summary.getJobId()).thenReturn(executionJob.getId());
+                Mockito.when(summary.getTestId()).thenReturn(result.getTestId());
+            }
+            testSummaries.add(summary);
+        }
+        Mockito.when(executionJobRepository.findAllById(List.of(executionJob.getId()))).thenReturn(List.of(executionJob));
+        Mockito.when(executionTestResultRepository.findSummariesByJobIds(List.of(executionJob.getId()))).thenReturn(testSummaries);
+
+        // when
+        JobResponseDto details = judgingQueryService.findById(executionJob.getId());
+        JobSummaryResponseDto summary = judgingQueryService.findSummariesByIds(List.of(executionJob.getId())).get(executionJob.getId());
+
+        // then
+        Assertions.assertEquals(1, summary.getPassedCriteria());
+        Assertions.assertEquals(details.getCriteria().stream().filter(criterion -> criterion.getStatus().equals("PASSED")).count(), summary.getPassedCriteria());
+        Assertions.assertEquals(details.getCriteria().size(), summary.getTotalCriteria());
+        Assertions.assertEquals(details.getStatus(), summary.getStatus());
     }
 
     private ExecutionTestResult createStoredResult(JsonNode test, TestExecutionResult.Status status, boolean passed) {

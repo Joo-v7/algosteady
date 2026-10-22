@@ -280,7 +280,11 @@ function ExercisePage() {
     const isCircularList = isLinkedList && Boolean(exercise.contract.circular) && !isDoublyList
     const isRecursion = exercise.category === 'recursion'
     const isTree = exercise.category === 'tree'
-    const categoryLabel = isTree ? '트리' : isRecursion ? '재귀' : isLinkedList ? '연결 리스트' : isDeque ? '덱' : isQueue ? '큐' : '스택'
+    const isHeap = exercise.category === 'heap'
+    const isHash = exercise.category === 'hash'
+    const isSet = exercise.category === 'set'
+    const isSearch = exercise.category === 'search'
+    const categoryLabel = isSearch ? '탐색' : isSet ? '집합' : isHash ? '해싱' : isHeap ? '힙' : isTree ? '트리' : isRecursion ? '재귀' : isLinkedList ? '연결 리스트' : isDeque ? '덱' : isQueue ? '큐' : '스택'
     const stepValues = step.values ?? []
     const treeNodes = (step.tree ?? []).flatMap((value, index) => {
         if (value === null) {
@@ -290,6 +294,24 @@ function ExercisePage() {
         return [{ value, index, depth, x: (index - (2 ** depth - 1) + 0.5) * 640 / 2 ** depth, y: 40 + depth * 80 }]
     })
     const treeHeight = treeNodes.length ? (Math.max(...treeNodes.map(node => node.depth)) + 1) * 80 + 70 : 0
+
+    const setParents = step.parents ?? []
+    const setRoots = setParents.flatMap((parent, index) => parent === -1 ? [index] : [])
+    const setNodes = setParents.map((parent, index) => {
+        let root = index
+        let depth = 0
+        while (setParents[root] !== -1) {
+            root = setParents[root]
+            depth++
+        }
+        return { index, parent, root, depth }
+    })
+    const setLayout = setNodes.map(node => {
+        const peers = setNodes.filter(other => other.root === node.root && other.depth === node.depth)
+        const group = setRoots.indexOf(node.root)
+        return { ...node, x: (group + (peers.indexOf(node) + 0.5) / peers.length) * 640 / setRoots.length, y: 40 + node.depth * 80 }
+    })
+    const setHeight = setNodes.length ? (Math.max(...setNodes.map(node => node.depth)) + 1) * 80 + 30 : 0
 
     const resultKind = job?.kind ?? requestKind ?? (jobId && jobId === gradingJobId ? 'GRADING' : 'RUN')
     const resultPending = runBusy && !executionError
@@ -367,7 +389,7 @@ function ExercisePage() {
                     02 <span>실습하기</span>
                 </button>
                 <span className="tab-note">
-                    {isTree ? '루트 · 왼쪽 자식 · 오른쪽 자식' : isRecursion ? '종료 조건 · 재귀 호출' : hasLinkedEnds ? `노드 · front와 rear 포인터 · ${isDeque ? '양방향 연결' : 'FIFO'}` : isLinkedStack ? '노드 · top 포인터 · 동적 메모리' : isLinkedList ? isDoublyList ? '헤드 노드 · 양방향 연결' : isCircularList ? '순환 연결 · head는 마지막 노드' : '노드 · 포인터 · 동적 메모리' : exercise.contract.circular
+                    {isSearch ? '정렬된 배열 · low · middle · high' : isSet ? '부모 배열 · 루트는 -1 · 경로 압축' : isHash ? `버킷 ${exercise.contract.capacity}개 · 연결 리스트 · 충돌 처리` : isHeap ? `완전 이진 트리 · 배열 · 저장 ${exercise.contract.usableCapacity}개` : isTree ? '루트 · 왼쪽 자식 · 오른쪽 자식' : isRecursion ? '종료 조건 · 재귀 호출' : hasLinkedEnds ? `노드 · front와 rear 포인터 · ${isDeque ? '양방향 연결' : 'FIFO'}` : isLinkedStack ? '노드 · top 포인터 · 동적 메모리' : isLinkedList ? isDoublyList ? '헤드 노드 · 양방향 연결' : isCircularList ? '순환 연결 · head는 마지막 노드' : '노드 · 포인터 · 동적 메모리' : exercise.contract.circular
                         ? `원형 배열 · ${isDeque ? '양쪽 삽입·삭제' : 'FIFO'} · 저장 ${exercise.contract.usableCapacity}개` : exercise.contract.initialCapacity !== undefined
                         ? `동적 배열 · LIFO · 초기 용량 ${exercise.contract.initialCapacity}`
                         : `배열 · ${isQueue ? 'FIFO' : 'LIFO'} · 용량 ${exercise.contract.capacity}`}
@@ -386,8 +408,8 @@ function ExercisePage() {
                                     <p key={paragraph}>{paragraph}</p>
                                 ))}
                                 <div className="concept-tags">
-                                    <span>{isTree ? 'Binary Tree' : isRecursion ? 'Recursion' : isLinkedList ? isDoublyList ? 'Doubly Linked List' : isCircularList ? 'Circular Linked List' : 'Singly Linked List' : isDeque ? 'Double-ended Queue' : isQueue ? 'First In, First Out' : 'Last In, First Out'}</span>
-                                    <span>{isTree ? '노드마다 최대 두 자식' : isRecursion ? '종료 조건과 작은 문제' : hasLinkedEnds ? isDeque ? '양쪽 끝에서 삽입 · 삭제 · 조회' : 'front에서 꺼내고 rear 뒤에 연결' : isLinkedStack ? 'top에서 link를 따라 순회' : isLinkedList ? isDoublyList ? 'llink와 rlink로 앞뒤 이동' : isCircularList ? 'head->link에서 한 바퀴 순회' : 'head에서 link를 따라 순회' : isDeque ? '양쪽 끝에서 삽입 · 삭제 · 조회' : isQueue ? '뒤에서 삽입 · 앞에서 삭제' : '삽입과 삭제는 맨 위에서'}</span>
+                                    <span>{isSearch ? 'Binary Search' : isSet ? 'Disjoint Set' : isHash ? 'Chaining Hash' : isHeap ? 'Binary Heap' : isTree ? 'Binary Tree' : isRecursion ? 'Recursion' : isLinkedList ? isDoublyList ? 'Doubly Linked List' : isCircularList ? 'Circular Linked List' : 'Singly Linked List' : isDeque ? 'Double-ended Queue' : isQueue ? 'First In, First Out' : 'Last In, First Out'}</span>
+                                    <span>{isSearch ? '정렬된 배열 · 인덱스 반환 · 없으면 -1' : isSet ? '대표 찾기 · 집합 합치기 · 경로 압축' : isHash ? '충돌은 같은 체인에 · 중복 키는 무시' : isHeap ? '부모와 자식의 우선순위 · 중복 키 허용' : isTree ? '노드마다 최대 두 자식' : isRecursion ? '종료 조건과 작은 문제' : hasLinkedEnds ? isDeque ? '양쪽 끝에서 삽입 · 삭제 · 조회' : 'front에서 꺼내고 rear 뒤에 연결' : isLinkedStack ? 'top에서 link를 따라 순회' : isLinkedList ? isDoublyList ? 'llink와 rlink로 앞뒤 이동' : isCircularList ? 'head->link에서 한 바퀴 순회' : 'head에서 link를 따라 순회' : isDeque ? '양쪽 끝에서 삽입 · 삭제 · 조회' : isQueue ? '뒤에서 삽입 · 앞에서 삭제' : '삽입과 삭제는 맨 위에서'}</span>
                                 </div>
                             </section>
 
@@ -396,28 +418,94 @@ function ExercisePage() {
                                 <div className="panel-heading">
                                     <div>
                                         <div className="section-label">{isRecursion ? '기준 코드 호출 예시' : '눈으로 따라가기'}</div>
-                                        <h2>{isTree ? '부모와 자식은 이렇게 연결돼요' : isRecursion ? '호출과 복귀를 따라가 보세요' : isLinkedList || isLinkedStack || hasLinkedEnds ? '노드는 이렇게 연결돼요' : isDeque ? '덱은 이렇게 움직여요' : isQueue ? '큐는 이렇게 움직여요' : '스택은 이렇게 움직여요'}</h2>
+                                        <h2>{isSearch ? '탐색 구간이 줄어드는 과정을 따라가 보세요' : isSet ? '부모 연결과 경로 압축을 따라가 보세요' : isHash ? '버킷과 체인을 따라가 보세요' : isHeap ? '배열과 트리를 함께 따라가 보세요' : isTree ? '부모와 자식은 이렇게 연결돼요' : isRecursion ? '호출과 복귀를 따라가 보세요' : isLinkedList || isLinkedStack || hasLinkedEnds ? '노드는 이렇게 연결돼요' : isDeque ? '덱은 이렇게 움직여요' : isQueue ? '큐는 이렇게 움직여요' : '스택은 이렇게 움직여요'}</h2>
                                     </div>
                                     <span className="step-counter">{stepIndex + 1} / {exercise.learning.steps.length}</span>
                                 </div>
                                 <div className="simulation" data-category={isLinkedStack || hasLinkedEnds ? 'linked-list' : exercise.category} data-circular={isCircularList || isDoublyList} data-doubly={isDoublyLinked}>
-                                    {isTree ? (
+                                    {isSearch ? (
+                                        <div className="search-array" aria-label={`정렬된 배열, 찾는 키 ${step.target}, 범위 ${step.low}~${step.high}`}>
+                                            {stepValues.map((value, index) => (
+                                                <div className="search-slot" data-in-range={index >= (step.low ?? 0) && index <= (step.high ?? -1)} data-middle={step.activeNode === index} data-found={step.result === index} key={index}>
+                                                    <small>[{index}]</small>
+                                                    <strong>{value}</strong>
+                                                    <span>{[step.low === index ? 'low' : '', step.activeNode === index ? 'mid' : '', step.high === index ? 'high' : ''].filter(Boolean).join(' · ') || ' '}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : isSet ? (
+                                        <>
+                                            <div className="tree-diagram set-diagram">
+                                                {setNodes.length ? (
+                                                    <svg viewBox={`0 0 640 ${setHeight}`} role="img" aria-label={`서로소 집합 ${setRoots.length}개, 화살표는 원소에서 부모 방향`}>
+                                                        <defs>
+                                                            <marker id="set-parent-arrow" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
+                                                                <path d="M 0 0 L 6 3 L 0 6 Z" />
+                                                            </marker>
+                                                        </defs>
+                                                        {setLayout.filter(node => node.parent !== -1).map(node => {
+                                                            const parent = setLayout[node.parent]
+                                                            return <line key={node.index} x1={node.x} y1={node.y - 19} x2={parent.x} y2={parent.y + 19} markerEnd="url(#set-parent-arrow)" />
+                                                        })}
+                                                        {setLayout.map(node => (
+                                                            <g className="tree-node set-node" data-state={step.activeNode === node.index ? 'active' : step.visited?.includes(node.index) ? 'visited' : undefined} key={node.index}>
+                                                                <title>{`원소 ${node.index}, parent는 ${node.parent}, 대표는 ${node.root}`}</title>
+                                                                <circle cx={node.x} cy={node.y} r="19" />
+                                                                <text className="tree-value" x={node.x} y={node.y + 5}>{node.index}</text>
+                                                                {node.parent === -1 && <text x={node.x} y={node.y - 26}>대표</text>}
+                                                            </g>
+                                                        ))}
+                                                    </svg>
+                                                ) : <span className="list-pointer">원소가 없습니다.</span>}
+                                            </div>
+                                            <div className="parent-array" aria-label="부모 배열, -1은 대표 원소">
+                                                {setParents.map((parent, index) => (
+                                                    <span className="parent-slot" data-active={step.activeNode === index} key={index}>
+                                                        <small>[{index}]</small>
+                                                        <strong>{parent}</strong>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <p className="set-legend">화살표는 원소 → 부모 방향입니다. -1은 대표, 초록색은 찾은 경로입니다.</p>
+                                        </>
+                                    ) : isHash ? (
+                                        <div className="hash-table" aria-label="버킷별 연결 리스트">
+                                            {step.buckets?.map((keys, bucket) => (
+                                                <div className="hash-bucket" data-active={step.activeBucket === bucket} key={bucket}>
+                                                    <strong className="hash-bucket-index">[{bucket}]</strong>
+                                                    <div className="hash-chain" aria-label={`${bucket}번 버킷: ${keys.length ? keys.join(' → ') + ' → ' : ''}NULL`}>
+                                                        <span className="list-pointer">→</span>
+                                                        {keys.map(key => (
+                                                            <div className="linked-node-group" key={key}>
+                                                                <div className="linked-node"><strong>{key}</strong><span>link</span></div>
+                                                                <span className="list-pointer">→</span>
+                                                            </div>
+                                                        ))}
+                                                        <span className="list-pointer">NULL</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : isTree || isHeap ? (
                                         <div className="tree-diagram">
                                             {treeNodes.length ? (
-                                                <svg viewBox={`0 0 640 ${treeHeight}`} role="img" aria-label={`이진 트리, root는 ${step.tree?.[0]}, 노드 ${treeNodes.length}개`}>
+                                                <svg viewBox={`0 0 640 ${treeHeight}`} role="img" aria-label={isHeap ? `힙, 루트는 ${step.tree?.[0]}, 노드 ${treeNodes.length}개` : `이진 트리, root는 ${step.tree?.[0]}, 노드 ${treeNodes.length}개`}>
                                                     {treeNodes.map(node => (
                                                         <g className="tree-node" data-state={step.activeNode === node.index ? 'active' : step.visited?.includes(node.index) ? 'visited' : undefined} key={node.index}>
-                                                            <title>{`${node.value} 노드, left는 ${step.tree?.[node.index * 2 + 1] ?? 'NULL'}, right는 ${step.tree?.[node.index * 2 + 2] ?? 'NULL'}`}</title>
+                                                            <title>{isHeap ? `heap[${node.index + 1}] = ${node.value}` : `${node.value} 노드, left는 ${step.tree?.[node.index * 2 + 1] ?? 'NULL'}, right는 ${step.tree?.[node.index * 2 + 2] ?? 'NULL'}`}</title>
                                                             {[0, 1].map(side => {
                                                                 const childIndex = node.index * 2 + 1 + side
                                                                 const childDepth = node.depth + 1
                                                                 const childX = (childIndex - (2 ** childDepth - 1) + 0.5) * 640 / 2 ** childDepth
                                                                 const childY = node.y + 80
                                                                 const childValue = step.tree?.[childIndex]
+                                                                if (isHeap && childValue == null) {
+                                                                    return null
+                                                                }
                                                                 return (
                                                                     <g className="tree-edge" key={side}>
                                                                         <line x1={node.x} y1={node.y + 19} x2={childX} y2={childY - 21} />
-                                                                        <text x={(node.x + childX) / 2} y={node.y + 40}>{side === 0 ? 'left' : 'right'}</text>
+                                                                        <text x={(node.x + childX) / 2} y={node.y + 40}>{isHeap ? childIndex + 1 : side === 0 ? 'left' : 'right'}</text>
                                                                         {childValue == null && <text className="tree-null" x={childX} y={childY + 4}>NULL</text>}
                                                                     </g>
                                                                 )
@@ -425,11 +513,11 @@ function ExercisePage() {
                                                             <circle cx={node.x} cy={node.y} r="19" />
                                                             <text className="tree-value" x={node.x} y={node.y + 5}>{node.value}</text>
                                                             {step.visited?.includes(node.index) && <text className="tree-order" x={node.x + 27} y={node.y - 14}>{step.visited.indexOf(node.index) + 1}</text>}
-                                                            {node.index === 0 && <text className="tree-root" x={node.x} y={node.y - 26}>root</text>}
+                                                            {isHeap ? <text className="heap-index" x={node.x} y={node.y - 26}>[{node.index + 1}]</text> : node.index === 0 && <text className="tree-root" x={node.x} y={node.y - 26}>root</text>}
                                                         </g>
                                                     ))}
                                                 </svg>
-                                            ) : <span className="list-pointer">root → NULL</span>}
+                                            ) : <span className="list-pointer">{isHeap ? '빈 힙 · heap_size = 0' : 'root → NULL'}</span>}
                                         </div>
                                     ) : isRecursion ? (
                                         <pre className="recursion-trace">{step.trace?.join('\n')}</pre>
@@ -503,7 +591,18 @@ function ExercisePage() {
                                             <div className="stack-base">data[{step.capacity ?? exercise.contract.capacity}]</div>
                                         </div>
                                     )}
-                                    {isTree && step.trace && <pre className="tree-output" aria-label="누적 출력">{step.trace.join('\n')}</pre>}
+                                    {isHeap && (
+                                        <div className="heap-array" aria-label="힙 배열, 0번 칸 미사용">
+                                            <span className="heap-slot" data-unused="true"><small>[0]</small><strong>미사용</strong></span>
+                                            {stepValues.map((value, index) => (
+                                                <span className="heap-slot" data-active={step.activeNode === index} key={index}>
+                                                    <small>[{index + 1}]</small>
+                                                    <strong>{value}</strong>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {(isTree || isHeap || isHash || isSet || isSearch) && step.trace && <pre className="tree-output" aria-label={isSearch ? '탐색 과정' : isSet ? '집합 연산 과정' : isHash ? '해싱 연산 과정' : isHeap ? '힙 연산 과정' : '누적 출력'}>{step.trace.join('\n')}</pre>}
                                     <div className="operation-info">
                                         <span className="operation-caption">현재 연산</span>
                                         <code>{isTree && step.operation === 'root' ? 'root = NULL' : `${step.operation}(${step.argument ?? ''})`}</code>
@@ -513,7 +612,24 @@ function ExercisePage() {
                                                     <span>front <strong>{hasLinkedEnds ? stepValues.length ? `${stepValues[0]} 노드` : 'NULL' : step.front}</strong></span>
                                                     <span>rear <strong>{hasLinkedEnds ? stepValues.length ? `${stepValues[stepValues.length - 1]} 노드` : 'NULL' : step.rear}</strong></span>
                                                 </>
-                                            ) : isTree ? <span>root <strong>{step.tree?.[0] == null ? 'NULL' : `${step.tree[0]} 노드`}</strong></span>
+                                            ) : isSearch ? (
+                                                <>
+                                                    <span>key <strong>{step.target}</strong></span>
+                                                    <span>low <strong>{step.low}</strong></span>
+                                                    <span>middle <strong>{step.activeNode ?? '—'}</strong></span>
+                                                    <span>high <strong>{step.high}</strong></span>
+                                                </>
+                                            ) : isSet ? (
+                                                <>
+                                                    <span>원소 수 <strong>{setParents.length}</strong></span>
+                                                    <span>집합 수 <strong>{setRoots.length}</strong></span>
+                                                </>
+                                            ) : isHash ? (
+                                                <>
+                                                    <span>버킷 <strong>{step.activeBucket ?? '—'}</strong></span>
+                                                    <span>노드 수 <strong>{step.buckets?.reduce((count, keys) => count + keys.length, 0) ?? 0}</strong></span>
+                                                </>
+                                            ) : isHeap ? <span>heap_size <strong>{stepValues.length}</strong></span> : isTree ? <span>root <strong>{step.tree?.[0] == null ? 'NULL' : `${step.tree[0]} 노드`}</strong></span>
                                                 : !isRecursion && !isLinkedList && <span>top <strong>{isLinkedStack ? stepValues.length ? `${stepValues[0]} 노드` : 'NULL' : step.top}</strong></span>}
                                             <span>반환값 <strong>{step.result ?? '—'}</strong></span>
                                         </div>

@@ -514,7 +514,11 @@ h1 {
     grid-template-columns: minmax(0, 1fr);
 }
 
-.simulation[data-category="tree"] {
+.simulation[data-category="tree"],
+.simulation[data-category="heap"],
+.simulation[data-category="hash"],
+.simulation[data-category="set"],
+.simulation[data-category="search"] {
     grid-template-columns: minmax(0, 1fr);
 }
 
@@ -570,6 +574,124 @@ h1 {
     fill: #5e9b76;
     font-size: 12px;
     font-weight: 600;
+}
+
+.search-array {
+    display: flex;
+    gap: 8px;
+    min-width: 0;
+    overflow-x: auto;
+    padding: 8px 0;
+}
+
+.search-slot {
+    display: flex;
+    flex: 0 0 92px;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 4px;
+    border: 1px solid #d9d3ed;
+    border-radius: 6px;
+}
+
+.search-slot small,
+.search-slot span {
+    color: #766c9b;
+    font-size: 11px;
+}
+
+.search-slot[data-in-range="false"] {
+    opacity: 0.4;
+}
+
+.search-slot[data-middle="true"] {
+    border-color: #7161c8;
+    background: #efecfa;
+}
+
+.search-slot[data-found="true"] {
+    border-color: #5e9b76;
+    background: #e5f3eb;
+}
+
+.set-diagram marker path {
+    fill: #aaa0dc;
+}
+
+.set-legend {
+    margin: 8px 0 0;
+    color: #766c9b;
+    font-size: 12px;
+}
+
+.hash-table {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+}
+
+.hash-bucket {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: center;
+    padding: 4px 8px;
+    border: 1px solid #e5e0ef;
+    border-radius: 6px;
+}
+
+.hash-bucket[data-active="true"] {
+    border-color: #7161c8;
+    background: #f6f4fb;
+}
+
+.hash-bucket-index {
+    color: #655a96;
+    font-family: monospace;
+}
+
+.hash-chain {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow-x: auto;
+    padding: 8px 0;
+}
+
+.heap-array,
+.parent-array {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.heap-slot,
+.parent-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 48px;
+    padding: 8px;
+    border: 1px solid #d9d3ed;
+    border-radius: 6px;
+}
+
+.heap-slot small,
+.parent-slot small {
+    color: #766c9b;
+}
+
+.heap-slot[data-unused="true"] {
+    color: #817b8b;
+    background: #f4f2f7;
+}
+
+.heap-slot[data-active="true"],
+.parent-slot[data-active="true"] {
+    border-color: #7161c8;
+    background: #efecfa;
 }
 
 .tree-output {

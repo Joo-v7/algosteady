@@ -59,6 +59,12 @@ export interface ExerciseDetails {
             result: number | string | null
             values?: number[]
             tree?: (number | null)[]
+            low?: number
+            high?: number
+            target?: number
+            parents?: number[]
+            buckets?: number[][]
+            activeBucket?: number
             activeNode?: number
             visited?: number[]
             trace?: string[]

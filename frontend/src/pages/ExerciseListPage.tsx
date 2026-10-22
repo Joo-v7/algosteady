@@ -37,13 +37,13 @@ function ExerciseListPage() {
                 {error && <p role="alert">{error}</p>}
                 {exercises.map(exercise => (
                     <article className="panel exercise-card" key={exercise.id}>
-                        <div className="section-label">{exercise.category === 'tree' ? '트리' : exercise.category === 'recursion' ? '재귀' : exercise.category === 'linked-list' ? '연결 리스트' : exercise.category === 'deque' ? '덱' : exercise.category === 'queue' ? '큐' : '스택'} · 기본 구현</div>
+                        <div className="section-label">{exercise.category === 'search' ? '탐색' : exercise.category === 'set' ? '집합' : exercise.category === 'hash' ? '해싱' : exercise.category === 'heap' ? '힙' : exercise.category === 'tree' ? '트리' : exercise.category === 'recursion' ? '재귀' : exercise.category === 'linked-list' ? '연결 리스트' : exercise.category === 'deque' ? '덱' : exercise.category === 'queue' ? '큐' : '스택'} · 기본 구현</div>
                         <h2>{exercise.title}</h2>
                         <p>{exercise.description}</p>
                         <div className="concept-tags">
                             <span>{exercise.languages.join(' · ').toUpperCase()}</span>
                             <span>
-                                {exercise.category === 'tree' ? '이진 트리 · 자식 포인터' : exercise.category === 'recursion' ? '종료 조건 · 재귀 호출' : exercise.contract.storage === 'linked' ? '연결 리스트 · 동적 메모리' : exercise.category === 'linked-list' ? exercise.contract.doubly ? '양방향 연결 · 헤드 노드' : exercise.contract.circular ? '원형 연결 · 동적 메모리' : '노드 · 동적 메모리' : exercise.contract.circular
+                                {exercise.category === 'search' ? '정렬된 배열 · 탐색 구간 절반 줄이기' : exercise.category === 'set' ? '부모 배열 · 경로 압축' : exercise.category === 'hash' ? `버킷 ${exercise.contract.capacity}개 · 연결 리스트` : exercise.category === 'heap' ? `완전 이진 트리 · 배열 · 저장 ${exercise.contract.usableCapacity}개` : exercise.category === 'tree' ? '이진 트리 · 자식 포인터' : exercise.category === 'recursion' ? '종료 조건 · 재귀 호출' : exercise.contract.storage === 'linked' ? '연결 리스트 · 동적 메모리' : exercise.category === 'linked-list' ? exercise.contract.doubly ? '양방향 연결 · 헤드 노드' : exercise.contract.circular ? '원형 연결 · 동적 메모리' : '노드 · 동적 메모리' : exercise.contract.circular
                                     ? `원형 배열 · 저장 ${exercise.contract.usableCapacity}개` : exercise.contract.initialCapacity !== undefined
                                     ? `동적 배열 · 초기 용량 ${exercise.contract.initialCapacity}`
                                     : `고정 배열 · 용량 ${exercise.contract.capacity}`}

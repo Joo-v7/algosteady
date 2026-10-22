@@ -1,0 +1,350 @@
+[
+  {
+    "id": "hash-positive",
+    "criterionId": "hash",
+    "public": false,
+    "description": "버킷 0~6과 배수",
+    "input": "HASH 0 0\nHASH 0 1\nHASH 0 6\nHASH 0 7\nHASH 0 8\nHASH 0 13\nHASH 0 14\nHASH 0 1000000\n",
+    "expected": {
+      "stdout": "HASH 0\nHASH 1\nHASH 6\nHASH 0\nHASH 1\nHASH 6\nHASH 0\nHASH 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "hash-negative",
+    "criterionId": "hash",
+    "public": false,
+    "description": "음수 나머지 보정",
+    "input": "HASH 0 -1\nHASH 0 -6\nHASH 0 -7\nHASH 0 -8\nHASH 0 -14\nHASH 0 -1000000\n",
+    "expected": {
+      "stdout": "HASH 6\nHASH 1\nHASH 0\nHASH 6\nHASH 0\nHASH 6\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-example",
+    "criterionId": "insert",
+    "public": true,
+    "description": "충돌 삽입·검색·중간 삭제",
+    "input": "ADD 0 8\nADD 0 1\nADD 0 15\nADD 0 9\nADD 0 6\nADD 0 13\nSTATE 0\nSEARCH 0 15\nDELETE 0 1\nSTATE 0\n",
+    "expected": {
+      "stdout": "[0]\n[1] 8 1 15\n[2] 9\n[3]\n[4]\n[5]\n[6] 6 13\nSEARCH 15\n[0]\n[1] 8 15\n[2] 9\n[3]\n[4]\n[5]\n[6] 6 13\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-all-buckets",
+    "criterionId": "insert",
+    "public": false,
+    "description": "각 버킷에 독립 삽입",
+    "input": "ADD 0 0\nADD 0 1\nADD 0 2\nADD 0 3\nADD 0 4\nADD 0 5\nADD 0 6\nSTATE 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "[0] 0\n[1] 1\n[2] 2\n[3] 3\n[4] 4\n[5] 5\n[6] 6\nSIZE 7\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-collisions",
+    "criterionId": "insert",
+    "public": false,
+    "description": "한 버킷의 삽입 순서와 노드 보존",
+    "input": "ADD 0 1\nADD 0 8\nADD 0 15\nADD 0 22\nADD 0 29\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "[0]\n[1] 1 8 15 22 29\n[2]\n[3]\n[4]\n[5]\n[6]\nSTATS 5 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-over-buckets",
+    "criterionId": "insert",
+    "public": false,
+    "description": "버킷 수보다 많은 노드 저장",
+    "input": "ADD 0 0\nADD 0 1\nADD 0 2\nADD 0 3\nADD 0 4\nADD 0 5\nADD 0 6\nADD 0 7\nADD 0 8\nADD 0 9\nADD 0 10\nADD 0 11\nADD 0 12\nADD 0 13\nADD 0 14\nADD 0 15\nADD 0 16\nADD 0 17\nADD 0 18\nADD 0 19\nADD 0 20\nADD 0 21\nADD 0 22\nADD 0 23\nADD 0 24\nSTATE 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "[0] 0 7 14 21\n[1] 1 8 15 22\n[2] 2 9 16 23\n[3] 3 10 17 24\n[4] 4 11 18\n[5] 5 12 19\n[6] 6 13 20\nSIZE 25\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "search-chain",
+    "criterionId": "search",
+    "public": false,
+    "description": "첫·중간·마지막 실제 노드 주소",
+    "input": "ADD 0 1\nADD 0 8\nADD 0 15\nADD 0 22\nSEARCH 0 1\nSEARCH 0 15\nSEARCH 0 22\nSTATS 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "SEARCH 1\nSEARCH 15\nSEARCH 22\nSTATS 4 0\n[0]\n[1] 1 8 15 22\n[2]\n[3]\n[4]\n[5]\n[6]\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "search-negative",
+    "criterionId": "search",
+    "public": false,
+    "description": "음수·0·경계 키",
+    "input": "ADD 0 -1000000\nADD 0 0\nADD 0 1000000\nADD 0 -1\nADD 0 6\nSEARCH 0 -1000000\nSEARCH 0 0\nSEARCH 0 1000000\nSEARCH 0 -1\nSTATE 0\n",
+    "expected": {
+      "stdout": "SEARCH -1000000\nSEARCH 0\nSEARCH 1000000\nSEARCH -1\n[0] 0\n[1] 1000000\n[2]\n[3]\n[4]\n[5]\n[6] -1000000 -1 6\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "search-preserve",
+    "criterionId": "search",
+    "public": false,
+    "description": "반복 검색 후 연결과 메모리 유지",
+    "input": "ADD 0 8\nADD 0 1\nADD 0 15\nSEARCH 0 8\nSEARCH 0 1\nSEARCH 0 15\nSEARCH 0 8\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "SEARCH 8\nSEARCH 1\nSEARCH 15\nSEARCH 8\n[0]\n[1] 8 1 15\n[2]\n[3]\n[4]\n[5]\n[6]\nSTATS 3 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-head",
+    "criterionId": "delete-head",
+    "public": false,
+    "description": "첫 포인터 갱신과 나머지 체인 유지",
+    "input": "ADD 0 8\nADD 0 1\nADD 0 15\nDELETE 0 8\nSTATE 0\nSEARCH 0 1\nSTATS 0\n",
+    "expected": {
+      "stdout": "[0]\n[1] 1 15\n[2]\n[3]\n[4]\n[5]\n[6]\nSEARCH 1\nSTATS 3 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-single",
+    "criterionId": "delete-head",
+    "public": false,
+    "description": "마지막 한 노드 삭제",
+    "input": "ADD 0 0\nDELETE 0 0\nSTATE 0\nSIZE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "[0]\n[1]\n[2]\n[3]\n[4]\n[5]\n[6]\nSIZE 0\nSTATS 1 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-middle",
+    "criterionId": "delete-chain",
+    "public": false,
+    "description": "중간 노드의 앞뒤 연결",
+    "input": "ADD 0 1\nADD 0 8\nADD 0 15\nADD 0 22\nDELETE 0 8\nSTATE 0\nSEARCH 0 15\nSTATS 0\n",
+    "expected": {
+      "stdout": "[0]\n[1] 1 15 22\n[2]\n[3]\n[4]\n[5]\n[6]\nSEARCH 15\nSTATS 4 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-tail",
+    "criterionId": "delete-chain",
+    "public": false,
+    "description": "마지막 노드와 반복 삭제",
+    "input": "ADD 0 1\nADD 0 8\nADD 0 15\nDELETE 0 15\nDELETE 0 15\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "[0]\n[1] 1 8\n[2]\n[3]\n[4]\n[5]\n[6]\nSTATS 3 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-negative",
+    "criterionId": "delete-chain",
+    "public": false,
+    "description": "음수·양수 충돌 키 삭제",
+    "input": "ADD 0 -6\nADD 0 1\nADD 0 8\nADD 0 -13\nDELETE 0 1\nDELETE 0 -13\nSTATE 0\n",
+    "expected": {
+      "stdout": "[0]\n[1] -6 8\n[2]\n[3]\n[4]\n[5]\n[6]\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "duplicate-head",
+    "criterionId": "duplicates",
+    "public": false,
+    "description": "첫 키 중복은 할당하지 않음",
+    "input": "ADD 0 8\nADD 0 8\nADD 0 8\nSIZE 0\nSTATS 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "SIZE 1\nSTATS 1 0\n[0]\n[1] 8\n[2]\n[3]\n[4]\n[5]\n[6]\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "duplicate-deep",
+    "criterionId": "duplicates",
+    "public": false,
+    "description": "체인 끝의 중복도 검사",
+    "input": "ADD 0 1\nADD 0 8\nADD 0 15\nADD 0 22\nADD 0 15\nADD 0 22\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "[0]\n[1] 1 8 15 22\n[2]\n[3]\n[4]\n[5]\n[6]\nSTATS 4 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "duplicate-no-allocation",
+    "criterionId": "duplicates",
+    "public": false,
+    "description": "할당 실패 설정에서도 중복은 정상 반환",
+    "input": "ADD 0 1\nADD 0 8\nFAIL_ALLOC 0 8\nSTATS 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "STATS 2 0\n[0]\n[1] 1 8\n[2]\n[3]\n[4]\n[5]\n[6]\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "missing-empty",
+    "criterionId": "missing",
+    "public": false,
+    "description": "빈 테이블 검색·삭제",
+    "input": "SEARCH 0 8\nDELETE 0 8\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "SEARCH NULL\n[0]\n[1]\n[2]\n[3]\n[4]\n[5]\n[6]\nSTATS 0 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "missing-collision",
+    "criterionId": "missing",
+    "public": false,
+    "description": "같은 버킷에 없는 키",
+    "input": "ADD 0 1\nADD 0 8\nADD 0 15\nSEARCH 0 22\nDELETE 0 22\nSEARCH 0 2\nDELETE 0 2\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "SEARCH NULL\nSEARCH NULL\n[0]\n[1] 1 8 15\n[2]\n[3]\n[4]\n[5]\n[6]\nSTATS 3 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-delete",
+    "criterionId": "memory",
+    "public": false,
+    "description": "삭제한 노드만 해제",
+    "input": "ADD 0 1\nADD 0 8\nADD 0 15\nADD 0 2\nADD 0 9\nDELETE 0 8\nDELETE 0 1\nDELETE 0 2\nSTATS 0\nSTATE 0\nCLEAR 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATS 5 3\n[0]\n[1] 15\n[2] 9\n[3]\n[4]\n[5]\n[6]\nSTATS 5 5\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-queries",
+    "criterionId": "memory",
+    "public": false,
+    "description": "검색과 없는 키 삭제는 할당·해제 없음",
+    "input": "ADD 0 0\nADD 0 7\nADD 0 14\nSEARCH 0 7\nSEARCH 0 21\nDELETE 0 21\nSTATS 0\n",
+    "expected": {
+      "stdout": "SEARCH 7\nSEARCH NULL\nSTATS 3 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "allocation-empty",
+    "criterionId": "allocation-error",
+    "public": false,
+    "description": "첫 노드 할당 실패",
+    "input": "FAIL_ALLOC 0 8\nSIZE 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "allocation-collision",
+    "criterionId": "allocation-error",
+    "public": false,
+    "description": "체인 끝 노드 할당 실패",
+    "input": "ADD 0 1\nADD 0 8\nFAIL_ALLOC 0 15\nSTATE 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "reuse-delete-add",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "삭제한 키 재삽입은 끝에 연결",
+    "input": "ADD 0 1\nADD 0 8\nADD 0 15\nDELETE 0 8\nADD 0 8\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "[0]\n[1] 1 15 8\n[2]\n[3]\n[4]\n[5]\n[6]\nSTATS 4 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-empty",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "전체 삭제 후 다시 사용",
+    "input": "ADD 0 1\nADD 0 8\nDELETE 0 1\nDELETE 0 8\nADD 0 -6\nADD 0 1\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "[0]\n[1] -6 1\n[2]\n[3]\n[4]\n[5]\n[6]\nSTATS 4 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-clear",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "호출 코드 정리 후 재사용",
+    "input": "ADD 0 2\nADD 0 9\nADD 0 16\nCLEAR 0\nADD 0 0\nADD 0 7\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "[0] 0 7\n[1]\n[2]\n[3]\n[4]\n[5]\n[6]\nSTATS 5 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-long-chain",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "128개 충돌 키의 검색·삭제",
+    "input": "ADD 0 0\nADD 0 7\nADD 0 14\nADD 0 21\nADD 0 28\nADD 0 35\nADD 0 42\nADD 0 49\nADD 0 56\nADD 0 63\nADD 0 70\nADD 0 77\nADD 0 84\nADD 0 91\nADD 0 98\nADD 0 105\nADD 0 112\nADD 0 119\nADD 0 126\nADD 0 133\nADD 0 140\nADD 0 147\nADD 0 154\nADD 0 161\nADD 0 168\nADD 0 175\nADD 0 182\nADD 0 189\nADD 0 196\nADD 0 203\nADD 0 210\nADD 0 217\nADD 0 224\nADD 0 231\nADD 0 238\nADD 0 245\nADD 0 252\nADD 0 259\nADD 0 266\nADD 0 273\nADD 0 280\nADD 0 287\nADD 0 294\nADD 0 301\nADD 0 308\nADD 0 315\nADD 0 322\nADD 0 329\nADD 0 336\nADD 0 343\nADD 0 350\nADD 0 357\nADD 0 364\nADD 0 371\nADD 0 378\nADD 0 385\nADD 0 392\nADD 0 399\nADD 0 406\nADD 0 413\nADD 0 420\nADD 0 427\nADD 0 434\nADD 0 441\nADD 0 448\nADD 0 455\nADD 0 462\nADD 0 469\nADD 0 476\nADD 0 483\nADD 0 490\nADD 0 497\nADD 0 504\nADD 0 511\nADD 0 518\nADD 0 525\nADD 0 532\nADD 0 539\nADD 0 546\nADD 0 553\nADD 0 560\nADD 0 567\nADD 0 574\nADD 0 581\nADD 0 588\nADD 0 595\nADD 0 602\nADD 0 609\nADD 0 616\nADD 0 623\nADD 0 630\nADD 0 637\nADD 0 644\nADD 0 651\nADD 0 658\nADD 0 665\nADD 0 672\nADD 0 679\nADD 0 686\nADD 0 693\nADD 0 700\nADD 0 707\nADD 0 714\nADD 0 721\nADD 0 728\nADD 0 735\nADD 0 742\nADD 0 749\nADD 0 756\nADD 0 763\nADD 0 770\nADD 0 777\nADD 0 784\nADD 0 791\nADD 0 798\nADD 0 805\nADD 0 812\nADD 0 819\nADD 0 826\nADD 0 833\nADD 0 840\nADD 0 847\nADD 0 854\nADD 0 861\nADD 0 868\nADD 0 875\nADD 0 882\nADD 0 889\nSEARCH 0 889\nDELETE 0 0\nDELETE 0 448\nDELETE 0 889\nSIZE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "SEARCH 889\nSIZE 125\nSTATS 128 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent",
+    "criterionId": "independence",
+    "public": false,
+    "description": "같은 키를 두 테이블에서 독립 처리",
+    "input": "ADD 0 1\nADD 0 8\nADD 0 15\nADD 1 1\nADD 1 22\nDELETE 0 1\nSEARCH 1 1\nSTATE 0\nSTATE 1\nCLEAR 0\nSTATE 1\nSTATS 0\n",
+    "expected": {
+      "stdout": "SEARCH 1\n[0]\n[1] 8 15\n[2]\n[3]\n[4]\n[5]\n[6]\n[0]\n[1] 1 22\n[2]\n[3]\n[4]\n[5]\n[6]\n[0]\n[1] 1 22\n[2]\n[3]\n[4]\n[5]\n[6]\nSTATS 5 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-negative",
+    "criterionId": "independence",
+    "public": false,
+    "description": "두 테이블의 음수·0과 정리 후 재사용",
+    "input": "ADD 0 -7\nADD 0 0\nADD 1 -7\nADD 1 7\nDELETE 1 -7\nSEARCH 0 -7\nCLEAR 1\nADD 1 -14\nSTATE 0\nSTATE 1\n",
+    "expected": {
+      "stdout": "SEARCH -7\n[0] -7 0\n[1]\n[2]\n[3]\n[4]\n[5]\n[6]\n[0] -14\n[1]\n[2]\n[3]\n[4]\n[5]\n[6]\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

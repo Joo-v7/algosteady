@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import { useEffect, useState } from 'react'
 import { getExercises } from '../api/exercises'
 import type { ExerciseSummary } from '../api/exercises'
+import { getExercisePresentation } from '../exercisePresentation'
 
 function ExerciseListPage() {
     const [exercises, setExercises] = useState<ExerciseSummary[]>([])
@@ -35,27 +36,27 @@ function ExerciseListPage() {
             {/* 현재 제공하는 과제 */}
             <section className="exercise-list" aria-label="과제 목록">
                 {error && <p role="alert">{error}</p>}
-                {exercises.map(exercise => (
-                    <article className="panel exercise-card" key={exercise.id}>
-                        <div className="section-label">{exercise.category === 'search' ? '탐색' : exercise.category === 'set' ? '집합' : exercise.category === 'hash' ? '해싱' : exercise.category === 'heap' ? '힙' : exercise.category === 'tree' ? '트리' : exercise.category === 'recursion' ? '재귀' : exercise.category === 'linked-list' ? '연결 리스트' : exercise.category === 'deque' ? '덱' : exercise.category === 'queue' ? '큐' : '스택'} · 기본 구현</div>
-                        <h2>{exercise.title}</h2>
-                        <p>{exercise.description}</p>
-                        <div className="concept-tags">
-                            <span>{exercise.languages.join(' · ').toUpperCase()}</span>
-                            <span>
-                                {exercise.category === 'search' ? '정렬된 배열 · 탐색 구간 절반 줄이기' : exercise.category === 'set' ? '부모 배열 · 경로 압축' : exercise.category === 'hash' ? `버킷 ${exercise.contract.capacity}개 · 연결 리스트` : exercise.category === 'heap' ? `완전 이진 트리 · 배열 · 저장 ${exercise.contract.usableCapacity}개` : exercise.category === 'tree' ? '이진 트리 · 자식 포인터' : exercise.category === 'recursion' ? '종료 조건 · 재귀 호출' : exercise.contract.storage === 'linked' ? '연결 리스트 · 동적 메모리' : exercise.category === 'linked-list' ? exercise.contract.doubly ? '양방향 연결 · 헤드 노드' : exercise.contract.circular ? '원형 연결 · 동적 메모리' : '노드 · 동적 메모리' : exercise.contract.circular
-                                    ? `원형 배열 · 저장 ${exercise.contract.usableCapacity}개` : exercise.contract.initialCapacity !== undefined
-                                    ? `동적 배열 · 초기 용량 ${exercise.contract.initialCapacity}`
-                                    : `고정 배열 · 용량 ${exercise.contract.capacity}`}
-                            </span>
-                            <span>채점 기준 {exercise.criteria.length}개</span>
-                        </div>
-                        <div className="exercise-card-actions">
-                            <Link className="secondary-button" to={`/exercises/${exercise.id}`}>학습</Link>
-                            <Link className="primary-button" to={`/exercises/${exercise.id}?tab=training`}>실습</Link>
-                        </div>
-                    </article>
-                ))}
+                {exercises.map(exercise => {
+                    const presentation = getExercisePresentation(exercise)
+                    return (
+                        <article className="panel exercise-card" key={exercise.id}>
+                            <div className="section-label">{presentation.label} · 기본 구현</div>
+                            <h2>{exercise.title}</h2>
+                            <p>{exercise.description}</p>
+                            <div className="concept-tags">
+                                <span>{exercise.languages.join(' · ').toUpperCase()}</span>
+                                <span>
+                                    {presentation.listTag}
+                                </span>
+                                <span>채점 기준 {exercise.criteria.length}개</span>
+                            </div>
+                            <div className="exercise-card-actions">
+                                <Link className="secondary-button" to={`/exercises/${exercise.id}`}>학습</Link>
+                                <Link className="primary-button" to={`/exercises/${exercise.id}?tab=training`}>실습</Link>
+                            </div>
+                        </article>
+                    )
+                })}
             </section>
 
             <footer className="workspace-footer">

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { getSubmission } from '../api/submissions'
 import type { SubmissionDetails } from '../api/submissions'
+import { getJobPresentation } from '../jobPresentation'
 
 const criterionLabels = {
     PENDING: '대기',
@@ -62,30 +63,7 @@ function SubmissionDetailsPage() {
 
     const job = submission.job
 
-    const resultPending = job.status === 'QUEUED' || job.status === 'RUNNING'
-    const preparation = job.preparation
-    const compilationFailed = preparation != null && preparation.status !== 'SUCCEEDED'
-    const resultTests = job.tests.filter(test => test.actual.status !== 'NOT_EXECUTED')
-    const resultFailed = job.criteria.some(criterion => criterion.status === 'FAILED') || resultTests.some(test => !test.passed)
-    const resultError = job.status === 'FAILED' || compilationFailed || job.criteria.some(criterion => criterion.status === 'UNAVAILABLE')
-    const resultStatus = resultPending ? 'pending' : resultError || resultFailed ? 'failed' : 'passed'
-    let resultLabel = '모든 기준 통과'
-
-    if (resultPending) {
-        resultLabel = '채점 중…'
-    } else if (job.status === 'FAILED' || preparation?.status === 'ENVIRONMENT_ERROR') {
-        resultLabel = '채점 오류'
-    } else if (compilationFailed) {
-        resultLabel = '컴파일 오류'
-    } else if (resultFailed) {
-        resultLabel = '일부 기준 실패'
-    } else if (resultError) {
-        resultLabel = '채점 오류'
-    }
-
-    const measuredTests = resultTests.filter(test => test.actual.executionTimeNanos != null)
-    const executionSeconds = measuredTests.length > 0
-        ? measuredTests.reduce((total, test) => total + (test.actual.executionTimeNanos ?? 0), 0) / 1000000000 : null
+    const { resultPending, preparation, compilationFailed, resultStatus, resultLabel, executionSeconds } = getJobPresentation(job, 'GRADING')
 
     return (
         <main className="workspace">

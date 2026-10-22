@@ -1,3 +1,5 @@
+export type ExerciseCategory = 'stack' | 'queue' | 'deque' | 'linked-list' | 'recursion' | 'tree' | 'heap' | 'hash' | 'set' | 'search'
+
 export interface ExpectedOutput {
     stdout: string
     exitCode: number
@@ -16,7 +18,7 @@ export interface ExerciseSummary {
     contentVersion: string
     title: string
     description: string
-    category: string
+    category: ExerciseCategory
     languages: string[]
     contract: {
         capacity?: number
@@ -34,12 +36,73 @@ export interface ExerciseSummary {
     }[]
 }
 
-export interface ExerciseDetails {
+export interface LearningStep {
+    operation: string
+    argument: number | string | null
+    result: number | string | null
+    description?: string
+}
+
+export interface SequenceStep extends LearningStep {
+    values: number[]
+    top?: number
+    front?: number
+    rear?: number
+    capacity?: number
+}
+
+export interface TreeStep extends LearningStep {
+    tree: (number | null)[]
+    activeNode?: number
+    visited?: number[]
+    trace?: string[]
+}
+
+export interface HeapStep extends TreeStep {
+    values: number[]
+}
+
+export interface SearchStep extends LearningStep {
+    values: number[]
+    low: number
+    high: number
+    target: number
+    activeNode?: number
+    trace: string[]
+}
+
+export interface SetStep extends LearningStep {
+    parents: number[]
+    activeNode?: number
+    visited?: number[]
+    trace: string[]
+}
+
+export interface HashStep extends LearningStep {
+    buckets: number[][]
+    activeBucket?: number
+    trace: string[]
+}
+
+export interface RecursionStep extends LearningStep {
+    trace: string[]
+}
+
+export type ExerciseDetails =
+    | ExerciseContent<'stack' | 'queue' | 'deque' | 'linked-list', SequenceStep>
+    | ExerciseContent<'tree', TreeStep>
+    | ExerciseContent<'heap', HeapStep>
+    | ExerciseContent<'search', SearchStep>
+    | ExerciseContent<'set', SetStep>
+    | ExerciseContent<'hash', HashStep>
+    | ExerciseContent<'recursion', RecursionStep>
+
+interface ExerciseContent<Category extends ExerciseCategory, Step extends LearningStep> {
     id: string
     version: string
     title: string
     description: string
-    category: string
+    category: Category
     language: string
     standard: string
     starterCode: string
@@ -53,27 +116,7 @@ export interface ExerciseDetails {
             function: string
             description: string
         }[]
-        steps: {
-            operation: string
-            argument: number | string | null
-            result: number | string | null
-            values?: number[]
-            tree?: (number | null)[]
-            low?: number
-            high?: number
-            target?: number
-            parents?: number[]
-            buckets?: number[][]
-            activeBucket?: number
-            activeNode?: number
-            visited?: number[]
-            trace?: string[]
-            description?: string
-            top?: number
-            front?: number
-            rear?: number
-            capacity?: number
-        }[]
+        steps: Step[]
         notes?: {
             title: string
             description: string

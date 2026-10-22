@@ -28,6 +28,8 @@ public class ExerciseCommandService implements ApplicationRunner {
 
     private final JsonMapper jsonMapper;
 
+    private final ExerciseLearningValidator exerciseLearningValidator;
+
     /**
      * 서버 시작 시 콘텐츠 파일과 테스트 연결을 검증한다.
      * @param arguments 애플리케이션 실행 인자
@@ -55,6 +57,8 @@ public class ExerciseCommandService implements ApplicationRunner {
                     || !exercise.path("languages").isObject() || exercise.path("languages").isEmpty()) {
                 throw new IllegalStateException("학습 내용, 규격, 기준과 언어를 확인해 주세요.");
             }
+
+            exerciseLearningValidator.validate(exercise);
 
             Set<String> criterionIds = new HashSet<>();
 

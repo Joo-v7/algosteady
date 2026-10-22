@@ -43,6 +43,20 @@ class ExerciseContentTests {
     @Spy
     private JsonMapper jsonMapper = JsonMapper.builder().build();
 
+    @Spy
+    private ExerciseLearningValidator exerciseLearningValidator = new ExerciseLearningValidator();
+
+    @Test
+    @DisplayName("학습 데이터 검증에 실패하면 콘텐츠를 저장하지 않습니다.")
+    void register_fail_withInvalidLearning() {
+        // given
+        Mockito.doThrow(new IllegalStateException("학습 콘텐츠 오류")).when(exerciseLearningValidator).validate(Mockito.any());
+
+        // when / then
+        Assertions.assertThrows(IllegalStateException.class, () -> exerciseCommandService.run(new DefaultApplicationArguments()));
+        Mockito.verifyNoInteractions(exerciseContentRepository);
+    }
+
     @Test
     @DisplayName("동일 버전은 재등록하지 않고 변경된 원본은 거부합니다.")
     void register_sameVersionIsImmutable() throws Exception {

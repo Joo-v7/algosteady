@@ -1,0 +1,302 @@
+[
+  {
+    "id": "init-empty",
+    "criterionId": "init",
+    "public": false,
+    "description": "빈 집합 초기화",
+    "input": "INIT 0\nSTATE\nGROUPS\n",
+    "expected": {
+      "stdout": "PARENT\nGROUPS 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "init-single",
+    "criterionId": "init",
+    "public": false,
+    "description": "한 원소 초기화",
+    "input": "INIT 1\nSTATE\nFIND 0\nGROUPS\n",
+    "expected": {
+      "stdout": "PARENT -1\nFIND 0\nGROUPS 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "init-separate",
+    "criterionId": "init",
+    "public": false,
+    "description": "모든 원소가 각자 대표",
+    "input": "INIT 6\nSTATE\nGROUPS\nSAME 0 5\n",
+    "expected": {
+      "stdout": "PARENT -1 -1 -1 -1 -1 -1\nGROUPS 6\nSAME 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "find-roots",
+    "criterionId": "find",
+    "public": false,
+    "description": "각 대표는 자기 번호 반환",
+    "input": "INIT 5\nFIND 0\nFIND 2\nFIND 4\nSTATE\n",
+    "expected": {
+      "stdout": "FIND 0\nFIND 2\nFIND 4\nPARENT -1 -1 -1 -1 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "find-deep",
+    "criterionId": "find",
+    "public": false,
+    "description": "직접 부모와 최종 대표 구분",
+    "input": "INIT 5\nUNION 0 1\nUNION 1 2\nUNION 2 3\nUNION 3 4\nFIND 0\nFIND 2\nSTATE\n",
+    "expected": {
+      "stdout": "FIND 4\nFIND 4\nPARENT 4 4 4 4 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "find-root-zero",
+    "criterionId": "find",
+    "public": false,
+    "description": "0번 대표도 정상 반환",
+    "input": "INIT 4\nUNION 3 2\nUNION 2 0\nFIND 3\nSTATE\n",
+    "expected": {
+      "stdout": "FIND 0\nPARENT -1 -1 0 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "union-example",
+    "criterionId": "union",
+    "public": true,
+    "description": "합치기·대표 찾기·경로 압축 예제",
+    "input": "INIT 6\nUNION 0 1\nUNION 1 2\nUNION 2 3\nUNION 4 5\nSTATE\nFIND 0\nSTATE\nUNION 1 4\nGROUPS\nFIND 0\nSTATE\n",
+    "expected": {
+      "stdout": "PARENT 1 2 3 -1 5 -1\nFIND 3\nPARENT 3 3 3 -1 5 -1\nGROUPS 1\nFIND 5\nPARENT 5 3 3 5 5 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "union-nonroots",
+    "criterionId": "union",
+    "public": false,
+    "description": "대표가 아닌 원소끼리 합치기",
+    "input": "INIT 6\nUNION 0 1\nUNION 2 3\nUNION 0 2\nSTATE\nSAME 0 3\nGROUPS\n",
+    "expected": {
+      "stdout": "PARENT 1 3 3 -1 -1 -1\nSAME 1\nGROUPS 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "union-direction",
+    "criterionId": "union",
+    "public": false,
+    "description": "첫 대표를 두 번째 대표에 연결",
+    "input": "INIT 4\nUNION 0 1\nUNION 2 3\nUNION 1 3\nSTATE\n",
+    "expected": {
+      "stdout": "PARENT 1 3 3 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "same-self",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "자신과 합치기는 순환 없음",
+    "input": "INIT 3\nUNION 0 0\nUNION 2 2\nSTATE\nGROUPS\n",
+    "expected": {
+      "stdout": "PARENT -1 -1 -1\nGROUPS 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "same-repeated",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "같은 합치기와 역순 반복",
+    "input": "INIT 4\nUNION 0 1\nUNION 0 1\nUNION 1 0\nUNION 0 1\nSTATE\nGROUPS\n",
+    "expected": {
+      "stdout": "PARENT 1 -1 -1 -1\nGROUPS 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "same-compress",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "같은 집합의 합치기도 경로 압축",
+    "input": "INIT 6\nUNION 0 1\nUNION 1 2\nUNION 2 3\nUNION 3 4\nUNION 4 5\nUNION 0 2\nSTATE\nGROUPS\n",
+    "expected": {
+      "stdout": "PARENT 5 5 5 5 5 -1\nGROUPS 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "compress-all",
+    "criterionId": "compression",
+    "public": false,
+    "description": "중간 원소까지 전체 경로 압축",
+    "input": "INIT 6\nUNION 0 1\nUNION 1 2\nUNION 2 3\nUNION 3 4\nUNION 4 5\nSTATE\nFIND 0\nSTATE\n",
+    "expected": {
+      "stdout": "PARENT 1 2 3 4 5 -1\nFIND 5\nPARENT 5 5 5 5 5 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "compress-middle",
+    "criterionId": "compression",
+    "public": false,
+    "description": "중간부터 찾으면 그 이후 경로만 압축",
+    "input": "INIT 7\nUNION 0 1\nUNION 1 2\nUNION 2 3\nUNION 3 4\nUNION 4 5\nUNION 5 6\nFIND 2\nSTATE\n",
+    "expected": {
+      "stdout": "FIND 6\nPARENT 1 2 6 6 6 6 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "compress-repeat",
+    "criterionId": "compression",
+    "public": false,
+    "description": "압축된 경로를 반복 탐색",
+    "input": "INIT 5\nUNION 0 1\nUNION 1 2\nUNION 2 3\nUNION 3 4\nFIND 0\nFIND 0\nFIND 1\nSTATE\n",
+    "expected": {
+      "stdout": "FIND 4\nFIND 4\nFIND 4\nPARENT 4 4 4 4 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "preserve-other-set",
+    "criterionId": "preservation",
+    "public": false,
+    "description": "다른 집합의 연결은 유지",
+    "input": "INIT 8\nUNION 0 1\nUNION 1 2\nUNION 2 3\nUNION 4 5\nUNION 5 6\nUNION 6 7\nFIND 0\nSTATE\nGROUPS\n",
+    "expected": {
+      "stdout": "FIND 3\nPARENT 3 3 3 -1 5 6 7 -1\nGROUPS 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "preserve-branch",
+    "criterionId": "preservation",
+    "public": false,
+    "description": "찾지 않은 가지는 보존",
+    "input": "INIT 7\nUNION 0 1\nUNION 2 1\nUNION 1 3\nUNION 4 5\nUNION 5 3\nUNION 3 6\nFIND 0\nSTATE\n",
+    "expected": {
+      "stdout": "FIND 6\nPARENT 6 6 1 6 5 3 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "preserve-union",
+    "criterionId": "preservation",
+    "public": false,
+    "description": "합치기는 전체 노드를 다시 연결하지 않음",
+    "input": "INIT 8\nUNION 0 1\nUNION 1 2\nUNION 2 3\nUNION 4 5\nUNION 5 6\nUNION 6 7\nUNION 1 5\nSTATE\nGROUPS\n",
+    "expected": {
+      "stdout": "PARENT 1 3 3 7 5 7 7 -1\nGROUPS 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-reset",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "합친 집합 재초기화",
+    "input": "INIT 6\nUNION 0 1\nUNION 1 2\nUNION 2 3\nUNION 3 4\nUNION 4 5\nFIND 0\nINIT 6\nSTATE\nGROUPS\nSAME 0 5\n",
+    "expected": {
+      "stdout": "FIND 5\nPARENT -1 -1 -1 -1 -1 -1\nGROUPS 6\nSAME 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-size",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "크기를 줄이고 늘려 다시 사용",
+    "input": "INIT 8\nUNION 0 1\nUNION 1 2\nUNION 2 3\nUNION 3 4\nUNION 4 5\nUNION 5 6\nUNION 6 7\nINIT 2\nUNION 0 1\nSTATE\nINIT 9\nSTATE\nGROUPS\n",
+    "expected": {
+      "stdout": "PARENT 1 -1\nPARENT -1 -1 -1 -1 -1 -1 -1 -1 -1\nGROUPS 9\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-empty",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "빈 초기화 후 다시 사용",
+    "input": "INIT 0\nINIT 3\nUNION 0 2\nFIND 0\nINIT 0\nSTATE\nGROUPS\n",
+    "expected": {
+      "stdout": "FIND 2\nPARENT\nGROUPS 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "boundary-last",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "마지막 원소와 0번 원소",
+    "input": "INIT 100\nUNION 99 0\nFIND 99\nFIND 0\nGROUPS\n",
+    "expected": {
+      "stdout": "FIND 0\nFIND 0\nGROUPS 99\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "boundary-chain",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "100개 긴 경로 전체 압축",
+    "input": "INIT 100\nUNION 0 1\nUNION 1 2\nUNION 2 3\nUNION 3 4\nUNION 4 5\nUNION 5 6\nUNION 6 7\nUNION 7 8\nUNION 8 9\nUNION 9 10\nUNION 10 11\nUNION 11 12\nUNION 12 13\nUNION 13 14\nUNION 14 15\nUNION 15 16\nUNION 16 17\nUNION 17 18\nUNION 18 19\nUNION 19 20\nUNION 20 21\nUNION 21 22\nUNION 22 23\nUNION 23 24\nUNION 24 25\nUNION 25 26\nUNION 26 27\nUNION 27 28\nUNION 28 29\nUNION 29 30\nUNION 30 31\nUNION 31 32\nUNION 32 33\nUNION 33 34\nUNION 34 35\nUNION 35 36\nUNION 36 37\nUNION 37 38\nUNION 38 39\nUNION 39 40\nUNION 40 41\nUNION 41 42\nUNION 42 43\nUNION 43 44\nUNION 44 45\nUNION 45 46\nUNION 46 47\nUNION 47 48\nUNION 48 49\nUNION 49 50\nUNION 50 51\nUNION 51 52\nUNION 52 53\nUNION 53 54\nUNION 54 55\nUNION 55 56\nUNION 56 57\nUNION 57 58\nUNION 58 59\nUNION 59 60\nUNION 60 61\nUNION 61 62\nUNION 62 63\nUNION 63 64\nUNION 64 65\nUNION 65 66\nUNION 66 67\nUNION 67 68\nUNION 68 69\nUNION 69 70\nUNION 70 71\nUNION 71 72\nUNION 72 73\nUNION 73 74\nUNION 74 75\nUNION 75 76\nUNION 76 77\nUNION 77 78\nUNION 78 79\nUNION 79 80\nUNION 80 81\nUNION 81 82\nUNION 82 83\nUNION 83 84\nUNION 84 85\nUNION 85 86\nUNION 86 87\nUNION 87 88\nUNION 88 89\nUNION 89 90\nUNION 90 91\nUNION 91 92\nUNION 92 93\nUNION 93 94\nUNION 94 95\nUNION 95 96\nUNION 96 97\nUNION 97 98\nUNION 98 99\nFIND 0\nSTATE\nGROUPS\n",
+    "expected": {
+      "stdout": "FIND 99\nPARENT 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 99 -1\nGROUPS 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "boundary-reverse",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "0번을 대표로 하는 긴 경로",
+    "input": "INIT 100\nUNION 99 98\nUNION 98 97\nUNION 97 96\nUNION 96 95\nUNION 95 94\nUNION 94 93\nUNION 93 92\nUNION 92 91\nUNION 91 90\nUNION 90 89\nUNION 89 88\nUNION 88 87\nUNION 87 86\nUNION 86 85\nUNION 85 84\nUNION 84 83\nUNION 83 82\nUNION 82 81\nUNION 81 80\nUNION 80 79\nUNION 79 78\nUNION 78 77\nUNION 77 76\nUNION 76 75\nUNION 75 74\nUNION 74 73\nUNION 73 72\nUNION 72 71\nUNION 71 70\nUNION 70 69\nUNION 69 68\nUNION 68 67\nUNION 67 66\nUNION 66 65\nUNION 65 64\nUNION 64 63\nUNION 63 62\nUNION 62 61\nUNION 61 60\nUNION 60 59\nUNION 59 58\nUNION 58 57\nUNION 57 56\nUNION 56 55\nUNION 55 54\nUNION 54 53\nUNION 53 52\nUNION 52 51\nUNION 51 50\nUNION 50 49\nUNION 49 48\nUNION 48 47\nUNION 47 46\nUNION 46 45\nUNION 45 44\nUNION 44 43\nUNION 43 42\nUNION 42 41\nUNION 41 40\nUNION 40 39\nUNION 39 38\nUNION 38 37\nUNION 37 36\nUNION 36 35\nUNION 35 34\nUNION 34 33\nUNION 33 32\nUNION 32 31\nUNION 31 30\nUNION 30 29\nUNION 29 28\nUNION 28 27\nUNION 27 26\nUNION 26 25\nUNION 25 24\nUNION 24 23\nUNION 23 22\nUNION 22 21\nUNION 21 20\nUNION 20 19\nUNION 19 18\nUNION 18 17\nUNION 17 16\nUNION 16 15\nUNION 15 14\nUNION 14 13\nUNION 13 12\nUNION 12 11\nUNION 11 10\nUNION 10 9\nUNION 9 8\nUNION 8 7\nUNION 7 6\nUNION 6 5\nUNION 5 4\nUNION 4 3\nUNION 3 2\nUNION 2 1\nUNION 1 0\nFIND 99\nSTATE\nGROUPS\n",
+    "expected": {
+      "stdout": "FIND 0\nPARENT -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\nGROUPS 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "boundary-pairs",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "여러 집합을 차례로 합치기",
+    "input": "INIT 100\nUNION 0 1\nUNION 2 3\nUNION 4 5\nUNION 6 7\nUNION 8 9\nUNION 10 11\nUNION 12 13\nUNION 14 15\nUNION 16 17\nUNION 18 19\nUNION 20 21\nUNION 22 23\nUNION 24 25\nUNION 26 27\nUNION 28 29\nUNION 30 31\nUNION 32 33\nUNION 34 35\nUNION 36 37\nUNION 38 39\nUNION 40 41\nUNION 42 43\nUNION 44 45\nUNION 46 47\nUNION 48 49\nUNION 50 51\nUNION 52 53\nUNION 54 55\nUNION 56 57\nUNION 58 59\nUNION 60 61\nUNION 62 63\nUNION 64 65\nUNION 66 67\nUNION 68 69\nUNION 70 71\nUNION 72 73\nUNION 74 75\nUNION 76 77\nUNION 78 79\nUNION 80 81\nUNION 82 83\nUNION 84 85\nUNION 86 87\nUNION 88 89\nUNION 90 91\nUNION 92 93\nUNION 94 95\nUNION 96 97\nUNION 98 99\nGROUPS\nUNION 1 99\nUNION 3 99\nUNION 5 99\nUNION 7 99\nUNION 9 99\nUNION 11 99\nUNION 13 99\nUNION 15 99\nUNION 17 99\nUNION 19 99\nUNION 21 99\nUNION 23 99\nUNION 25 99\nUNION 27 99\nUNION 29 99\nUNION 31 99\nUNION 33 99\nUNION 35 99\nUNION 37 99\nUNION 39 99\nUNION 41 99\nUNION 43 99\nUNION 45 99\nUNION 47 99\nUNION 49 99\nUNION 51 99\nUNION 53 99\nUNION 55 99\nUNION 57 99\nUNION 59 99\nUNION 61 99\nUNION 63 99\nUNION 65 99\nUNION 67 99\nUNION 69 99\nUNION 71 99\nUNION 73 99\nUNION 75 99\nUNION 77 99\nUNION 79 99\nUNION 81 99\nUNION 83 99\nUNION 85 99\nUNION 87 99\nUNION 89 99\nUNION 91 99\nUNION 93 99\nUNION 95 99\nUNION 97 99\nSAME 0 98\nGROUPS\n",
+    "expected": {
+      "stdout": "GROUPS 50\nSAME 1\nGROUPS 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

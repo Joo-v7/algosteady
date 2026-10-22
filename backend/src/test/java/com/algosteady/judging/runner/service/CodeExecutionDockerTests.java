@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.core.io.Resource;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import tools.jackson.databind.JsonNode;
@@ -527,6 +528,352 @@ class CodeExecutionDockerTests {
             Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
                     && expected.path("exitCode").asInt() == actual.exitCode()
                     && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), mistake.getKey());
+        }
+    }
+
+    @Test
+    @DisplayName("후위 순회의 부모 조기 방문·좌우 반전·노드 누락·트리 변경 오답을 구분합니다.")
+    void execute_success_detectsPostorderMistakes() throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/tree-postorder/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String harness = Files.readString(contentDirectory.resolve("harness.c"));
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        Map<String, String> mistakes = Map.of(
+                "root-example", reference.replace("postorder(root->right);\n        printf(\"[%d] \", root->data);", "printf(\"[%d] \", root->data);\n        postorder(root->right);"),
+                "left-subtree", reference.replace("postorder(root->left);\n        postorder(root->right);", "postorder(root->right);\n        postorder(root->left);"),
+                "sparse-right", reference.replace("postorder(root->right);", ""),
+                "preserve-both", reference.replace("printf(\"[%d] \", root->data);", "printf(\"[%d] \", root->data); root->data = -999;"),
+                "leaf-zero", reference.replace("if (root != NULL)", "if (root != NULL && root->data != 0)"));
+
+        for (Map.Entry<String, String> mistake : mistakes.entrySet()) {
+            JsonNode test = tests.valueStream().filter(item -> item.path("id").asString().equals(mistake.getKey())).findFirst().orElseThrow();
+            ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
+
+            // when
+            ExecutionResult result = service.execute(request, actual -> {});
+
+            // then
+            Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
+            TestExecutionResult actual = result.tests().getFirst();
+            JsonNode expected = test.path("expected");
+            Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+            Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                    && expected.path("exitCode").asInt() == actual.exitCode()
+                    && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), mistake.getKey());
+        }
+    }
+
+    @Test
+    @DisplayName("레벨 순회의 깊이·좌우 순서·누락·트리 변경 오답을 구분합니다.")
+    void execute_success_detectsLevelOrderMistakes() throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/tree-level-order/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String harness = Files.readString(contentDirectory.resolve("harness.c"));
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        Map<String, String> mistakes = Map.of(
+                "root-example", reference.replace("TreeNode *node = dequeue(&q);", "TreeNode *node = q.data[q.rear--];"),
+                "left-subtree", reference.replace("if (node->left != NULL) enqueue(&q, node->left);\n        if (node->right != NULL) enqueue(&q, node->right);", "if (node->right != NULL) enqueue(&q, node->right);\n        if (node->left != NULL) enqueue(&q, node->left);"),
+                "sparse-right", reference.replace("if (node->right != NULL) enqueue(&q, node->right);", ""),
+                "preserve-both", reference.replace("printf(\"[%d] \", node->data);", "printf(\"[%d] \", node->data); node->left = NULL;"),
+                "leaf-zero", reference.replace("if (root == NULL) return;", "if (root == NULL || root->data == 0) return;"));
+
+        for (Map.Entry<String, String> mistake : mistakes.entrySet()) {
+            Assertions.assertNotEquals(reference, mistake.getValue(), mistake.getKey());
+            JsonNode test = tests.valueStream()
+                    .filter(item -> item.path("id").asString().equals(mistake.getKey()))
+                    .findFirst()
+                    .orElseThrow();
+            ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
+
+            // when
+            ExecutionResult result = service.execute(request, actual -> {});
+
+            // then
+            Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
+            TestExecutionResult actual = result.tests().getFirst();
+            JsonNode expected = test.path("expected");
+            Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+            Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                    && expected.path("exitCode").asInt() == actual.exitCode()
+                    && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), mistake.getKey());
+        }
+    }
+
+    @Test
+    @DisplayName("이진 탐색 트리의 탐색·중복·삭제 연결·후계자·해제 오답을 구분합니다.")
+    void execute_success_detectsBstMistakes() throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/tree-bst/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String harness = Files.readString(contentDirectory.resolve("harness.c"));
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        Map<String, String> mistakes = Map.of(
+                "search-branches", reference.replace("if (key < node->key) return search(node->left, key);", "if (key < node->key) return search(node->right, key);"),
+                "insert-order", reference.replace("node->left = insert_node(node->left, key);", "insert_node(node->left, key);"),
+                "duplicate-root", reference.replace("else if (key > node->key) node->right = insert_node(node->right, key);", "else node->right = insert_node(node->right, key);"),
+                "minimum-deep", reference.replace("while (current->left != NULL) current = current->left;", "if (current->left != NULL) current = current->left;"),
+                "delete-root-left", reference.replace("TreeNode *next = root->left;", "TreeNode *next = NULL;"),
+                "delete-successor-deep", reference.replace("root->right = delete_node(root->right, next->key);", "root->right = NULL;"),
+                "memory-release", reference.replace("free(root);", ""),
+                "search-preserve", reference.replace("if (key == node->key) return node;", "if (key == node->key) { node->left = NULL; return node; }"));
+
+        for (Map.Entry<String, String> mistake : mistakes.entrySet()) {
+            Assertions.assertNotEquals(reference, mistake.getValue(), mistake.getKey());
+            JsonNode test = tests.valueStream()
+                    .filter(item -> item.path("id").asString().equals(mistake.getKey()))
+                    .findFirst()
+                    .orElseThrow();
+            ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
+
+            // when
+            ExecutionResult result = service.execute(request, actual -> {});
+
+            // then
+            Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
+            TestExecutionResult actual = result.tests().getFirst();
+            JsonNode expected = test.path("expected");
+            Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+            Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                    && expected.path("exitCode").asInt() == actual.exitCode()
+                    && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), mistake.getKey());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"max", "min"})
+    @DisplayName("힙의 비교·부모 이동·자식 선택·크기·오류 종료 오답을 구분합니다.")
+    void execute_success_detectsHeapMistakes(String mode) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/heap-" + mode + "/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String harness = Files.readString(contentDirectory.resolve("harness.c"));
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        String comparison = mode.equals("max") ? ">" : "<";
+        String reversed = mode.equals("max") ? "<" : ">";
+        Map<String, String> mistakes = Map.of(
+                "insert-example", reference.replace("item.key " + comparison + " h->heap[i / 2].key", "item.key " + reversed + " h->heap[i / 2].key"),
+                "insert-rise", reference.replace("i /= 2;", "i = 1;"),
+                "child-right", reference.replace("if (child < h->heap_size &&", "if (0 &&"),
+                "child-left-only", reference.replace("while (child <= h->heap_size)", "while (child < h->heap_size)"),
+                "delete-size", reference.replace("h->heap[(h->heap_size)--]", "h->heap[h->heap_size]"),
+                "init-empty", reference.replace("h->heap_size = 0;", "h->heap_size = 1;"),
+                "full-boundary", reference.replace("h->heap_size == MAX_ELEMENT - 1", "h->heap_size == MAX_ELEMENT - 2"),
+                "empty-initial", reference.replace("exit(1);", "exit(0);"),
+                "zero-negative", reference.replace("h->heap[i] = item;", ""));
+
+        for (Map.Entry<String, String> mistake : mistakes.entrySet()) {
+            Assertions.assertNotEquals(reference, mistake.getValue(), mistake.getKey());
+            JsonNode test = tests.valueStream()
+                    .filter(item -> item.path("id").asString().equals(mistake.getKey()))
+                    .findFirst()
+                    .orElseThrow();
+            ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
+
+            // when
+            ExecutionResult result = service.execute(request, actual -> {});
+
+            // then
+            Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
+            TestExecutionResult actual = result.tests().getFirst();
+            JsonNode expected = test.path("expected");
+            Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+            Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                    && expected.path("exitCode").asInt() == actual.exitCode()
+                    && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), mode + ":" + mistake.getKey());
+        }
+
+        // given
+        String alternative = reference.replace("item.key " + comparison + " h->heap[i / 2].key", "item.key " + comparison + "= h->heap[i / 2].key")
+                .replace("h->heap[child].key " + reversed + " h->heap[child + 1].key", "h->heap[child].key " + reversed + "= h->heap[child + 1].key");
+        JsonNode duplicate = tests.valueStream()
+                .filter(test -> test.path("id").asString().equals("duplicate"))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, alternative, harness, List.of(new TestInput("duplicate", duplicate.path("input").asString())));
+
+        // when
+        ExecutionResult result = service.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
+        TestExecutionResult actual = result.tests().getFirst();
+        Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+        Assertions.assertEquals(duplicate.path("expected").path("stdout").asString(), actual.stdout());
+        Assertions.assertEquals(0, actual.exitCode());
+        Assertions.assertTrue(actual.stderr().isBlank());
+    }
+
+    @Test
+    @DisplayName("체이닝 해싱의 음수 버킷·충돌·중복·검색 주소·삭제 연결·할당 오류를 구분합니다.")
+    void execute_success_detectsChainingMistakes() throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/hash-chaining/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String harness = Files.readString(contentDirectory.resolve("harness.c"));
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        Map<String, String> mistakes = Map.of(
+                "hash-negative", reference.replace("return (key % TABLE_SIZE + TABLE_SIZE) % TABLE_SIZE;", "return key % TABLE_SIZE;"),
+                "insert-collisions", reference.replace("else before->link = created;", "else ht[hash_value] = created;"),
+                "duplicate-deep", reference.replace("if (node->item.key == item.key) return;", ""),
+                "search-chain", reference.replace("if (node->item.key == item.key) return node;", "if (node->item.key == item.key) return ht[hash_value];"),
+                "delete-head", reference.replace("if (before == NULL) ht[hash_value] = node->link;", "if (before == NULL) ht[hash_value] = NULL;"),
+                "delete-middle", reference.replace("else before->link = node->link;", "else before->link = NULL;"),
+                "memory-delete", reference.replace("free(node);", ""),
+                "allocation-empty", reference.replace("exit(1);", "exit(0);"),
+                "search-preserve", reference.replace("if (node->item.key == item.key) return node;", "if (node->item.key == item.key) { node->link = NULL; return node; }"));
+
+        for (Map.Entry<String, String> mistake : mistakes.entrySet()) {
+            Assertions.assertNotEquals(reference, mistake.getValue(), mistake.getKey());
+            JsonNode test = tests.valueStream()
+                    .filter(item -> item.path("id").asString().equals(mistake.getKey()))
+                    .findFirst()
+                    .orElseThrow();
+            ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
+
+            // when
+            ExecutionResult result = service.execute(request, actual -> {});
+
+            // then
+            Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
+            TestExecutionResult actual = result.tests().getFirst();
+            JsonNode expected = test.path("expected");
+            Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+            Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                    && expected.path("exitCode").asInt() == actual.exitCode()
+                    && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), mistake.getKey());
+        }
+    }
+
+    @Test
+    @DisplayName("유니온 파인드의 대표·합치기 방향·순환·부분 압축·다른 경로 변경 오답을 구분합니다.")
+    void execute_success_detectsUnionFindMistakes() throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/set-union-find/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String harness = Files.readString(contentDirectory.resolve("harness.c"));
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        Map<String, String> mistakes = Map.of(
+                "init-single", reference.replace("i < n;", "i < n - 1;"),
+                "find-roots", reference.replace("if (parent[curr] == -1) return curr;", "if (parent[curr] == -1) return -1;"),
+                "find-deep", reference.replace("return parent[curr] = set_find(parent[curr]);", "return parent[curr];"),
+                "compress-all", reference.replace("return parent[curr] = set_find(parent[curr]);", "return set_find(parent[curr]);"),
+                "compress-middle", reference.replace("return parent[curr] = set_find(parent[curr]);", "int root = curr; while (parent[root] != -1) root = parent[root]; parent[curr] = root; return root;"),
+                "union-nonroots", reference.replace("if (root1 != root2) parent[root1] = root2;", "if (root1 != root2) parent[a] = b;"),
+                "union-direction", reference.replace("parent[root1] = root2;", "parent[root2] = root1;"),
+                "same-self", reference.replace("if (root1 != root2) parent[root1] = root2;", "parent[root1] = root2;"),
+                "preserve-branch", reference.replace("return parent[curr] = set_find(parent[curr]);", "int root = set_find(parent[curr]); for (int i = 0; i < MAX_VERTICES; i++) { if (parent[i] == curr) parent[i] = root; } return parent[curr] = root;"));
+
+        for (Map.Entry<String, String> mistake : mistakes.entrySet()) {
+            Assertions.assertNotEquals(reference, mistake.getValue(), mistake.getKey());
+            JsonNode test = tests.valueStream()
+                    .filter(item -> item.path("id").asString().equals(mistake.getKey()))
+                    .findFirst()
+                    .orElseThrow();
+            ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
+
+            // when
+            ExecutionResult result = service.execute(request, actual -> {});
+
+            // then
+            Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
+            TestExecutionResult actual = result.tests().getFirst();
+            JsonNode expected = test.path("expected");
+            Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+            Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                    && expected.path("exitCode").asInt() == actual.exitCode()
+                    && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), mistake.getKey());
+        }
+
+        // given
+        String iterative = reference.replace("return parent[curr] = set_find(parent[curr]);", "int root = curr; while (parent[root] != -1) root = parent[root]; while (parent[curr] != -1) { int next = parent[curr]; parent[curr] = root; curr = next; } return root;");
+        List<TestInput> inputs = tests.valueStream()
+                .map(test -> new TestInput(test.path("id").asString(), test.path("input").asString()))
+                .toList();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, iterative, harness, inputs);
+
+        // when
+        ExecutionResult result = service.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
+        Assertions.assertEquals(tests.size(), result.tests().size());
+        for (int index = 0; index < tests.size(); index++) {
+            TestExecutionResult actual = result.tests().get(index);
+            JsonNode expected = tests.get(index).path("expected");
+            Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+            Assertions.assertEquals(expected.path("stdout").asString(), actual.stdout(), actual.testId());
+            Assertions.assertEquals(expected.path("exitCode").asInt(), actual.exitCode(), actual.testId());
+            Assertions.assertEquals(expected.path("stderrRequired").asBoolean(), !actual.stderr().isBlank(), actual.testId());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"iterative", "recursive"})
+    @DisplayName("이진 탐색의 구간·반환 인덱스·배열 변경·결과 전달 오답을 구분합니다.")
+    void execute_success_detectsBinarySearchMistakes(String mode) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/search-binary-" + mode + "/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String harness = Files.readString(contentDirectory.resolve("harness.c"));
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        boolean iterative = mode.equals("iterative");
+        Map<String, String> mistakes = Map.of(
+                "single-found", reference.replace(iterative ? "while (low <= high)" : "if (low > high)", iterative ? "while (low < high)" : "if (low >= high)"),
+                "search-example", reference.replace("return middle;", "return list[middle];"),
+                "search-left", reference.replace(iterative ? "key > list[middle]" : "key < list[middle]", iterative ? "key < list[middle]" : "key > list[middle]"),
+                "search-right", reference.replace("middle + 1", "middle + 2"),
+                "subrange-found", reference.replace("return middle;", "return middle - low;"),
+                "missing-between", reference.replace("return -1;", "return 0;"),
+                "preserve-array", reference.replace("if (key == list[middle]) return middle;", "if (key == list[middle]) { list[middle] = 999; return middle; }"),
+                "subrange-excluded", reference.replace("int search_binary(int key, int low, int high)\n{\n", "int search_binary(int key, int low, int high)\n{\n    if (key == list[0]) return 0;\n"),
+                "max-array", reference.replace(iterative ? "while (low <= high)" : "return search_binary(key, middle + 1, high);", iterative ? "if (low <= high)" : "search_binary(key, middle + 1, high); return -1;"));
+
+        for (Map.Entry<String, String> mistake : mistakes.entrySet()) {
+            Assertions.assertNotEquals(reference, mistake.getValue(), mistake.getKey());
+            JsonNode test = tests.valueStream()
+                    .filter(item -> item.path("id").asString().equals(mistake.getKey()))
+                    .findFirst()
+                    .orElseThrow();
+            ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
+
+            // when
+            ExecutionResult result = service.execute(request, actual -> {});
+
+            // then
+            Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
+            TestExecutionResult actual = result.tests().getFirst();
+            JsonNode expected = test.path("expected");
+            Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+            Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                    && expected.path("exitCode").asInt() == actual.exitCode()
+                    && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), mode + ":" + mistake.getKey());
+        }
+
+        // given
+        String alternative = reference.replace("if (key == list[middle]) return middle;", "if (key == list[middle]) { while (middle < high && list[middle + 1] == key) middle++; return middle; }");
+        List<JsonNode> duplicateTests = tests.valueStream()
+                .filter(test -> test.path("id").asString().equals("duplicates") || test.path("id").asString().equals("all-equal"))
+                .toList();
+        List<TestInput> inputs = duplicateTests.stream()
+                .map(test -> new TestInput(test.path("id").asString(), test.path("input").asString()))
+                .toList();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, alternative, harness, inputs);
+
+        // when
+        ExecutionResult result = service.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
+        Assertions.assertEquals(duplicateTests.size(), result.tests().size());
+        for (int index = 0; index < duplicateTests.size(); index++) {
+            TestExecutionResult actual = result.tests().get(index);
+            JsonNode expected = duplicateTests.get(index).path("expected");
+            Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+            Assertions.assertEquals(expected.path("stdout").asString(), actual.stdout());
+            Assertions.assertEquals(0, actual.exitCode());
+            Assertions.assertTrue(actual.stderr().isBlank());
         }
     }
 

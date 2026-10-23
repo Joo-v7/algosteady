@@ -112,50 +112,57 @@ const categories = {
     simulationTitle: string
 }>
 
-// 목록과 상세에서 분류·저장 방식의 표시 정의를 함께 사용한다.
+// 목록·상세의 분류와 저장 방식별 표시 문구 결정
 export function getExercisePresentation(exercise: Pick<ExerciseSummary, 'category' | 'contract'>) {
     const presentation = { ...categories[exercise.category] }
     const { category, contract } = exercise
 
-    if (category === 'heap') {
-        presentation.note = `완전 이진 트리 · 배열 · 저장 ${contract.usableCapacity}개`
-        presentation.listTag = presentation.note
-    } else if (category === 'hash') {
-        presentation.note = `버킷 ${contract.capacity}개 · 연결 리스트 · 충돌 처리`
-        presentation.listTag = `버킷 ${contract.capacity}개 · 연결 리스트`
-    } else if (category === 'linked-list') {
-        if (contract.doubly) {
-            presentation.note = '헤드 노드 · 양방향 연결'
-            presentation.tag = 'Doubly Linked List'
-            presentation.detail = 'llink와 rlink로 앞뒤 이동'
-            presentation.listTag = '양방향 연결 · 헤드 노드'
-        } else if (contract.circular) {
-            presentation.note = '순환 연결 · head는 마지막 노드'
-            presentation.tag = 'Circular Linked List'
-            presentation.detail = 'head->link에서 한 바퀴 순회'
-            presentation.listTag = '원형 연결 · 동적 메모리'
-        }
-    } else if (category === 'stack' || category === 'queue' || category === 'deque') {
-        if (contract.storage === 'linked') {
-            presentation.simulationTitle = '노드는 이렇게 연결돼요'
-            presentation.listTag = '연결 리스트 · 동적 메모리'
-            if (category === 'stack') {
-                presentation.note = '노드 · top 포인터 · 동적 메모리'
-                presentation.detail = 'top에서 link를 따라 순회'
-            } else {
-                presentation.note = `노드 · front와 rear 포인터 · ${category === 'deque' ? '양방향 연결' : 'FIFO'}`
-                presentation.detail = category === 'deque' ? '양쪽 끝에서 삽입 · 삭제 · 조회' : 'front에서 꺼내고 rear 뒤에 연결'
+    switch (category) {
+        case 'heap':
+            presentation.note = `완전 이진 트리 · 배열 · 저장 ${contract.usableCapacity}개`
+            presentation.listTag = presentation.note
+            break
+        case 'hash':
+            presentation.note = `버킷 ${contract.capacity}개 · 연결 리스트 · 충돌 처리`
+            presentation.listTag = `버킷 ${contract.capacity}개 · 연결 리스트`
+            break
+        case 'linked-list':
+            if (contract.doubly) {
+                presentation.note = '헤드 노드 · 양방향 연결'
+                presentation.tag = 'Doubly Linked List'
+                presentation.detail = 'llink와 rlink로 앞뒤 이동'
+                presentation.listTag = '양방향 연결 · 헤드 노드'
+            } else if (contract.circular) {
+                presentation.note = '순환 연결 · head는 마지막 노드'
+                presentation.tag = 'Circular Linked List'
+                presentation.detail = 'head->link에서 한 바퀴 순회'
+                presentation.listTag = '원형 연결 · 동적 메모리'
             }
-        } else if (contract.circular) {
-            presentation.note = `원형 배열 · ${category === 'deque' ? '양쪽 삽입·삭제' : 'FIFO'} · 저장 ${contract.usableCapacity}개`
-            presentation.listTag = `원형 배열 · 저장 ${contract.usableCapacity}개`
-        } else if (contract.initialCapacity !== undefined) {
-            presentation.note = `동적 배열 · LIFO · 초기 용량 ${contract.initialCapacity}`
-            presentation.listTag = `동적 배열 · 초기 용량 ${contract.initialCapacity}`
-        } else {
-            presentation.note = `배열 · ${category === 'queue' ? 'FIFO' : 'LIFO'} · 용량 ${contract.capacity}`
-            presentation.listTag = `고정 배열 · 용량 ${contract.capacity}`
-        }
+            break
+        case 'stack':
+        case 'queue':
+        case 'deque':
+            if (contract.storage === 'linked') {
+                presentation.simulationTitle = '노드는 이렇게 연결돼요'
+                presentation.listTag = '연결 리스트 · 동적 메모리'
+                if (category === 'stack') {
+                    presentation.note = '노드 · top 포인터 · 동적 메모리'
+                    presentation.detail = 'top에서 link를 따라 순회'
+                } else {
+                    presentation.note = `노드 · front와 rear 포인터 · ${category === 'deque' ? '양방향 연결' : 'FIFO'}`
+                    presentation.detail = category === 'deque' ? '양쪽 끝에서 삽입 · 삭제 · 조회' : 'front에서 꺼내고 rear 뒤에 연결'
+                }
+            } else if (contract.circular) {
+                presentation.note = `원형 배열 · ${category === 'deque' ? '양쪽 삽입·삭제' : 'FIFO'} · 저장 ${contract.usableCapacity}개`
+                presentation.listTag = `원형 배열 · 저장 ${contract.usableCapacity}개`
+            } else if (contract.initialCapacity !== undefined) {
+                presentation.note = `동적 배열 · LIFO · 초기 용량 ${contract.initialCapacity}`
+                presentation.listTag = `동적 배열 · 초기 용량 ${contract.initialCapacity}`
+            } else {
+                presentation.note = `배열 · ${category === 'queue' ? 'FIFO' : 'LIFO'} · 용량 ${contract.capacity}`
+                presentation.listTag = `고정 배열 · 용량 ${contract.capacity}`
+            }
+            break
     }
     return presentation
 }

@@ -24,7 +24,7 @@ public class CodeExecutionService {
     private final DockerContainerManager dockerContainerManager;
 
     /**
-     * 제출 코드를 컴파일하고 테스트별 실행 결과를 전달한다.
+     * 제출 코드를 컴파일하고 테스트별 실행 결과 전달
      * @param executionRequest 언어별 제출 코드와 테스트 입력
      * @param onTestCompleted 각 테스트 완료 시 결과를 전달할 처리
      * @return 컴파일 결과와 테스트별 실행 결과
@@ -33,13 +33,13 @@ public class CodeExecutionService {
         Objects.requireNonNull(executionRequest, "request");
         Objects.requireNonNull(onTestCompleted, "onTestCompleted");
 
-        // 작업별 컨테이너에서 컴파일 또는 문법 검사를 수행한다.
+        // 작업별 컨테이너에서 컴파일 또는 문법 검사 수행
         try (DockerExecutionSession executionSession = dockerContainerManager.open(executionRequest)) {
             PreparationResult preparationResult = executionSession.prepare();
             List<TestExecutionResult> testResults = new ArrayList<>();
             String unavailableReason = preparationResult.status() == PreparationResult.Status.SUCCEEDED ? null : "준비 단계가 완료되지 않아 실행하지 않았습니다.";
 
-            // 테스트를 실행하고 완료 결과를 채점부에 전달한다.
+            // 테스트를 실행하고 완료 결과를 채점부에 전달
             for (TestInput testInput : executionRequest.tests()) {
                 TestExecutionResult testResult;
 

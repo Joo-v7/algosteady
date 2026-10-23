@@ -1,6 +1,9 @@
 package com.algosteady.training.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -51,7 +54,7 @@ public class Submission {
     }
 
     /**
-     * 원본을 수정하지 않는 새 제출을 생성한다.
+     * 원본을 수정하지 않는 새 제출 생성
      * @param exerciseId 조회 또는 실행할 과제 ID
      * @param contentVersion 조회 또는 실행할 콘텐츠 버전
      * @param language 구현 언어 코드

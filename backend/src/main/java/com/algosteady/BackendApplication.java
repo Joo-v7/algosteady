@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BackendApplication {
 
     /**
-     * Spring Boot 서버를 시작한다.
+     * Spring Boot 서버 시작
      * @param args 애플리케이션 실행 인자
      */
     public static void main(String[] args) {

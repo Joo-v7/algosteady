@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class ProcessExecutor {
 
     /**
-     * 명령을 실행하며 제한에 도달하면 호출자가 지정한 종료 처리를 수행한다.
+     * 외부 명령 실행 및 제한 도달 시 지정된 종료 처리
      * @param command 실행할 명령과 인자 목록
      * @param input 표준 입력으로 사용할 파일 경로, 없으면 null
      * @param timeout 명령 응답 제한 시간
@@ -46,7 +46,7 @@ public class ProcessExecutor {
             if (input == null) {
                 process.getOutputStream().close();
             }
-            // 시간·출력 제한에 도달하면 실행을 종료한다.
+            // 시간·출력 제한 도달 시 실행 종료
             while (!process.waitFor(20, TimeUnit.MILLISECONDS)) {
                 if (outputCollector.exceeded && !terminationRequested) {
                     onLimit.terminate();
@@ -108,7 +108,7 @@ public class ProcessExecutor {
             String stderr
     ) {
         /**
-         * 명령이 제한 없이 종료 코드 0으로 완료되었는지 반환한다.
+         * 제한 없이 종료 코드 0으로 완료되었는지 확인
          * @return 제한 없이 종료 코드 0으로 완료했으면 true
          */
         public boolean succeeded() {
@@ -116,7 +116,7 @@ public class ProcessExecutor {
         }
 
         /**
-         * 명령 실패 원인을 반환한다.
+         * 명령 실패 원인 반환
          * @return 실패 상태에 따른 진단 메시지
          */
         public String diagnostic() {
@@ -132,7 +132,7 @@ public class ProcessExecutor {
     @FunctionalInterface
     public interface TerminationAction {
         /**
-         * 실행 프로세스를 종료한다.
+         * 실행 프로세스 종료
          */
         void terminate() throws IOException, InterruptedException;
     }

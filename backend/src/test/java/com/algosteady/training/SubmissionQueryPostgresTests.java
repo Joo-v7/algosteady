@@ -35,7 +35,8 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /** PostgreSQL 기반 제출 조회·페이지·요약·원본 보존 검증 */
 @SpringBootTest

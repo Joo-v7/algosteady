@@ -2,7 +2,9 @@ package com.algosteady.exercise;
 
 import com.algosteady.exercise.domain.ExerciseContent;
 import com.algosteady.exercise.repository.ExerciseContentRepository;
-import com.algosteady.exercise.service.*;
+import com.algosteady.exercise.service.ExerciseCommandService;
+import com.algosteady.exercise.service.ExerciseLearningValidator;
+import com.algosteady.exercise.service.ExerciseQueryService;
 import com.algosteady.support.ExerciseContentSource;
 import org.springframework.core.io.Resource;
 import org.junit.jupiter.api.Assertions;

@@ -1,6 +1,9 @@
 package com.algosteady.exercise.dto.response;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
 /** 콘텐츠 버전별 기준 코드 */
 @Getter

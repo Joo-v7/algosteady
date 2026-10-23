@@ -39,7 +39,7 @@ public class DockerExecutionSession implements AutoCloseable {
     private boolean closed;
 
     void start(String imageName) throws IOException, InterruptedException {
-        // 생성 도중 실패한 컨테이너도 정리할 수 있도록 생성 시도를 기록한다.
+        // 생성 도중 실패한 컨테이너도 정리할 수 있도록 생성 시도 기록
         creationAttempted = true;
         startupResult = executeDockerCommand(List.of("docker", "create", "--name", containerName,
                 "--network", "none", "--cpus", Double.toString(runnerProperties.cpus()),
@@ -57,7 +57,7 @@ public class DockerExecutionSession implements AutoCloseable {
     }
 
     /**
-     * 선택한 언어의 컴파일 또는 문법 검사를 수행한다.
+     * 선택한 언어의 컴파일 또는 문법 검사 수행
      * @return 컴파일 상태와 출력·종료 정보
      */
     public PreparationResult prepare() throws IOException, InterruptedException {
@@ -79,7 +79,7 @@ public class DockerExecutionSession implements AutoCloseable {
     }
 
     /**
-     * 테스트 입력을 전달하고 새 프로세스의 실제 실행 결과를 반환한다.
+     * 테스트 입력을 전달하고 새 프로세스의 실제 실행 결과 반환
      * @param test 실행할 테스트 ID와 입력
      * @return 테스트의 출력·종료 코드·제한 상태·실행 시간
      */
@@ -101,7 +101,7 @@ public class DockerExecutionSession implements AutoCloseable {
         if (commandResult.status() == ProcessExecutor.Status.RESPONSE_TIMEOUT) {
             return createEnvironmentError(commandResult, "Docker 실행 응답 시간이 초과되었습니다.");
         }
-        // 사용자 프로그램의 종료 정보와 Docker CLI 종료 정보를 구분한다.
+        // 사용자 프로그램의 종료 정보와 Docker CLI 종료 정보 구분
         ProcessExecutor.Result metadataResult = executeDockerCommand(List.of("docker", "exec", containerName, "cat", "/work/result"));
 
         if (!metadataResult.succeeded() || commandResult.exitCode() != 0) {
@@ -158,7 +158,7 @@ public class DockerExecutionSession implements AutoCloseable {
     }
 
     /**
-     * 컨테이너와 임시 작업 공간을 정리한다.
+     * 컨테이너와 임시 작업 공간 정리
      */
     @Override
     public void close() throws IOException, InterruptedException {
@@ -166,7 +166,7 @@ public class DockerExecutionSession implements AutoCloseable {
             return;
         }
         closed = true;
-        // 정리 작업 중에는 중단 상태를 잠시 해제하고 작업 종료 후 복원한다.
+        // 자원 정리 중 중단 상태 임시 해제 및 정리 후 복원
         boolean interrupted = Thread.interrupted();
         Exception cleanupFailure = null;
 

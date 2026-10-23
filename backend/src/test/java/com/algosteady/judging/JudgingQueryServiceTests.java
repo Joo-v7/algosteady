@@ -5,7 +5,9 @@ import com.algosteady.judging.domain.ExecutionJob;
 import com.algosteady.judging.domain.ExecutionTestResult;
 import com.algosteady.judging.dto.response.JobResponseDto;
 import com.algosteady.judging.dto.response.JobSummaryResponseDto;
-import com.algosteady.judging.repository.*;
+import com.algosteady.judging.repository.ExecutionJobRepository;
+import com.algosteady.judging.repository.ExecutionTestResultRepository;
+import com.algosteady.judging.repository.ExecutionTestSummary;
 import com.algosteady.judging.runner.model.TestExecutionResult;
 import com.algosteady.judging.service.JudgingQueryService;
 import org.junit.jupiter.api.Assertions;
@@ -24,7 +26,9 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /** 채점 기준별 상태 및 원본 테스트 연결 검증 */
 @ExtendWith(MockitoExtension.class)

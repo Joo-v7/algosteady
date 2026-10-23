@@ -1,7 +1,10 @@
 package com.algosteady.training.dto.response;
 
 import com.algosteady.training.domain.Submission;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.util.UUID;
 
@@ -16,7 +19,7 @@ public class SubmissionResponseDto {
     private UUID jobId;
 
     /**
-     * 저장한 제출 식별자를 변환한다.
+     * 저장된 제출 식별자의 응답 변환
      * @param submission 저장된 제출 원본
      * @return 제출 ID와 작업 ID 응답
      */

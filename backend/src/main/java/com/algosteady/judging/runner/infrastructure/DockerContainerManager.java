@@ -26,7 +26,7 @@ public class DockerContainerManager {
     private final RunnerProperties runnerProperties;
 
     /**
-     * 제출 코드와 테스트 호출 코드를 준비하고 실행 세션을 생성한다.
+     * 제출 코드와 테스트 호출 코드를 준비하고 실행 세션 생성
      * @param executionRequest 언어별 제출 코드와 테스트 입력
      * @return 작업 공간과 컨테이너를 관리하는 실행 세션
      */
@@ -41,7 +41,7 @@ public class DockerContainerManager {
         DockerExecutionSession executionSession = new DockerExecutionSession("algosteady-runner-" + UUID.randomUUID(), workspace, executionRequest.language(), runnerProperties, processExecutor);
 
         try {
-            // 컨테이너에서 읽을 소스 파일과 실행 스크립트를 준비한다.
+            // 컨테이너에서 읽을 소스 파일과 실행 스크립트 준비
             Files.setPosixFilePermissions(workspace, PosixFilePermissions.fromString("rwxr-xr-x"));
             writeSource(workspace.resolve(executionRequest.language().getSubmissionFilename()), executionRequest.code());
             writeSource(workspace.resolve(executionRequest.language().getHarnessFilename()), executionRequest.harness());
@@ -51,7 +51,7 @@ public class DockerContainerManager {
             }
             Files.setPosixFilePermissions(workspace.resolve("stage.sh"), PosixFilePermissions.fromString("rw-r--r--"));
 
-            // 작업용 컨테이너를 시작한다.
+            // 작업용 컨테이너 시작
             executionSession.start(imageName);
 
             return executionSession;

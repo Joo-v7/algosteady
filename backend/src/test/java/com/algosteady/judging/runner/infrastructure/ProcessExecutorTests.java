@@ -11,12 +11,13 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** 외부 명령 출력 수집 및 실행 제한 검증 */
 class ProcessExecutorTests {
 
-    private final ProcessExecutor executor = new ProcessExecutor();
+    private final ProcessExecutor processExecutor = new ProcessExecutor();
 
     @Test
     @DisplayName("입력, 표준 출력, 오류 출력과 종료 코드를 수집합니다.")
@@ -24,7 +25,7 @@ class ProcessExecutorTests {
         // given
         Path input = Files.writeString(work.resolve("input"), "입력\n");
         // when
-        ProcessExecutor.Result result = executor.execute(List.of("sh", "-c", "cat; printf 'error' >&2; exit 7"),
+        ProcessExecutor.Result result = processExecutor.execute(List.of("sh", "-c", "cat; printf 'error' >&2; exit 7"),
                 input, Duration.ofSeconds(2), 1024, () -> {});
 
         // then
@@ -39,7 +40,7 @@ class ProcessExecutorTests {
     void limitsCombinedOutputWithoutExpandingTruncatedUtf8() throws Exception {
         // given
         // when
-        ProcessExecutor.Result result = executor.execute(List.of("sh", "-c",
+        ProcessExecutor.Result result = processExecutor.execute(List.of("sh", "-c",
                         "i=0; while [ $i -lt 5000 ]; do printf '가나다'; printf '라마바' >&2; i=$((i+1)); done"),
                 null, Duration.ofSeconds(3), 1024, () -> {});
 
@@ -54,7 +55,7 @@ class ProcessExecutorTests {
         // given
         AtomicInteger calls = new AtomicInteger();
         // when
-        ProcessExecutor.Result result = executor.execute(List.of("sh", "-c", "exec sleep 5"), null,
+        ProcessExecutor.Result result = processExecutor.execute(List.of("sh", "-c", "exec sleep 5"), null,
                 Duration.ofMillis(200), 1024, calls::incrementAndGet);
 
         // then

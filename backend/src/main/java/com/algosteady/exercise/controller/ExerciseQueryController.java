@@ -1,9 +1,15 @@
 package com.algosteady.exercise.controller;
 
-import com.algosteady.exercise.dto.response.*;
+import com.algosteady.exercise.dto.response.ExerciseDetailsResponseDto;
+import com.algosteady.exercise.dto.response.ExerciseSummaryResponseDto;
+import com.algosteady.exercise.dto.response.ReferenceResponseDto;
 import com.algosteady.exercise.service.ExerciseQueryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -16,7 +22,7 @@ public class ExerciseQueryController {
     private final ExerciseQueryService exerciseQueryService;
 
     /**
-     * 등록된 과제 목록을 조회한다.
+     * 등록된 과제 목록 조회
      * @return 과제별 최신 버전 요약 목록
      */
     @GetMapping
@@ -25,7 +31,7 @@ public class ExerciseQueryController {
     }
 
     /**
-     * 최신 콘텐츠의 학습 정보와 공개 예시를 조회한다.
+     * 최신 콘텐츠의 학습 정보와 공개 예시 조회
      * @param id 조회할 과제 ID
      * @param language 구현 언어 코드
      * @return 학습 정보, 규격, 시작 코드와 공개 예시
@@ -36,7 +42,7 @@ public class ExerciseQueryController {
     }
 
     /**
-     * 선택한 버전의 기준 코드를 조회한다.
+     * 선택한 버전의 기준 코드 조회
      * @param id 조회할 과제 ID
      * @param language 구현 언어 코드
      * @param contentVersion 조회 또는 실행할 콘텐츠 버전

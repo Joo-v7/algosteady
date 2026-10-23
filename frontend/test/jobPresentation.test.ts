@@ -15,14 +15,31 @@ function completedJob(kind: Job['kind'] = 'GRADING'): Job {
         kind,
         criteria: [],
         status: 'COMPLETED',
-        preparation: { status: 'SUCCEEDED', stdout: '', stderr: '', exitCode: 0, message: null },
+        preparation: {
+            status: 'SUCCEEDED',
+            stdout: '',
+            stderr: '',
+            exitCode: 0,
+            message: null
+        },
         tests: [{
             testId: 'example',
             criterionId: 'init',
             description: '초기화',
             input: '',
-            expected: { stdout: 'OK\n', exitCode: 0, stderrRequired: false },
-            actual: { status: 'COMPLETED', stdout: 'OK\n', stderr: '', exitCode: 0, executionTimeNanos: 300000000, message: null },
+            expected: {
+                stdout: 'OK\n',
+                exitCode: 0,
+                stderrRequired: false
+            },
+            actual: {
+                status: 'COMPLETED',
+                stdout: 'OK\n',
+                stderr: '',
+                exitCode: 0,
+                executionTimeNanos: 300000000,
+                message: null
+            },
             passed: true
         }],
         message: null
@@ -68,7 +85,15 @@ test('컴파일 오류·서버 장애·검사 불가를 통과로 표시하지 �
     assert.equal(presentation.resultStatus, 'failed')
     const unavailable = completedJob()
     unavailable.tests = []
-    unavailable.criteria = [{ criterionId: 'init', title: '초기화', description: '', status: 'UNAVAILABLE', totalTests: 2, completedTests: 0, passedTests: 0 }]
+    unavailable.criteria = [{
+        criterionId: 'init',
+        title: '초기화',
+        description: '',
+        status: 'UNAVAILABLE',
+        totalTests: 2,
+        completedTests: 0,
+        passedTests: 0
+    }]
     assert.equal(getJobPresentation(unavailable, 'GRADING').resultLabel, '채점 오류')
 })
 
@@ -83,8 +108,23 @@ test('시간 초과는 기준 실패로 표시하고 실행은 오류로 표시�
 
 test('측정된 테스트 시간만 초 단위로 합산하고 0초도 보존한다', () => {
     const job = completedJob()
-    job.tests.push({ ...job.tests[0], testId: 'second', actual: { ...job.tests[0].actual, executionTimeNanos: 700000000 } })
-    job.tests.push({ ...job.tests[0], testId: 'skipped', actual: { ...job.tests[0].actual, status: 'NOT_EXECUTED', executionTimeNanos: null } })
+    job.tests.push({
+        ...job.tests[0],
+        testId: 'second',
+        actual: {
+            ...job.tests[0].actual,
+            executionTimeNanos: 700000000
+        }
+    })
+    job.tests.push({
+        ...job.tests[0],
+        testId: 'skipped',
+        actual: {
+            ...job.tests[0].actual,
+            status: 'NOT_EXECUTED',
+            executionTimeNanos: null
+        }
+    })
     assert.equal(getJobPresentation(job, 'GRADING').executionSeconds, 1)
     job.tests = [job.tests[0]]
     job.tests[0].actual.executionTimeNanos = 0

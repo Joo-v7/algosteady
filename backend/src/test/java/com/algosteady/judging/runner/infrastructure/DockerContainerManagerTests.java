@@ -15,17 +15,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /** 컨테이너 생성 옵션 및 작업 공간 정리 검증 */
 class DockerContainerManagerTests {
 
-    private final ProcessExecutor executor = mock(ProcessExecutor.class);
-    private final RunnerProperties properties = new RunnerProperties(Map.of("c", "test-image"),
+    private final ProcessExecutor processExecutor = mock(ProcessExecutor.class);
+    private final RunnerProperties runnerProperties = new RunnerProperties(Map.of("c", "test-image"),
             Duration.ofSeconds(30), Duration.ofSeconds(2), Duration.ofSeconds(10), 1048576, 1, "512m", 128);
-    private final DockerContainerManager manager = new DockerContainerManager(executor, properties);
+    private final DockerContainerManager dockerContainerManager = new DockerContainerManager(processExecutor, runnerProperties);
     private final ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, "code", "harness", List.of());
 
     @Test
@@ -33,13 +41,13 @@ class DockerContainerManagerTests {
     void createsRestrictedContainerAndDeletesWorkspace() throws Exception {
         // given
         List<List<String>> commands = new ArrayList<>();
-        when(executor.execute(anyList(), any(), any(), anyInt(), any())).thenAnswer(call -> {
+        when(processExecutor.execute(anyList(), any(), any(), anyInt(), any())).thenAnswer(call -> {
             commands.add(call.getArgument(0));
             return new ProcessExecutor.Result(ProcessExecutor.Status.COMPLETED, 0, "", "");
         });
 
         // when
-        try (DockerExecutionSession session = manager.open(request)) {
+        try (DockerExecutionSession session = dockerContainerManager.open(request)) {
             List<String> create = commands.getFirst();
             assertEquals(List.of("docker", "create"), create.subList(0, 2));
             assertTrue(create.containsAll(List.of("--network", "none", "--read-only", "--cap-drop", "ALL",
@@ -59,7 +67,7 @@ class DockerContainerManagerTests {
         List<List<String>> commands = new ArrayList<>();
         IOException original = new IOException("start failed");
         IOException cleanup = new IOException("remove failed");
-        when(executor.execute(anyList(), any(), any(), anyInt(), any())).thenAnswer(call -> {
+        when(processExecutor.execute(anyList(), any(), any(), anyInt(), any())).thenAnswer(call -> {
             List<String> command = call.getArgument(0);
             commands.add(command);
             if (command.get(1).equals("start")) {
@@ -72,7 +80,7 @@ class DockerContainerManagerTests {
         });
 
         // when
-        IOException thrown = assertThrows(IOException.class, () -> manager.open(request));
+        IOException thrown = assertThrows(IOException.class, () -> dockerContainerManager.open(request));
 
         // then
         assertSame(original, thrown);
@@ -84,14 +92,14 @@ class DockerContainerManagerTests {
     @DisplayName("Docker 엔진 장애를 컴파일 오류와 구분합니다.")
     void daemonErrorIsNotACompilationFailure() throws Exception {
         // given
-        when(executor.execute(anyList(), any(), any(), anyInt(), any())).thenAnswer(call -> {
+        when(processExecutor.execute(anyList(), any(), any(), anyInt(), any())).thenAnswer(call -> {
             List<String> command = call.getArgument(0);
             return new ProcessExecutor.Result(ProcessExecutor.Status.COMPLETED, 1, "",
                     command.get(1).equals("rm") ? "No such container" : "Cannot connect to Docker daemon");
         });
 
         // when
-        try (DockerExecutionSession session = manager.open(request)) {
+        try (DockerExecutionSession session = dockerContainerManager.open(request)) {
             assertEquals(PreparationResult.Status.ENVIRONMENT_ERROR, session.prepare().status());
         }
     }

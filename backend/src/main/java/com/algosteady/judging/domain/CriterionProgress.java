@@ -9,7 +9,7 @@ import java.util.Set;
 public record CriterionProgress(Set<String> testIds, int passedTests) {
 
     /**
-     * 상세와 기록 요약에서 같은 필수 테스트를 기준으로 통과 수를 계산한다.
+     * 상세와 기록 요약에서 같은 필수 테스트를 기준으로 통과 수 계산
      * @param criterionId 채점 기준 ID
      * @param tests 콘텐츠에 등록된 테스트
      * @param passedTestIds 저장된 통과 테스트 ID
@@ -27,7 +27,7 @@ public record CriterionProgress(Set<String> testIds, int passedTests) {
     }
 
     /**
-     * 기준의 모든 필수 테스트 통과 여부를 반환한다.
+     * 기준의 모든 필수 테스트 통과 여부 반환
      * @return 전체 테스트를 통과했으면 true
      */
     public boolean isPassed() {

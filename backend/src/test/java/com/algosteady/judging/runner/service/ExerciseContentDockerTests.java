@@ -48,7 +48,7 @@ class ExerciseContentDockerTests {
         List<TestExecutionResult> delivered = new ArrayList<>();
 
         // when
-        ExecutionResult result = fixture.service.execute(request, delivered::add);
+        ExecutionResult result = fixture.codeExecutionService.execute(request, delivered::add);
 
         // then
         Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
@@ -85,7 +85,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -111,7 +111,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -149,7 +149,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")), List.of(new TestInput(example.getValue(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -176,7 +176,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -208,7 +208,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -240,7 +240,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -269,7 +269,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -302,7 +302,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -335,7 +335,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -369,7 +369,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -403,7 +403,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -436,7 +436,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -469,7 +469,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -502,7 +502,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -535,7 +535,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -572,7 +572,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -612,7 +612,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -656,7 +656,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -678,7 +678,7 @@ class ExerciseContentDockerTests {
         ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, alternative, harness, List.of(new TestInput("duplicate", duplicate.path("input").asString())));
 
         // when
-        ExecutionResult result = fixture.service.execute(request, actual -> {});
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
         // then
         Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -717,7 +717,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -758,7 +758,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -778,7 +778,7 @@ class ExerciseContentDockerTests {
         ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, iterative, harness, inputs);
 
         // when
-        ExecutionResult result = fixture.service.execute(request, actual -> {});
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
         // then
         Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -823,7 +823,7 @@ class ExerciseContentDockerTests {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake.getValue(), harness, List.of(new TestInput(mistake.getKey(), test.path("input").asString())));
 
             // when
-            ExecutionResult result = fixture.service.execute(request, actual -> {});
+            ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
             // then
             Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
@@ -846,7 +846,7 @@ class ExerciseContentDockerTests {
         ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, alternative, harness, inputs);
 
         // when
-        ExecutionResult result = fixture.service.execute(request, actual -> {});
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
 
         // then
         Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());

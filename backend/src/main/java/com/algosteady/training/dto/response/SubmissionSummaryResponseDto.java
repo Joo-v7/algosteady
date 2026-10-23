@@ -2,7 +2,10 @@ package com.algosteady.training.dto.response;
 
 import com.algosteady.training.domain.Submission;
 import com.algosteady.judging.dto.response.JobSummaryResponseDto;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -28,7 +31,7 @@ public class SubmissionSummaryResponseDto {
     private JobSummaryResponseDto job;
 
     /**
-     * 제출 메타데이터와 조회한 작업 요약을 변환한다.
+     * 제출 메타데이터와 작업 요약의 응답 변환
      * @param submission 저장된 제출 원본
      * @param job 제출에 연결된 작업 요약
      * @return 제출 메타데이터와 작업 요약 응답

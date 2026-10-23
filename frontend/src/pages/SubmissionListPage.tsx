@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { getExercise } from '../api/exercises'
@@ -26,7 +27,7 @@ function SubmissionListPage() {
     const loading = pageState?.key !== requestKey
     const error = pageState?.key === requestKey ? pageState.error ?? '' : ''
 
-    // 목록의 진행 중인 작업만 재조회하고 URL 변경 시 중단한다.
+    // 진행 중인 제출 결과 재조회 및 URL 변경 시 중단
     useEffect(() => {
         const controller = new AbortController()
         let timer: ReturnType<typeof setTimeout>
@@ -45,7 +46,10 @@ function SubmissionListPage() {
                 }
             } catch (error) {
                 if (!controller.signal.aborted) {
-                    setPageState({ key, error: error instanceof Error ? error.message : '제출 기록을 조회하지 못했습니다.' })
+                    setPageState({
+                        key,
+                        error: error instanceof Error ? error.message : '제출 기록을 조회하지 못했습니다.'
+                    })
                 }
             }
         }
@@ -60,7 +64,10 @@ function SubmissionListPage() {
             })
             .catch(error => {
                 if (!controller.signal.aborted) {
-                    setPageState({ key, error: error.message })
+                    setPageState({
+                        key,
+                        error: error.message
+                    })
                 }
             })
 
@@ -69,6 +76,49 @@ function SubmissionListPage() {
             clearTimeout(timer)
         }
     }, [exerciseId, page])
+
+    // 목록 조회 상태에 따른 오류·대기·결과 화면 선택
+    let historyContent: ReactNode
+    if (error) {
+        historyContent = <p role="alert">{error}</p>
+    } else if (loading) {
+        historyContent = <p role="status">제출 기록을 불러오는 중입니다.</p>
+    } else if (submissions) {
+        historyContent = (
+            <>
+                <h2>제출 {submissions.totalElements}건</h2>
+                {submissions.content.length === 0 ? <p>제출 기록이 없습니다.</p> : (
+                    <div className="history-table-scroll">
+                        <table className="history-table">
+                            <thead>
+                                <tr>
+                                    <th>제출 시각</th>
+                                    <th>상태</th>
+                                    <th>통과 기준</th>
+                                    <th>상세</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {submissions.content.map(submission => (
+                                    <tr key={submission.submissionId}>
+                                        <td><time dateTime={submission.submittedAt}>{new Date(submission.submittedAt).toLocaleString('ko-KR')}</time></td>
+                                        <td>{jobLabels[submission.job.status]}</td>
+                                        <td>{submission.job.passedCriteria} / {submission.job.totalCriteria}</td>
+                                        <td><Link to={`/submissions/${submission.submissionId}?page=${submissions.page}`}>상세 보기</Link></td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                <div className="history-pagination">
+                    <button className="secondary-button" disabled={submissions.page === 0} onClick={() => setSearchParams({ page: String(submissions.page - 1) })}>이전 페이지</button>
+                    <span>{submissions.page + 1} / {Math.max(submissions.totalPages, 1)}</span>
+                    <button className="secondary-button" disabled={submissions.page + 1 >= submissions.totalPages} onClick={() => setSearchParams({ page: String(submissions.page + 1) })}>다음 페이지</button>
+                </div>
+            </>
+        )
+    }
 
     return (
         <main className="workspace">
@@ -85,40 +135,7 @@ function SubmissionListPage() {
                 <Link className="primary-button" to={`/exercises/${exerciseId}?tab=training`}>실습하기로</Link>
             </section>
             <section className="panel history-panel" aria-busy={loading}>
-                {error ? <p role="alert">{error}</p> : loading ? <p role="status">제출 기록을 불러오는 중입니다.</p> : submissions && (
-                    <>
-                        <h2>제출 {submissions.totalElements}건</h2>
-                        {submissions.content.length === 0 ? <p>제출 기록이 없습니다.</p> : (
-                            <div className="history-table-scroll">
-                                <table className="history-table">
-                                    <thead>
-                                        <tr>
-                                            <th>제출 시각</th>
-                                            <th>상태</th>
-                                            <th>통과 기준</th>
-                                            <th>상세</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {submissions.content.map(submission => (
-                                            <tr key={submission.submissionId}>
-                                                <td><time dateTime={submission.submittedAt}>{new Date(submission.submittedAt).toLocaleString('ko-KR')}</time></td>
-                                                <td>{jobLabels[submission.job.status]}</td>
-                                                <td>{submission.job.passedCriteria} / {submission.job.totalCriteria}</td>
-                                                <td><Link to={`/submissions/${submission.submissionId}?page=${submissions.page}`}>상세 보기</Link></td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                        <div className="history-pagination">
-                            <button className="secondary-button" disabled={submissions.page === 0} onClick={() => setSearchParams({ page: String(submissions.page - 1) })}>이전 페이지</button>
-                            <span>{submissions.page + 1} / {Math.max(submissions.totalPages, 1)}</span>
-                            <button className="secondary-button" disabled={submissions.page + 1 >= submissions.totalPages} onClick={() => setSearchParams({ page: String(submissions.page + 1) })}>다음 페이지</button>
-                        </div>
-                    </>
-                )}
+                {historyContent}
             </section>
         </main>
     )

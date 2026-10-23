@@ -11,7 +11,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class BackendApplicationTests {
 
     @MockitoBean
-    private ExecutionWorker worker;
+    private ExecutionWorker executionWorker;
 
     @Test
     @DisplayName("백엔드 애플리케이션을 시작합니다.")

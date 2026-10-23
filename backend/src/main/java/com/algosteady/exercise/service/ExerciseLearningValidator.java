@@ -11,10 +11,11 @@ import java.util.Set;
 public class ExerciseLearningValidator {
 
     /**
-     * 화면에서 사용하는 학습 데이터의 형식과 연결을 확인한다.
+     * 화면에서 사용하는 학습 데이터의 형식과 연결 확인
      * @param exercise 등록할 콘텐츠 원본
      */
     public void validate(JsonNode exercise) {
+        // 공통 개념·연산·참고 내용의 형식 확인
         String exerciseId = exercise.path("id").asString();
         JsonNode learning = exercise.path("learning");
         require(learning.path("concept").path("title").isString(), exerciseId, "개념 제목");
@@ -34,6 +35,7 @@ public class ExerciseLearningValidator {
         String category = exercise.path("category").asString();
         JsonNode contract = exercise.path("contract");
 
+        // 학습 단계별 시각화 필드와 노드 연결 확인
         for (int index = 0; index < steps.size(); index++) {
             JsonNode step = steps.get(index);
             String location = exerciseId + " " + (index + 1) + "단계";
@@ -68,6 +70,7 @@ public class ExerciseLearningValidator {
                     for (JsonNode parent : parents) {
                         require(parent.asInt() >= -1 && parent.asInt() < parents.size(), location, "부모 인덱스 범위");
                     }
+                    // 각 원소에서 대표까지의 부모 연결 순환 확인
                     for (int node = 0; node < parents.size(); node++) {
                         Set<Integer> visited = new HashSet<>();
                         int current = node;

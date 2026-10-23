@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
-import type { ExerciseDetails, SequenceStep, TreeStep, SearchStep, SetStep, HashStep } from '../api/exercises'
-import { getExercisePresentation } from '../exercisePresentation'
+import type { ExerciseDetails, TreeStep, SearchStep, SetStep, HashStep } from '../api/exercises'
+import ArraySequenceDiagram from './ArraySequenceDiagram'
+import LinkedSequenceDiagram from './LinkedSequenceDiagram'
 
-// 동일한 상태 표현을 사용하는 과제들이 시각화를 공유한다.
+// 과제별 학습 상태 시각화
 function SearchDiagram({ step }: { step: SearchStep }) {
     const stepValues = step.values
     return (
@@ -20,6 +21,7 @@ function SearchDiagram({ step }: { step: SearchStep }) {
 
 function SetDiagram({ step }: { step: SetStep }) {
     const setParents = step.parents
+    // 부모 배열을 따라 대표 원소와 깊이 확인
     const setRoots = setParents.flatMap((parent, index) => parent === -1 ? [index] : [])
     const setNodes = setParents.map((parent, index) => {
         let root = index
@@ -28,12 +30,20 @@ function SetDiagram({ step }: { step: SetStep }) {
             root = setParents[root]
             depth++
         }
-        return { index, parent, root, depth }
+        return {
+            index,
+            parent,
+            root,
+            depth
+        }
     })
+    // 같은 집합·깊이의 노드를 나란히 배치
     const setLayout = setNodes.map(node => {
         const peers = setNodes.filter(other => other.root === node.root && other.depth === node.depth)
         const group = setRoots.indexOf(node.root)
-        return { ...node, x: (group + (peers.indexOf(node) + 0.5) / peers.length) * 640 / setRoots.length, y: 40 + node.depth * 80 }
+        const x = (group + (peers.indexOf(node) + 0.5) / peers.length) * 640 / setRoots.length
+        const y = 40 + node.depth * 80
+        return { ...node, x, y }
     })
     const setHeight = setNodes.length ? (Math.max(...setNodes.map(node => node.depth)) + 1) * 80 + 30 : 0
 
@@ -51,14 +61,22 @@ function SetDiagram({ step }: { step: SetStep }) {
                             const parent = setLayout[node.parent]
                             return <line key={node.index} x1={node.x} y1={node.y - 19} x2={parent.x} y2={parent.y + 19} markerEnd="url(#set-parent-arrow)" />
                         })}
-                        {setLayout.map(node => (
-                            <g className="tree-node set-node" data-state={step.activeNode === node.index ? 'active' : step.visited?.includes(node.index) ? 'visited' : undefined} key={node.index}>
-                                <title>{`원소 ${node.index}, parent는 ${node.parent}, 대표는 ${node.root}`}</title>
-                                <circle cx={node.x} cy={node.y} r="19" />
-                                <text className="tree-value" x={node.x} y={node.y + 5}>{node.index}</text>
-                                {node.parent === -1 && <text x={node.x} y={node.y - 26}>대표</text>}
-                            </g>
-                        ))}
+                        {setLayout.map(node => {
+                            let nodeState: string | undefined
+                            if (step.activeNode === node.index) {
+                                nodeState = 'active'
+                            } else if (step.visited?.includes(node.index)) {
+                                nodeState = 'visited'
+                            }
+                            return (
+                                <g className="tree-node set-node" data-state={nodeState} key={node.index}>
+                                    <title>{`원소 ${node.index}, parent는 ${node.parent}, 대표는 ${node.root}`}</title>
+                                    <circle cx={node.x} cy={node.y} r="19" />
+                                    <text className="tree-value" x={node.x} y={node.y + 5}>{node.index}</text>
+                                    {node.parent === -1 && <text x={node.x} y={node.y - 26}>대표</text>}
+                                </g>
+                            )
+                        })}
                     </svg>
                 ) : <span className="list-pointer">원소가 없습니다.</span>}
             </div>
@@ -103,12 +121,15 @@ function TreeDiagram({ step, isHeap }: {
     step: TreeStep
     isHeap: boolean
 }) {
+    // 배열 인덱스로 노드 깊이와 좌표 계산
     const treeNodes = step.tree.flatMap((value, index) => {
         if (value === null) {
             return []
         }
         const depth = Math.floor(Math.log2(index + 1))
-        return [{ value, index, depth, x: (index - (2 ** depth - 1) + 0.5) * 640 / 2 ** depth, y: 40 + depth * 80 }]
+        const x = (index - (2 ** depth - 1) + 0.5) * 640 / 2 ** depth
+        const y = 40 + depth * 80
+        return [{ value, index, depth, x, y }]
     })
     const treeHeight = treeNodes.length ? (Math.max(...treeNodes.map(node => node.depth)) + 1) * 80 + 70 : 0
 
@@ -116,120 +137,58 @@ function TreeDiagram({ step, isHeap }: {
         <div className="tree-diagram">
             {treeNodes.length ? (
                 <svg viewBox={`0 0 640 ${treeHeight}`} role="img" aria-label={isHeap ? `힙, 루트는 ${step.tree?.[0]}, 노드 ${treeNodes.length}개` : `이진 트리, root는 ${step.tree?.[0]}, 노드 ${treeNodes.length}개`}>
-                    {treeNodes.map(node => (
-                        <g className="tree-node" data-state={step.activeNode === node.index ? 'active' : step.visited?.includes(node.index) ? 'visited' : undefined} key={node.index}>
-                            <title>{isHeap ? `heap[${node.index + 1}] = ${node.value}` : `${node.value} 노드, left는 ${step.tree?.[node.index * 2 + 1] ?? 'NULL'}, right는 ${step.tree?.[node.index * 2 + 2] ?? 'NULL'}`}</title>
-                            {[0, 1].map(side => {
-                                const childIndex = node.index * 2 + 1 + side
-                                const childDepth = node.depth + 1
-                                const childX = (childIndex - (2 ** childDepth - 1) + 0.5) * 640 / 2 ** childDepth
-                                const childY = node.y + 80
-                                const childValue = step.tree?.[childIndex]
-                                if (isHeap && childValue == null) {
-                                    return null
-                                }
-                                return (
-                                    <g className="tree-edge" key={side}>
-                                        <line x1={node.x} y1={node.y + 19} x2={childX} y2={childY - 21} />
-                                        <text x={(node.x + childX) / 2} y={node.y + 40}>{isHeap ? childIndex + 1 : side === 0 ? 'left' : 'right'}</text>
-                                        {childValue == null && <text className="tree-null" x={childX} y={childY + 4}>NULL</text>}
-                                    </g>
-                                )
-                            })}
-                            <circle cx={node.x} cy={node.y} r="19" />
-                            <text className="tree-value" x={node.x} y={node.y + 5}>{node.value}</text>
-                            {step.visited?.includes(node.index) && <text className="tree-order" x={node.x + 27} y={node.y - 14}>{step.visited.indexOf(node.index) + 1}</text>}
-                            {isHeap ? <text className="heap-index" x={node.x} y={node.y - 26}>[{node.index + 1}]</text> : node.index === 0 && <text className="tree-root" x={node.x} y={node.y - 26}>root</text>}
-                        </g>
-                    ))}
+                    {treeNodes.map(node => {
+                        let nodeState: string | undefined
+                        if (step.activeNode === node.index) {
+                            nodeState = 'active'
+                        } else if (step.visited?.includes(node.index)) {
+                            nodeState = 'visited'
+                        }
+
+                        let nodeTitle: string
+                        if (isHeap) {
+                            nodeTitle = `heap[${node.index + 1}] = ${node.value}`
+                        } else {
+                            const leftValue = step.tree[node.index * 2 + 1] ?? 'NULL'
+                            const rightValue = step.tree[node.index * 2 + 2] ?? 'NULL'
+                            nodeTitle = `${node.value} 노드, left는 ${leftValue}, right는 ${rightValue}`
+                        }
+                        return (
+                            <g className="tree-node" data-state={nodeState} key={node.index}>
+                                <title>{nodeTitle}</title>
+                                {[0, 1].map(side => {
+                                    const childIndex = node.index * 2 + 1 + side
+                                    const childDepth = node.depth + 1
+                                    const childX = (childIndex - (2 ** childDepth - 1) + 0.5) * 640 / 2 ** childDepth
+                                    const childY = node.y + 80
+                                    const childValue = step.tree[childIndex]
+                                    let edgeLabel: string | number
+                                    if (isHeap) {
+                                        edgeLabel = childIndex + 1
+                                    } else {
+                                        edgeLabel = side === 0 ? 'left' : 'right'
+                                    }
+                                    if (isHeap && childValue == null) {
+                                        return null
+                                    }
+                                    return (
+                                        <g className="tree-edge" key={side}>
+                                            <line x1={node.x} y1={node.y + 19} x2={childX} y2={childY - 21} />
+                                            <text x={(node.x + childX) / 2} y={node.y + 40}>{edgeLabel}</text>
+                                            {childValue == null && <text className="tree-null" x={childX} y={childY + 4}>NULL</text>}
+                                        </g>
+                                    )
+                                })}
+                                <circle cx={node.x} cy={node.y} r="19" />
+                                <text className="tree-value" x={node.x} y={node.y + 5}>{node.value}</text>
+                                {step.visited?.includes(node.index) && <text className="tree-order" x={node.x + 27} y={node.y - 14}>{step.visited.indexOf(node.index) + 1}</text>}
+                                {isHeap && <text className="heap-index" x={node.x} y={node.y - 26}>[{node.index + 1}]</text>}
+                                {!isHeap && node.index === 0 && <text className="tree-root" x={node.x} y={node.y - 26}>root</text>}
+                            </g>
+                        )
+                    })}
                 </svg>
             ) : <span className="list-pointer">{isHeap ? '빈 힙 · heap_size = 0' : 'root → NULL'}</span>}
-        </div>
-    )
-}
-
-function SequenceDiagram({ exercise, step }: {
-    exercise: ExerciseDetails
-    step: SequenceStep
-}) {
-    const isQueue = exercise.category === 'queue'
-    const isDeque = exercise.category === 'deque'
-    const isLinkedList = exercise.category === 'linked-list'
-    const isLinkedStack = exercise.category === 'stack' && exercise.contract.storage === 'linked'
-    const hasLinkedEnds = (isQueue || isDeque) && exercise.contract.storage === 'linked'
-    const isDoublyList = isLinkedList && Boolean(exercise.contract.doubly)
-    const isDoublyLinked = isDoublyList || (isDeque && hasLinkedEnds)
-    const isCircularList = isLinkedList && Boolean(exercise.contract.circular) && !isDoublyList
-    const categoryLabel = getExercisePresentation(exercise).label
-    const stepValues = step.values
-    return isLinkedList || isLinkedStack || hasLinkedEnds ? (
-        <div className="linked-list-diagram" data-doubly={isDoublyLinked} aria-label={isDoublyList ? `헤드 노드 ⇄ ${stepValues.length ? `${stepValues.join(' ⇄ ')} ⇄ ` : ''}헤드 노드, 데이터가 없는 head로 돌아오는 양방향 고리` : isDeque && hasLinkedEnds && stepValues.length ? `NULL ⇄ ${stepValues.join(' ⇄ ')} ⇄ NULL, front는 ${stepValues[0]} 노드, rear는 ${stepValues[stepValues.length - 1]} 노드` : isCircularList && stepValues.length ? `첫 노드 → ${stepValues.join(' → ')} → 첫 노드, head는 마지막 노드` : `${hasLinkedEnds ? 'front' : isLinkedStack ? 'top' : 'head'} → ${stepValues.join(' → ')}${stepValues.length ? ' → ' : ''}NULL${hasLinkedEnds ? `, rear는 ${stepValues.length ? `${stepValues[stepValues.length - 1]} 노드` : 'NULL'}` : ''}`}>
-            <div className="linked-list-nodes">
-                {isDoublyList ? (
-                    <>
-                        <div className="linked-node linked-sentinel"><span>llink</span><strong>head</strong><span>rlink</span></div>
-                        <span className="list-pointer">⇄</span>
-                    </>
-                ) : <span className="list-pointer">{hasLinkedEnds ? isDeque && stepValues.length ? 'NULL ⇄' : 'front →' : isLinkedStack ? 'top →' : isCircularList && stepValues.length ? '첫 노드 →' : 'head →'}</span>}
-                {stepValues.map((value, index) => (
-                    <div className="linked-node-group" key={index}>
-                        <div className="linked-node">
-                            {isDoublyLinked && <span>llink</span>}
-                            <strong>{value}</strong><span>{isDoublyLinked ? 'rlink' : 'link'}</span>
-                            {isCircularList && index === stepValues.length - 1 && <small className="linked-head-label">head</small>}
-                            {isDeque && hasLinkedEnds && index === 0 && <small className="linked-head-label">front</small>}
-                            {hasLinkedEnds && index === stepValues.length - 1 && <small className="linked-head-label">rear</small>}
-                        </div>
-                        <span className="list-pointer">{isDoublyLinked ? '⇄' : '→'}</span>
-                    </div>
-                ))}
-                <span className="list-pointer">{isDoublyList ? '↩ head' : isCircularList && stepValues.length ? '↩ 첫 노드' : 'NULL'}</span>
-                {hasLinkedEnds && stepValues.length === 0 && <span className="list-pointer">· rear → NULL</span>}
-            </div>
-        </div>
-    ) : isQueue || isDeque ? (
-        <div className="queue-diagram" aria-label={`${categoryLabel} 값 ${stepValues.join(', ') || '없음'}, front ${step.front}, rear ${step.rear}`}>
-            <div className="queue-cells">
-                {Array.from({ length: exercise.contract.capacity ?? 0 }, (_, index) => {
-                    let offset = index - (step.front ?? -1) - 1
-                    if (exercise.contract.circular) {
-                        const capacity = exercise.contract.capacity ?? 0
-                        offset = (offset + capacity) % capacity
-                    }
-                    const active = offset >= 0 && offset < stepValues.length
-                    return (
-                        <div className="queue-cell" key={index} data-active={active}>
-                            <span className="queue-index">[{index}]</span>
-                            <strong>{active ? stepValues[offset] : '—'}</strong>
-                            <span className="queue-marker">{[step.front === index ? 'front' : '', step.rear === index ? 'rear' : ''].filter(Boolean).join(' · ')}</span>
-                        </div>
-                    )
-                })}
-            </div>
-            <div className="stack-base">
-                data[{exercise.contract.capacity}] · {exercise.contract.circular ? '한 칸을 비우고 순환합니다' : '빈 앞 공간은 재사용하지 않습니다'}
-            </div>
-        </div>
-    ) : (
-        <div className="stack-diagram" aria-label={`스택 값 ${stepValues.join(', ') || '없음'}, top ${step.top}`}>
-            <div className="stack-cell empty-cell">
-                {stepValues.length === (step.capacity ?? exercise.contract.capacity)
-                    ? exercise.contract.growthFactor ? '다음 삽입 시 용량 확장' : '현재 공간이 가득 찼습니다'
-                    : '다음 값이 들어올 자리'}
-            </div>
-            {[...stepValues].reverse().map((value, index) => (
-                <div className={`stack-cell ${index === 0 ? 'top-cell' : ''}`} key={stepValues.length - index}>
-                    <span className="cell-index">[{stepValues.length - index - 1}]</span>
-                    {value}
-                    {index === 0 && (
-                        <span className="top-marker">← top</span>
-                    )}
-                </div>
-            ))}
-            {stepValues.length === 0 && (
-                <div className="empty-stack">비어 있는 스택</div>
-            )}
-            <div className="stack-base">data[{step.capacity ?? exercise.contract.capacity}]</div>
         </div>
     )
 }
@@ -244,6 +203,7 @@ export default function LearningVisualization({ exercise, stepIndex }: {
     let traceLabel = '누적 출력'
     const step = exercise.learning.steps[stepIndex]
 
+    // 과제 분류에 맞는 그림·현재 값·실행 과정 선택
     switch (exercise.category) {
         case 'search': {
             const step = exercise.learning.steps[stepIndex]
@@ -322,16 +282,30 @@ export default function LearningVisualization({ exercise, stepIndex }: {
         default: {
             const step = exercise.learning.steps[stepIndex]
             const linked = exercise.contract.storage === 'linked'
-            diagram = <SequenceDiagram exercise={exercise} step={step} />
+            let frontLabel: string | number | undefined = step.front
+            let rearLabel: string | number | undefined = step.rear
+            let topLabel: string | number | undefined = step.top
+            if (linked) {
+                const firstNode = step.values.length ? `${step.values[0]} 노드` : 'NULL'
+                const lastNode = step.values.length ? `${step.values[step.values.length - 1]} 노드` : 'NULL'
+                frontLabel = firstNode
+                rearLabel = lastNode
+                topLabel = firstNode
+            }
+            if (exercise.category === 'linked-list' || linked) {
+                diagram = <LinkedSequenceDiagram exercise={exercise} step={step} />
+            } else {
+                diagram = <ArraySequenceDiagram exercise={exercise} step={step} />
+            }
             if (exercise.category === 'queue' || exercise.category === 'deque') {
                 details = (
                     <>
-                        <span>front <strong>{linked ? step.values.length ? `${step.values[0]} 노드` : 'NULL' : step.front}</strong></span>
-                        <span>rear <strong>{linked ? step.values.length ? `${step.values[step.values.length - 1]} 노드` : 'NULL' : step.rear}</strong></span>
+                        <span>front <strong>{frontLabel}</strong></span>
+                        <span>rear <strong>{rearLabel}</strong></span>
                     </>
                 )
             } else if (exercise.category === 'stack') {
-                details = <span>top <strong>{linked ? step.values.length ? `${step.values[0]} 노드` : 'NULL' : step.top}</strong></span>
+                details = <span>top <strong>{topLabel}</strong></span>
             }
         }
     }

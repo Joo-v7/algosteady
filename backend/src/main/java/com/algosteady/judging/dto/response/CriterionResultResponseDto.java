@@ -1,6 +1,9 @@
 package com.algosteady.judging.dto.response;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
 /** 채점 기준별 진행 및 판정 결과 */
 @Getter

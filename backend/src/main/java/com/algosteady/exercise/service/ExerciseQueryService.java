@@ -2,7 +2,9 @@ package com.algosteady.exercise.service;
 
 import com.algosteady.exercise.domain.ExerciseContent;
 import com.algosteady.exercise.repository.ExerciseContentRepository;
-import com.algosteady.exercise.dto.response.*;
+import com.algosteady.exercise.dto.response.ExerciseDetailsResponseDto;
+import com.algosteady.exercise.dto.response.ExerciseSummaryResponseDto;
+import com.algosteady.exercise.dto.response.ReferenceResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,11 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /** 콘텐츠 조회 및 공개 예시 선택 */
 @Service
@@ -26,10 +32,11 @@ public class ExerciseQueryService {
     private final JsonMapper jsonMapper;
 
     /**
-     * 과제별로 가장 최근 등록한 버전과 지원 언어를 반환한다.
+     * 과제별로 가장 최근 등록한 버전과 지원 언어 반환
      * @return 과제별 최신 버전과 지원 언어 목록
      */
     public List<ExerciseSummaryResponseDto> findAll() {
+        // 과제별 최신 등록 콘텐츠만 목록에 포함
         List<ExerciseSummaryResponseDto> response = new ArrayList<>();
         Set<String> exerciseIds = new HashSet<>();
 
@@ -56,7 +63,7 @@ public class ExerciseQueryService {
     }
 
     /**
-     * 기준 코드와 비공개 테스트를 제외한 상세 정보를 반환한다.
+     * 기준 코드와 비공개 테스트를 제외한 상세 정보 반환
      * @param exerciseId 조회 또는 실행할 과제 ID
      * @param language 구현 언어 코드
      * @return 학습 정보, 규격, 시작 코드와 공개 예시
@@ -67,6 +74,7 @@ public class ExerciseQueryService {
         JsonNode source = snapshot.path("sources").path(language);
         ArrayNode examples = jsonMapper.createArrayNode();
 
+        // 공개 테스트의 입력·기대값만 상세 응답에 포함
         for (JsonNode test : source.path("tests")) {
             if (test.path("public").asBoolean()) {
                 ObjectNode example = jsonMapper.createObjectNode();
@@ -95,7 +103,7 @@ public class ExerciseQueryService {
     }
 
     /**
-     * 선택한 버전의 기준 코드를 반환한다.
+     * 선택한 버전의 기준 코드 반환
      * @param exerciseId 조회 또는 실행할 과제 ID
      * @param contentVersion 조회 또는 실행할 콘텐츠 버전
      * @param language 구현 언어 코드
@@ -113,7 +121,7 @@ public class ExerciseQueryService {
     }
 
     /**
-     * 실행부에 전달할 버전별 콘텐츠 원본을 조회한다.
+     * 실행부에 전달할 버전별 콘텐츠 원본 조회
      * @param exerciseId 조회 또는 실행할 과제 ID
      * @param contentVersion 조회 또는 실행할 콘텐츠 버전
      * @param language 구현 언어 코드
@@ -124,8 +132,14 @@ public class ExerciseQueryService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 언어입니다.");
         }
 
-        ExerciseContent content = (contentVersion == null ? exerciseContentRepository.findFirstByExerciseIdOrderByIdDesc(exerciseId) : exerciseContentRepository.findByExerciseIdAndContentVersion(exerciseId, contentVersion))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "과제 또는 콘텐츠 버전을 찾을 수 없습니다."));
+        // 버전 미지정 시 최신 콘텐츠, 지정 시 해당 버전 조회
+        Optional<ExerciseContent> selectedContent;
+        if (contentVersion == null) {
+            selectedContent = exerciseContentRepository.findFirstByExerciseIdOrderByIdDesc(exerciseId);
+        } else {
+            selectedContent = exerciseContentRepository.findByExerciseIdAndContentVersion(exerciseId, contentVersion);
+        }
+        ExerciseContent content = selectedContent.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "과제 또는 콘텐츠 버전을 찾을 수 없습니다."));
         JsonNode snapshot = jsonMapper.readTree(content.getSnapshot());
 
         if (!snapshot.path("sources").has(language)) {
@@ -136,7 +150,7 @@ public class ExerciseQueryService {
     }
 
     /**
-     * 등록된 공개 예시만 실행 대상으로 선택한다.
+     * 등록된 공개 예시만 실행 대상으로 선택
      * @param snapshot 버전별 과제 정보와 언어별 소스 스냅샷
      * @param language 구현 언어 코드
      * @param exampleId 실행할 공개 예시 ID

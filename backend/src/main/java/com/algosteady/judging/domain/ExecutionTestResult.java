@@ -1,6 +1,9 @@
 package com.algosteady.judging.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,7 +44,7 @@ public class ExecutionTestResult {
     }
 
     /**
-     * 실행된 테스트 결과를 생성한다.
+     * 실행된 테스트 결과 생성
      * @param jobId 실행 또는 채점 작업 ID
      * @param testId 결과를 저장할 테스트 ID
      * @param result 직렬화한 테스트 실행 결과

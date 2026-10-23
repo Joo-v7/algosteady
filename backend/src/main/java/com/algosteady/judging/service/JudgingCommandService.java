@@ -3,10 +3,13 @@ package com.algosteady.judging.service;
 import com.algosteady.exercise.service.ExerciseQueryService;
 import com.algosteady.judging.domain.ExecutionJob;
 import com.algosteady.judging.domain.ExecutionTestResult;
-import com.algosteady.judging.repository.*;
+import com.algosteady.judging.repository.ExecutionJobRepository;
+import com.algosteady.judging.repository.ExecutionTestResultRepository;
 import com.algosteady.judging.dto.request.RunRequestDto;
 import com.algosteady.judging.dto.response.RunResponseDto;
-import com.algosteady.judging.runner.model.*;
+import com.algosteady.judging.runner.model.ExecutionResult;
+import com.algosteady.judging.runner.model.PreparationResult;
+import com.algosteady.judging.runner.model.TestExecutionResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +34,7 @@ public class JudgingCommandService {
     private final JsonMapper jsonMapper;
 
     /**
-     * 서버 콘텐츠에서 공개 예시를 검증한 뒤 작업을 저장한다.
+     * 서버 콘텐츠에서 공개 예시를 검증한 뒤 작업 저장
      * @param request 실행할 코드와 공개 예시 정보
      * @return 등록된 실행 작업 ID
      */
@@ -47,7 +50,7 @@ public class JudgingCommandService {
     }
 
     /**
-     * 지정 버전의 전체 테스트를 실행할 채점 작업을 저장한다.
+     * 지정 버전의 전체 테스트를 실행할 채점 작업 저장
      * @param exerciseId 조회 또는 실행할 과제 ID
      * @param contentVersion 조회 또는 실행할 콘텐츠 버전
      * @param language 구현 언어 코드
@@ -63,7 +66,7 @@ public class JudgingCommandService {
     }
 
     /**
-     * 가장 오래된 대기 작업을 실행 상태로 확정한다.
+     * 가장 오래된 대기 작업을 실행 상태로 확정
      * @return 실행 상태로 변경한 작업, 대기 작업이 없으면 null
      */
     public ExecutionJob claimNext() {
@@ -80,27 +83,31 @@ public class JudgingCommandService {
     }
 
     /**
-     * 실제 출력과 콘텐츠의 기대값을 비교해 저장한다.
+     * 실제 출력과 콘텐츠의 기대값을 비교해 저장
      * @param jobId 실행 또는 채점 작업 ID
      * @param result 테스트 하나의 실제 실행 결과
      * @param expected 콘텐츠에 정의된 기대 출력과 종료 조건
      */
     public void saveTest(UUID jobId, TestExecutionResult result, JsonNode expected) {
+        // 줄바꿈 형식 통일 및 마지막 줄바꿈 한 개 제외
         String actualStdout = result.stdout().replace("\r\n", "\n").replace('\r', '\n').replaceFirst("\n$", "");
         String expectedStdout = expected.path("stdout").asString().replace("\r\n", "\n").replace('\r', '\n').replaceFirst("\n$", "");
+        // 실행 상태·표준 출력·종료 코드·오류 출력 여부 비교
         boolean passed = result.status() == TestExecutionResult.Status.COMPLETED
                 && expectedStdout.equals(actualStdout)
                 && Integer.valueOf(expected.path("exitCode").asInt()).equals(result.exitCode())
                 && expected.path("stderrRequired").asBoolean() == !result.stderr().isBlank();
+        // 테스트별 실제 결과와 통과 여부 저장
         executionTestResultRepository.save(ExecutionTestResult.create(jobId, result.testId(), jsonMapper.writeValueAsString(result), passed));
     }
 
     /**
-     * 컴파일 결과와 환경 장애 여부로 최종 상태를 저장한다.
+     * 컴파일 결과와 환경 장애 여부로 최종 상태 저장
      * @param jobId 실행 또는 채점 작업 ID
      * @param result 컴파일 결과와 테스트별 실행 결과
      */
     public void complete(UUID jobId, ExecutionResult result) {
+        // 컴파일·프로그램 오류와 실행 환경 장애 구분
         boolean environmentError = result.preparation().status() == PreparationResult.Status.ENVIRONMENT_ERROR
                 || result.tests().stream()
                         .anyMatch(test -> test.status() == TestExecutionResult.Status.ENVIRONMENT_ERROR);
@@ -108,7 +115,7 @@ public class JudgingCommandService {
     }
 
     /**
-     * 작업을 시스템 장애로 종료한다.
+     * 작업을 시스템 장애로 종료
      * @param jobId 실행 또는 채점 작업 ID
      * @param message 작업 실패 사유
      */
@@ -117,7 +124,7 @@ public class JudgingCommandService {
     }
 
     /**
-     * 재시작 전에 실행 중이던 작업을 중단으로 기록한다.
+     * 재시작 전에 실행 중이던 작업을 중단으로 기록
      */
     public void recoverInterrupted() {
         for (ExecutionJob job : executionJobRepository.findAllByStatus(ExecutionJob.Status.RUNNING)) {

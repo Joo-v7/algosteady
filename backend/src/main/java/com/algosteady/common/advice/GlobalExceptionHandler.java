@@ -4,7 +4,8 @@ import com.algosteady.common.dto.ErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -17,7 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class GlobalExceptionHandler {
 
     /**
-     * 콘텐츠 및 작업 조회 오류를 전달한다.
+     * 콘텐츠 및 작업 조회 오류 전달
      * @param exception HTTP 상태와 업무 오류 사유를 가진 예외
      * @return 업무 오류의 HTTP 상태와 오류 응답
      */
@@ -29,7 +30,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 필수 필드 검증 결과를 전달한다.
+     * 필수 필드 검증 결과 전달
      * @param exception 요청 필드 검증에 실패한 예외
      * @return 필드 검증 실패를 설명하는 400 응답
      */
@@ -43,7 +44,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * JSON 및 URL 형식 오류를 전달한다.
+     * JSON 및 URL 형식 오류 전달
      * @param exception 요청 본문 또는 URL 형식 오류
      * @return 입력 형식 오류를 설명하는 400 응답
      */
@@ -55,7 +56,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 내부 오류의 원인은 로그에 보존한다.
+     * 내부 오류 원인의 서버 로그 보존
      * @param exception 처리하지 못한 내부 예외
      * @return 내부 오류를 안내하는 500 응답
      */

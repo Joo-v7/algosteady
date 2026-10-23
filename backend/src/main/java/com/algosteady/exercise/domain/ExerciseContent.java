@@ -1,6 +1,11 @@
 package com.algosteady.exercise.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,7 +46,7 @@ public class ExerciseContent {
     }
 
     /**
-     * 검증한 콘텐츠를 새 버전으로 생성한다.
+     * 검증한 콘텐츠를 새 버전으로 생성
      * @param exerciseId 조회 또는 실행할 과제 ID
      * @param contentVersion 조회 또는 실행할 콘텐츠 버전
      * @param snapshot 버전별 과제 정보와 언어별 소스 스냅샷

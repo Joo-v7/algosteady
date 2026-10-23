@@ -144,7 +144,7 @@ interface ExerciseContent<Category extends ExerciseCategory, Step extends Learni
     }[]
 }
 
-// 콘텐츠와 실행 API의 오류 응답을 같은 방식으로 처리한다.
+// API 요청 및 공통 오류 응답 처리
 export async function requestApi<T>(url: string, options?: RequestInit): Promise<T> {
     const response = await fetch(url, options)
 

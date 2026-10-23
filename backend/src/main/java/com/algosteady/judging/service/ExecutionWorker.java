@@ -4,7 +4,9 @@ import com.algosteady.exercise.service.ExerciseQueryService;
 import com.algosteady.judging.domain.ExecutionJob;
 import com.algosteady.judging.runner.service.CodeExecutionService;
 import com.algosteady.judging.runner.language.LanguageSpec;
-import com.algosteady.judging.runner.model.*;
+import com.algosteady.judging.runner.model.ExecutionRequest;
+import com.algosteady.judging.runner.model.ExecutionResult;
+import com.algosteady.judging.runner.model.TestInput;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +21,9 @@ import java.util.Map;
 import java.util.UUID;
 import tools.jackson.databind.JsonNode;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /** DB 대기 작업의 순차 실행 */
 @Slf4j
@@ -36,7 +40,7 @@ public class ExecutionWorker {
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     /**
-     * 콘텐츠 등록 후 중단된 작업을 복구하고 큐 처리를 시작한다.
+     * 콘텐츠 등록 후 중단된 작업을 복구하고 큐 처리 시작
      */
     @EventListener(ApplicationReadyEvent.class)
     public void start() {
@@ -48,12 +52,14 @@ public class ExecutionWorker {
         ExecutionJob job = null;
 
         try {
+            // 커밋된 대기 작업을 등록 순서대로 실행 상태로 변경
             job = judgingCommandService.claimNext();
 
             if (job == null) {
                 return;
             }
 
+            // 실행 당시 콘텐츠에서 공개 예제 또는 전체 테스트 선택
             JsonNode snapshot = exerciseQueryService.findSnapshot(job.getExerciseId(), job.getContentVersion(), job.getLanguage());
             JsonNode source = snapshot.path("sources").path(job.getLanguage());
             Map<String, JsonNode> selectedTests = new LinkedHashMap<>();
@@ -71,7 +77,7 @@ public class ExecutionWorker {
             selectedTests.forEach((id, test) -> inputs.add(new TestInput(id, test.path("input").asString())));
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, job.getCode(), source.path("harness").asString(), inputs);
             UUID jobId = job.getId();
-            // 실행 중에는 DB 트랜잭션을 유지하지 않는다.
+            // DB 트랜잭션 없이 실행, 테스트 완료마다 결과 비교·저장
             ExecutionResult result = codeExecutionService.execute(request, test -> judgingCommandService.saveTest(jobId, test, selectedTests.get(test.testId()).path("expected")));
             judgingCommandService.complete(jobId, result);
         } catch (InterruptedException exception) {
@@ -98,7 +104,7 @@ public class ExecutionWorker {
     }
 
     /**
-     * 실행 스레드를 중단하고 runner의 자원 정리를 기다립니다.
+     * 실행 스레드 중단 및 runner 자원 정리 대기
      */
     @PreDestroy
     public void stop() {

@@ -11,7 +11,9 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.Properties;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /** 실행 설정 바인딩 및 의존성 연결 검증 */
 class RunnerPropertiesTests {

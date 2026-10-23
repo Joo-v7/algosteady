@@ -31,12 +31,13 @@ public class ExerciseCommandService implements ApplicationRunner {
     private final ExerciseLearningValidator exerciseLearningValidator;
 
     /**
-     * 서버 시작 시 콘텐츠 파일과 테스트 연결을 검증한다.
+     * 서버 시작 시 콘텐츠 파일과 테스트 연결 검증
      * @param arguments 애플리케이션 실행 인자
      */
     @Override
     @Transactional
     public void run(ApplicationArguments arguments) throws Exception {
+        // 패키징된 과제 메타데이터 파일 조회
         Resource[] resources = new PathMatchingResourcePatternResolver().getResources("classpath*:content/*/exercise.json");
 
         if (resources.length == 0) {
@@ -46,6 +47,7 @@ public class ExerciseCommandService implements ApplicationRunner {
         for (Resource resource : resources) {
             JsonNode exercise = jsonMapper.readTree(resource.getContentAsString(StandardCharsets.UTF_8));
 
+            // 필수 메타데이터와 학습 내용 검증
             for (String field : new String[]{"id", "version", "title", "description", "category"}) {
                 if (!exercise.path(field).isString() || exercise.path(field).asString().isBlank()) {
                     throw new IllegalStateException("필수 콘텐츠 항목이 없습니다: " + field);
@@ -60,12 +62,14 @@ public class ExerciseCommandService implements ApplicationRunner {
 
             exerciseLearningValidator.validate(exercise);
 
+            // 채점 기준 ID의 존재·중복 확인
             Set<String> criterionIds = new HashSet<>();
 
             for (JsonNode criterion : exercise.path("criteria")) {
-                if (criterion.path("id").asString("").isBlank() || !criterionIds.add(criterion.path("id").asString())) {
+                if (criterion.path("id").asString("").isBlank() || criterionIds.contains(criterion.path("id").asString())) {
                     throw new IllegalStateException("채점 기준 ID가 없거나 중복됩니다.");
                 }
+                criterionIds.add(criterion.path("id").asString());
             }
 
             ObjectNode sources = jsonMapper.createObjectNode();
@@ -81,6 +85,7 @@ public class ExerciseCommandService implements ApplicationRunner {
 
                 ObjectNode source = sources.putObject(language.getKey());
 
+                // 언어별 시작·기준·호출 코드와 테스트 파일 연결
                 for (String file : new String[]{"starter", "reference", "harness", "tests"}) {
                     String filename = language.getValue().path(file).asString("");
 
@@ -111,12 +116,13 @@ public class ExerciseCommandService implements ApplicationRunner {
                     throw new IllegalStateException("테스트 목록이 없습니다.");
                 }
 
+                // 테스트 ID·채점 기준 연결·기대값 검증
                 Set<String> testIds = new HashSet<>();
                 Set<String> testedCriteria = new HashSet<>();
                 boolean hasPublicExample = false;
 
                 for (JsonNode test : tests) {
-                    if (test.path("id").asString("").isBlank() || !testIds.add(test.path("id").asString())
+                    if (test.path("id").asString("").isBlank() || testIds.contains(test.path("id").asString())
                             || !criterionIds.contains(test.path("criterionId").asString(""))
                             || !test.path("public").isBoolean() || !test.path("input").isString()
                             || !test.path("description").isString() || !test.path("expected").path("stdout").isString()
@@ -124,6 +130,7 @@ public class ExerciseCommandService implements ApplicationRunner {
                             || !test.path("expected").path("stderrRequired").isBoolean()) {
                         throw new IllegalStateException("테스트 ID, 기준 연결, 입력과 기대값을 확인해 주세요.");
                     }
+                    testIds.add(test.path("id").asString());
                     testedCriteria.add(test.path("criterionId").asString());
                     hasPublicExample |= test.path("public").asBoolean();
                 }
@@ -137,6 +144,7 @@ public class ExerciseCommandService implements ApplicationRunner {
                 }
             }
 
+            // 검증된 원본을 버전별 스냅샷으로 구성
             ObjectNode snapshot = jsonMapper.createObjectNode();
             snapshot.set("exercise", exercise);
             snapshot.set("sources", sources);
@@ -144,6 +152,7 @@ public class ExerciseCommandService implements ApplicationRunner {
             String contentVersion = exercise.path("version").asString();
             Optional<ExerciseContent> existing = exerciseContentRepository.findByExerciseIdAndContentVersion(exerciseId, contentVersion);
 
+            // 동일 버전의 원본 변경 거부, 새 버전만 등록
             if (existing.isPresent()) {
                 if (!jsonMapper.readTree(existing.get().getSnapshot()).equals(snapshot)) {
                     throw new IllegalStateException("등록된 콘텐츠와 다릅니다. 콘텐츠 버전을 올려 주세요: " + exerciseId + " " + contentVersion);

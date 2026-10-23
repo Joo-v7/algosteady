@@ -1,6 +1,11 @@
 package com.algosteady.judging.dto.request;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import jakarta.validation.constraints.NotBlank;
 
 /** 실행 코드 및 공개 예시 ID */

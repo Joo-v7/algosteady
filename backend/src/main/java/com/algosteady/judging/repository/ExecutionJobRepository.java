@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface ExecutionJobRepository extends JpaRepository<ExecutionJob, UUID> {
 
     /**
-     * 지정한 상태의 가장 오래된 작업을 잠금 조회한다.
+     * 지정한 상태의 가장 오래된 작업을 잠금 조회
      * @param status 조회할 작업 상태
      * @return 지정한 상태 중 가장 먼저 등록된 작업
      */
@@ -21,7 +21,7 @@ public interface ExecutionJobRepository extends JpaRepository<ExecutionJob, UUID
     Optional<ExecutionJob> findFirstByStatusOrderByQueuedAtAscIdAsc(ExecutionJob.Status status);
 
     /**
-     * 지정한 상태의 작업을 조회한다.
+     * 지정한 상태의 작업 조회
      * @param status 조회할 작업 상태
      * @return 지정한 상태의 작업 목록
      */

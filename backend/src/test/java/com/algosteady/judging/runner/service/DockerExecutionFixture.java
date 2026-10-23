@@ -13,21 +13,22 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Docker 테스트의 공통 실행 환경과 자원 정리 확인 */
 class DockerExecutionFixture {
 
-    final RunnerProperties properties = new RunnerProperties(Map.of("c", "algosteady-runner-c:14.4.0"),
+    final RunnerProperties runnerProperties = new RunnerProperties(Map.of("c", "algosteady-runner-c:14.4.0"),
             Duration.ofSeconds(30), Duration.ofSeconds(2), Duration.ofSeconds(10), 1048576, 1, "512m", 128);
-    final ProcessExecutor executor = new ProcessExecutor();
-    final CodeExecutionService service = new CodeExecutionService(new DockerContainerManager(executor, properties));
+    final ProcessExecutor processExecutor = new ProcessExecutor();
+    final CodeExecutionService codeExecutionService = new CodeExecutionService(new DockerContainerManager(processExecutor, runnerProperties));
     private final Set<Path> initialWorkspaces = workspaces();
     private final String containerPrefix = "algosteady-runner-";
 
     void assertCleanedUp() throws Exception {
         // given
-        ProcessExecutor.Result containers = executor.execute(List.of("docker", "ps", "-a", "--filter", "name=" + containerPrefix,
+        ProcessExecutor.Result containers = processExecutor.execute(List.of("docker", "ps", "-a", "--filter", "name=" + containerPrefix,
                         "--format", "{{.Names}}"), null, Duration.ofSeconds(10), 1048576, () -> {});
         assertTrue(containers.succeeded(), containers.diagnostic());
         assertTrue(containers.stdout().isBlank(), containers.stdout());

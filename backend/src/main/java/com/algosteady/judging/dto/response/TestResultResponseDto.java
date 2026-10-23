@@ -1,6 +1,9 @@
 package com.algosteady.judging.dto.response;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import tools.jackson.databind.JsonNode;
 
 /** 테스트 입력·기대값·실제 결과·통과 여부 */

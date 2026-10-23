@@ -1,6 +1,11 @@
 package com.algosteady.judging.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -81,7 +86,7 @@ public class ExecutionJob {
     }
 
     /**
-     * 검증한 실행 요청을 대기 작업으로 생성한다.
+     * 검증한 실행 요청을 대기 작업으로 생성
      * @param exerciseId 조회 또는 실행할 과제 ID
      * @param contentVersion 조회 또는 실행할 콘텐츠 버전
      * @param language 구현 언어 코드
@@ -94,7 +99,7 @@ public class ExecutionJob {
     }
 
     /**
-     * 전체 테스트를 실행할 채점 작업을 생성한다.
+     * 전체 테스트를 실행할 채점 작업 생성
      * @param exerciseId 조회 또는 실행할 과제 ID
      * @param contentVersion 조회 또는 실행할 콘텐츠 버전
      * @param language 구현 언어 코드
@@ -106,7 +111,7 @@ public class ExecutionJob {
     }
 
     /**
-     * 작업 실행을 시작한다.
+     * 작업 실행 시작
      */
     public void markRunning() {
         status = Status.RUNNING;
@@ -114,7 +119,7 @@ public class ExecutionJob {
     }
 
     /**
-     * 컴파일 결과와 최종 상태를 저장한다.
+     * 컴파일 결과와 최종 상태 저장
      * @param preparation 직렬화한 컴파일 결과
      * @param environmentError 실행 환경 장애 발생 여부
      */
@@ -126,7 +131,7 @@ public class ExecutionJob {
     }
 
     /**
-     * 서버 또는 실행 환경 장애로 작업을 종료한다.
+     * 서버 또는 실행 환경 장애로 작업 종료
      * @param message 작업 실패 사유
      */
     public void markFailed(String message) {

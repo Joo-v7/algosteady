@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import Editor, { loader } from '@monaco-editor/react'
 import * as monaco from 'monaco-editor'
@@ -7,12 +8,12 @@ import { getExercise, getReference } from '../api/exercises'
 import type { ExerciseDetails } from '../api/exercises'
 import { createRun, getJob } from '../api/runs'
 import type { Job } from '../api/runs'
-import { getJobPresentation } from '../jobPresentation'
+import ExecutionResultPanel from '../components/ExecutionResultPanel'
 import { createSubmission } from '../api/submissions'
 import LearningVisualization from '../components/LearningVisualization'
 import { getExercisePresentation } from '../exercisePresentation'
 
-// 편집기와 작업자를 로컬 번들에서 불러온다.
+// 편집기와 작업자의 로컬 번들 연결
 self.MonacoEnvironment = {
     getWorker() {
         return new EditorWorker()
@@ -56,7 +57,7 @@ function ExercisePage() {
 
     const gradingJobKey = exercise ? `algosteady:${exercise.id}:${exercise.version}:c:last-grading-job` : ''
 
-    // URL 변경 시 요청을 취소하고 해당 과제의 초안과 마지막 작업을 복구한다.
+    // 과제 조회 및 저장된 초안·마지막 작업 복구, URL 변경 시 요청 취소
     useEffect(() => {
         const controller = new AbortController()
         requests.current = controller
@@ -79,6 +80,7 @@ function ExercisePage() {
                 setGradingJob(null)
                 setExecutionError('')
                 setRequestKind(null)
+                // 과제·버전별 저장된 초안과 마지막 작업 ID 복구
                 let draft = content.starterCode
                 let savedJob = null
                 let savedGradingJob = null
@@ -103,7 +105,7 @@ function ExercisePage() {
         return () => controller.abort()
     }, [exerciseId])
 
-    // 마지막 작업과 채점 결과를 복구하고 진행 중인 작업만 재조회한다.
+    // 마지막 실행·채점 결과 복구 및 진행 중인 작업 재조회
     useEffect(() => {
         if ((!jobId && !gradingJobId) || !exercise || exercise.id !== exerciseId) {
             return
@@ -118,6 +120,7 @@ function ExercisePage() {
                 if (controller.signal.aborted) {
                     return
                 }
+                // 현재 과제의 작업만 화면과 채점 기준에 반영
                 for (const result of responses) {
                     if (result.exerciseId !== exercise!.id || result.contentVersion !== exercise!.version || result.language !== 'c') {
                         throw new Error('현재 과제와 실행 작업의 정보가 다릅니다.')
@@ -128,6 +131,7 @@ function ExercisePage() {
                     if (result.jobId === gradingJobId) {
                         setGradingJob(result)
                     }
+                    // 종료된 작업을 재조회 대상에서 제외
                     if (result.status === 'COMPLETED' || result.status === 'FAILED') {
                         pendingIds.delete(result.jobId)
                         if (result.jobId === jobId) {
@@ -154,7 +158,7 @@ function ExercisePage() {
         }
     }, [jobId, gradingJobId, exercise, exerciseId])
 
-    // 공개 예시는 실행 요청으로, 전체 테스트는 새 제출로 등록한다.
+    // 공개 예제 실행 또는 전체 테스트 채점 제출 등록
     async function handleRun(kind: 'RUN' | 'GRADING') {
         if (!exercise || !requests.current || runBusy) {
             return
@@ -192,6 +196,7 @@ function ExercisePage() {
             if (kind === 'GRADING') {
                 setGradingJobId(response.jobId)
             }
+            // 새로고침 후 복구할 마지막 작업 ID 저장
             try {
                 localStorage.setItem(jobKey, response.jobId)
                 if (kind === 'GRADING') {
@@ -208,7 +213,7 @@ function ExercisePage() {
         }
     }
 
-    // 작성한 코드를 브라우저에 저장한다.
+    // 작성 코드의 브라우저 초안 저장
     function handleCodeChange(value: string) {
         setCode(value)
         try {
@@ -219,7 +224,7 @@ function ExercisePage() {
         }
     }
 
-    // 기준 코드 표시와 열람 여부를 갱신한다.
+    // 기준 코드 조회 및 표시·열람 여부 갱신
     async function handleReferenceToggle() {
         if (referenceOpen) {
             setReferenceOpen(false)
@@ -250,7 +255,7 @@ function ExercisePage() {
         }
     }
 
-    // 같은 과제의 탭을 URL에 반영한다.
+    // 학습·실습 탭 선택을 URL에 반영
     function handleTabChange(tab: 'learning' | 'training') {
         const params = new URLSearchParams(searchParams)
         if (tab === 'training') {
@@ -277,15 +282,61 @@ function ExercisePage() {
     const example = publicExamples[exampleIndex]
     const isQueue = exercise.category === 'queue'
     const isDeque = exercise.category === 'deque'
-    const isLinkedList = exercise.category === 'linked-list'
     const isLinkedStack = exercise.category === 'stack' && exercise.contract.storage === 'linked'
     const hasLinkedEnds = (isQueue || isDeque) && exercise.contract.storage === 'linked'
     const isRecursion = exercise.category === 'recursion'
-    const isTree = exercise.category === 'tree'
     const presentation = getExercisePresentation(exercise)
     const categoryLabel = presentation.label
-    const { resultKind, resultPending, resultTests, preparation, compilationFailed, resultStatus, resultLabel, executionSeconds, failedTest } = getJobPresentation(
-        job, requestKind ?? (jobId && jobId === gradingJobId ? 'GRADING' : 'RUN'), runBusy, executionError)
+    const restoredKind = jobId && jobId === gradingJobId ? 'GRADING' : 'RUN'
+    const resultKind = job?.kind ?? requestKind ?? restoredKind
+
+    // 등록된 실습 안내 우선 표시, 안내가 없는 스택·선형 큐만 기본 문구 적용
+    let practiceNotes: ReactNode
+    if (exercise.learning.notes?.length) {
+        practiceNotes = exercise.learning.notes.map((note, index) => (
+            <div key={note.title}>
+                {index > 0 && <div className="contract-divider" />}
+                <h3>{note.title}</h3>
+                <p>{note.description}</p>
+            </div>
+        ))
+    } else {
+        switch (exercise.category) {
+            case 'queue':
+                if (!hasLinkedEnds && !exercise.contract.circular) {
+                    practiceNotes = (
+                        <>
+                            <h3>front는 다음 값의 바로 앞</h3>
+                            <p>초기 front와 rear는 -1입니다. front와 rear가 같으면 비어 있고, 저장된 값의 개수는 <code>rear - front</code>입니다.</p>
+                            <div className="contract-divider" />
+                            <h3>앞 공간은 재사용하지 않습니다</h3>
+                            <p>rear가 마지막 칸에 도달하면 포화 상태입니다. 포화 상태의 enqueue와 빈 상태의 dequeue는 오류 출력 후 종료합니다.</p>
+                        </>
+                    )
+                }
+                break
+            case 'stack':
+                if (!isLinkedStack) {
+                    practiceNotes = (
+                        <>
+                            <h3>빈 스택의 top은 -1</h3>
+                            <p>
+                                값 하나가 있으면 0, 가득 차면 {exercise.contract.initialCapacity !== undefined ? 'capacity - 1' : (exercise.contract.capacity ?? 0) - 1}입니다.
+                                {' '}저장된 값의 개수는 <code>top + 1</code>이에요.
+                            </p>
+                            <div className="contract-divider" />
+                            <h3>오류도 구현의 일부</h3>
+                            <p>
+                                {exercise.contract.growthFactor !== undefined
+                                    ? `포화 상태의 push는 용량을 ${exercise.contract.growthFactor}배로 늘립니다. 메모리 할당 실패와 빈 상태의 pop·peek는 오류 출력 후 종료합니다.`
+                                    : '포화 상태의 push는 값을 유지하고 반환합니다. 빈 상태의 pop·peek는 오류 출력 후 종료합니다.'}
+                            </p>
+                        </>
+                    )
+                }
+                break
+        }
+    }
 
     return (
         <main className="workspace">
@@ -472,33 +523,14 @@ function ExercisePage() {
                             </section>
 
                             {(job || runBusy || executionError) && (
-                                <section className="panel execution-result practice-result" aria-live="polite" aria-busy={resultPending}>
-                                    <div className="result-heading">
-                                        <h2>
-                                            {resultKind === 'GRADING' ? '제출 결과' : '실행 결과'}
-                                            <span className="result-status" data-status={resultStatus}>{resultLabel}</span>
-                                        </h2>
-                                        <span className="result-time" title={resultKind === 'GRADING' ? '테스트 실행 시간 합계' : '코드 실행 시간'}>{executionSeconds == null ? '— s' : `${executionSeconds.toFixed(3)} s`}</span>
-                                    </div>
-                                    {job && job.code !== code && <p>수정 전 코드의 결과</p>}
-                                    {resultPending && (
-                                        <p>{resultKind === 'GRADING' ? '전체 테스트를 채점하고 있습니다.' : '선택한 예제를 실행하고 있습니다.'}</p>
-                                    )}
-                                    {executionError && <pre role="alert">{executionError}</pre>}
-                                    {job?.message && <pre>{job.message}</pre>}
-                                    {compilationFailed && preparation && (
-                                        <pre>{preparation.stderr || preparation.stdout || preparation.message || '컴파일하지 못했습니다.'}</pre>
-                                    )}
-                                    {job?.kind === 'RUN' && resultTests.map(test => (
-                                        <pre key={test.testId}>
-                                            {[test.actual.stdout, test.actual.stderr, test.actual.message
-                                                || (test.actual.status !== 'COMPLETED' ? '프로그램이 정상적으로 실행되지 않았습니다.' : '')].filter(Boolean).join('\n') || '(출력 없음)'}
-                                        </pre>
-                                    ))}
-                                    {job?.kind === 'GRADING' && !resultPending && !compilationFailed && failedTest && (
-                                        <pre>{failedTest.actual.stderr || failedTest.actual.message || '일부 테스트를 통과하지 못했습니다. 우측 채점 기준을 확인해 주세요.'}</pre>
-                                    )}
-                                </section>
+                                <ExecutionResultPanel
+                                    variant="practice"
+                                    job={job}
+                                    kind={requestKind ?? restoredKind}
+                                    pending={runBusy}
+                                    error={executionError}
+                                    currentCode={code}
+                                />
                             )}
                         </>
                     )}
@@ -563,36 +595,7 @@ function ExercisePage() {
                         {/* 구현 시 주의사항 */}
                         <section className="contract-note">
                             <span className="section-label">기억해 두세요</span>
-                            {isTree || isRecursion || isLinkedList || isLinkedStack || hasLinkedEnds || exercise.contract.circular ? exercise.learning.notes?.map((note, index) => (
-                                <div key={note.title}>
-                                    {index > 0 && <div className="contract-divider" />}
-                                    <h3>{note.title}</h3>
-                                    <p>{note.description}</p>
-                                </div>
-                            )) : isQueue ? (
-                                <>
-                                    <h3>front는 다음 값의 바로 앞</h3>
-                                    <p>초기 front와 rear는 -1입니다. front와 rear가 같으면 비어 있고, 저장된 값의 개수는 <code>rear - front</code>입니다.</p>
-                                    <div className="contract-divider" />
-                                    <h3>앞 공간은 재사용하지 않습니다</h3>
-                                    <p>rear가 마지막 칸에 도달하면 포화 상태입니다. 포화 상태의 enqueue와 빈 상태의 dequeue는 오류 출력 후 종료합니다.</p>
-                                </>
-                            ) : (
-                                <>
-                                    <h3>빈 스택의 top은 -1</h3>
-                                    <p>
-                                        값 하나가 있으면 0, 가득 차면 {exercise.contract.initialCapacity !== undefined ? 'capacity - 1' : (exercise.contract.capacity ?? 0) - 1}입니다.
-                                        {' '}저장된 값의 개수는 <code>top + 1</code>이에요.
-                                    </p>
-                                    <div className="contract-divider" />
-                                    <h3>오류도 구현의 일부</h3>
-                                    <p>
-                                        {exercise.contract.growthFactor !== undefined
-                                            ? `포화 상태의 push는 용량을 ${exercise.contract.growthFactor}배로 늘립니다. 메모리 할당 실패와 빈 상태의 pop·peek는 오류 출력 후 종료합니다.`
-                                            : '포화 상태의 push는 값을 유지하고 반환합니다. 빈 상태의 pop·peek는 오류 출력 후 종료합니다.'}
-                                    </p>
-                                </>
-                            )}
+                            {practiceNotes}
                         </section>
                     </aside>
                 )}

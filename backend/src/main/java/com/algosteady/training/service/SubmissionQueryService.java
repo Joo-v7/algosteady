@@ -3,7 +3,9 @@ package com.algosteady.training.service;
 import com.algosteady.judging.service.JudgingQueryService;
 import com.algosteady.judging.dto.response.JobSummaryResponseDto;
 import com.algosteady.training.domain.Submission;
-import com.algosteady.training.dto.response.*;
+import com.algosteady.training.dto.response.SubmissionDetailsResponseDto;
+import com.algosteady.training.dto.response.SubmissionPageResponseDto;
+import com.algosteady.training.dto.response.SubmissionSummaryResponseDto;
 import com.algosteady.training.repository.SubmissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,7 +30,7 @@ public class SubmissionQueryService {
     private final JudgingQueryService judgingQueryService;
 
     /**
-     * 과제와 언어별 제출을 최신순으로 조회한다.
+     * 과제와 언어별 제출을 최신순으로 조회
      * @param exerciseId 조회 또는 실행할 과제 ID
      * @param language 구현 언어 코드
      * @param page 0부터 시작하는 페이지 번호
@@ -44,10 +46,12 @@ public class SubmissionQueryService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "페이지는 0 이상, 한 페이지의 건수는 1 이상이어야 합니다.");
         }
 
+        // 과제·언어별 제출을 최신순으로 페이지 조회
         Page<Submission> submissionPage = submissionRepository.findByExerciseIdAndLanguageOrderBySubmittedAtDescIdDesc(exerciseId, language, PageRequest.of(page, size));
         List<UUID> jobIds = submissionPage.getContent().stream()
                 .map(submission -> submission.getJobId())
                 .toList();
+        // 조회한 제출의 채점 결과를 작업 ID로 일괄 연결
         Map<UUID, JobSummaryResponseDto> summaries = judgingQueryService.findSummariesByIds(jobIds);
         List<SubmissionSummaryResponseDto> content = submissionPage.getContent().stream()
                 .map(submission -> SubmissionSummaryResponseDto.from(submission, summaries.get(submission.getJobId())))
@@ -63,7 +67,7 @@ public class SubmissionQueryService {
     }
 
     /**
-     * 제출 원본과 해당 작업의 상세 결과를 조회한다.
+     * 제출 원본과 해당 작업의 상세 결과 조회
      * @param submissionId 조회할 제출 ID
      * @return 제출 원본과 연결된 채점 결과
      */

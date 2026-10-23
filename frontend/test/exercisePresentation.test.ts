@@ -12,7 +12,12 @@ for (const entry of readdirSync(directory, { withFileTypes: true }).filter(entry
             assert.ok(value.length > 0)
             assert.ok(!value.includes('undefined'))
         }
-        const concepts = { heap: '힙', hash: '버킷', set: '대표', search: '탐색' }
+        const concepts = {
+            heap: '힙',
+            hash: '버킷',
+            set: '대표',
+            search: '탐색'
+        }
         const keyword = concepts[exercise.category as keyof typeof concepts]
         if (keyword) {
             assert.ok(presentation.introduction.includes(keyword))

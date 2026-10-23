@@ -24,7 +24,7 @@ public final class ExerciseContentSource {
     }
 
     /**
-     * 콘텐츠 메타데이터를 확인하고 경로 순서대로 조회한다.
+     * 콘텐츠 메타데이터를 확인하고 경로 순서대로 조회
      * @return ID와 버전이 유효한 콘텐츠 리소스 목록
      */
     public static List<Resource> contents() throws IOException {
@@ -47,7 +47,7 @@ public final class ExerciseContentSource {
     }
 
     /**
-     * API 테스트에 사용할 과제 ID와 버전을 조회한다.
+     * API 테스트에 사용할 과제 ID와 버전 조회
      * @return 콘텐츠 파일에서 읽은 ID·버전 인자 목록
      */
     public static Stream<Arguments> exercises() throws IOException {

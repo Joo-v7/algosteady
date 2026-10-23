@@ -15,7 +15,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Docker 기반 C 실행·제한·자원 정리 검증 */
 @EnabledIfSystemProperty(named = "algosteady.docker.tests", matches = "true")
@@ -29,7 +32,7 @@ class CodeExecutionDockerTests {
     void compilationFailureDoesNotExecuteTests() throws Exception {
         // given
         // when
-        ExecutionResult result = fixture.service.execute(new ExecutionRequest(LanguageSpec.C, "invalid C code;", mainHarness,
+        ExecutionResult result = fixture.codeExecutionService.execute(new ExecutionRequest(LanguageSpec.C, "invalid C code;", mainHarness,
                 List.of(new TestInput("example", ""))), test -> {});
 
         // then
@@ -48,7 +51,7 @@ class CodeExecutionDockerTests {
                 mainHarness, List.of(new TestInput("loop", "x"), new TestInput("next", "y")));
 
         // when
-        ExecutionResult result = fixture.service.execute(request, test -> {});
+        ExecutionResult result = fixture.codeExecutionService.execute(request, test -> {});
 
         // then
         assertEquals(TestExecutionResult.Status.TIME_LIMIT_EXCEEDED, result.tests().getFirst().status());
@@ -74,12 +77,12 @@ class CodeExecutionDockerTests {
                 """, mainHarness, List.of(new TestInput("flood", "x"), new TestInput("next", "y")));
 
         // when
-        ExecutionResult result = fixture.service.execute(request, test -> {});
+        ExecutionResult result = fixture.codeExecutionService.execute(request, test -> {});
 
         TestExecutionResult limited = result.tests().getFirst();
         // then
         assertEquals(TestExecutionResult.Status.OUTPUT_LIMIT_EXCEEDED, limited.status());
-        assertTrue((limited.stdout() + limited.stderr()).getBytes(StandardCharsets.UTF_8).length <= fixture.properties.outputLimitBytes());
+        assertTrue((limited.stdout() + limited.stderr()).getBytes(StandardCharsets.UTF_8).length <= fixture.runnerProperties.outputLimitBytes());
         assertEquals(TestExecutionResult.Status.COMPLETED, result.tests().getLast().status());
         assertEquals("OK\n", result.tests().getLast().stdout());
     }
@@ -89,13 +92,13 @@ class CodeExecutionDockerTests {
     void exit124IsNotTimeLimitAndSignalsKeepExitInformation() throws Exception {
         // given
         // when
-        ExecutionResult returned = fixture.service.execute(new ExecutionRequest(LanguageSpec.C, "int main(void) { return 124; }",
+        ExecutionResult returned = fixture.codeExecutionService.execute(new ExecutionRequest(LanguageSpec.C, "int main(void) { return 124; }",
                 mainHarness, List.of(new TestInput("exit", ""))), test -> {});
         // then
         assertEquals(TestExecutionResult.Status.COMPLETED, returned.tests().getFirst().status());
         assertEquals(124, returned.tests().getFirst().exitCode());
 
-        ExecutionResult signalled = fixture.service.execute(new ExecutionRequest(LanguageSpec.C,
+        ExecutionResult signalled = fixture.codeExecutionService.execute(new ExecutionRequest(LanguageSpec.C,
                 "#include <signal.h>\nint main(void) { raise(SIGSEGV); }", mainHarness,
                 List.of(new TestInput("signal", ""))), test -> {});
         assertEquals(TestExecutionResult.Status.COMPLETED, signalled.tests().getFirst().status());
@@ -109,7 +112,7 @@ class CodeExecutionDockerTests {
         AtomicReference<Throwable> failure = new AtomicReference<Throwable>();
         Thread thread = new Thread(() -> {
             try {
-                fixture.service.execute(new ExecutionRequest(LanguageSpec.C, "int main(void) { for (;;) {} }", mainHarness,
+                fixture.codeExecutionService.execute(new ExecutionRequest(LanguageSpec.C, "int main(void) { for (;;) {} }", mainHarness,
                         List.of(new TestInput("loop", ""))), test -> {});
                 failure.set(new AssertionError("작업이 중단되지 않았습니다."));
             } catch (InterruptedException exception) {

@@ -12,14 +12,14 @@ import java.util.UUID;
 public interface ExecutionTestResultRepository extends JpaRepository<ExecutionTestResult, UUID> {
 
     /**
-     * 작업에 저장된 테스트 결과를 조회한다.
+     * 작업에 저장된 테스트 결과 조회
      * @param jobId 실행 또는 채점 작업 ID
      * @return 작업에 저장된 테스트 결과 목록
      */
     List<ExecutionTestResult> findAllByJobId(UUID jobId);
 
     /**
-     * 실행 출력 없이 작업별 테스트 통과 여부를 조회한다.
+     * 실행 출력 없이 작업별 테스트 통과 여부 조회
      * @param jobIds 요약을 조회할 작업 ID 목록
      * @return 작업별 테스트 ID와 통과 여부 목록
      */

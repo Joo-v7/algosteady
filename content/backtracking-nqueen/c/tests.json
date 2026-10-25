@@ -1,0 +1,362 @@
+[
+  {
+    "id": "nqueen-example",
+    "criterionId": "basic",
+    "public": true,
+    "description": "4×4 체스판의 두 가지 배치",
+    "input": "SOLVE 4\n",
+    "expected": {
+      "stdout": "COUNT 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "no-solution-example",
+    "criterionId": "basic",
+    "public": true,
+    "description": "배치할 수 없는 체스판",
+    "input": "SOLVE 3\n",
+    "expected": {
+      "stdout": "COUNT 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "solve-1",
+    "criterionId": "basic",
+    "public": false,
+    "description": "해의 개수",
+    "input": "SOLVE 1\n",
+    "expected": {
+      "stdout": "COUNT 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "solve-2",
+    "criterionId": "basic",
+    "public": false,
+    "description": "해의 개수",
+    "input": "SOLVE 2\n",
+    "expected": {
+      "stdout": "COUNT 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "solve-5",
+    "criterionId": "basic",
+    "public": false,
+    "description": "해의 개수",
+    "input": "SOLVE 5\n",
+    "expected": {
+      "stdout": "COUNT 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "solve-6",
+    "criterionId": "basic",
+    "public": false,
+    "description": "해의 개수",
+    "input": "SOLVE 6\n",
+    "expected": {
+      "stdout": "COUNT 4\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "solve-7",
+    "criterionId": "basic",
+    "public": false,
+    "description": "해의 개수",
+    "input": "SOLVE 7\n",
+    "expected": {
+      "stdout": "COUNT 40\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "solve-8",
+    "criterionId": "basic",
+    "public": false,
+    "description": "해의 개수",
+    "input": "SOLVE 8\n",
+    "expected": {
+      "stdout": "COUNT 92\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "maximum-size",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "경계·종료 조건",
+    "input": "SOLVE 10\n",
+    "expected": {
+      "stdout": "COUNT 724\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "near-maximum",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "경계·종료 조건",
+    "input": "SOLVE 9\n",
+    "expected": {
+      "stdout": "COUNT 352\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "dead-first-column",
+    "criterionId": "pruning",
+    "public": false,
+    "description": "가지치기·부분 배치",
+    "input": "CONTINUE 4 1 0\n",
+    "expected": {
+      "stdout": "COUNT 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "one-completion",
+    "criterionId": "pruning",
+    "public": false,
+    "description": "가지치기·부분 배치",
+    "input": "CONTINUE 4 1 1\n",
+    "expected": {
+      "stdout": "COUNT 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "mirror-completion",
+    "criterionId": "pruning",
+    "public": false,
+    "description": "가지치기·부분 배치",
+    "input": "CONTINUE 4 1 2\n",
+    "expected": {
+      "stdout": "COUNT 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "partial-two-rows",
+    "criterionId": "pruning",
+    "public": false,
+    "description": "가지치기·부분 배치",
+    "input": "CONTINUE 4 2 1 3\n",
+    "expected": {
+      "stdout": "COUNT 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "larger-prefix",
+    "criterionId": "pruning",
+    "public": false,
+    "description": "가지치기·부분 배치",
+    "input": "CONTINUE 8 2 0 4\n",
+    "expected": {
+      "stdout": "COUNT 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "complete-placement",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "경계·종료 조건",
+    "input": "CONTINUE 4 4 1 3 0 2\n",
+    "expected": {
+      "stdout": "COUNT 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "single-complete",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "경계·종료 조건",
+    "input": "CONTINUE 1 1 0\n",
+    "expected": {
+      "stdout": "COUNT 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-prefix",
+    "criterionId": "pruning",
+    "public": false,
+    "description": "가지치기·부분 배치",
+    "input": "CONTINUE 5 0\n",
+    "expected": {
+      "stdout": "COUNT 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "first-row-safe",
+    "criterionId": "safety",
+    "public": false,
+    "description": "열·대각선 검사",
+    "input": "SAFE 4 0 0\n",
+    "expected": {
+      "stdout": "SAFE 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "first-row-last",
+    "criterionId": "safety",
+    "public": false,
+    "description": "열·대각선 검사",
+    "input": "SAFE 4 0 3\n",
+    "expected": {
+      "stdout": "SAFE 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "same-column",
+    "criterionId": "safety",
+    "public": false,
+    "description": "열·대각선 검사",
+    "input": "SAFE 4 1 1 1\n",
+    "expected": {
+      "stdout": "SAFE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "left-diagonal",
+    "criterionId": "safety",
+    "public": false,
+    "description": "열·대각선 검사",
+    "input": "SAFE 4 1 0 1\n",
+    "expected": {
+      "stdout": "SAFE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "right-diagonal",
+    "criterionId": "safety",
+    "public": false,
+    "description": "열·대각선 검사",
+    "input": "SAFE 4 1 2 1\n",
+    "expected": {
+      "stdout": "SAFE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "free-column",
+    "criterionId": "safety",
+    "public": false,
+    "description": "열·대각선 검사",
+    "input": "SAFE 4 1 3 1\n",
+    "expected": {
+      "stdout": "SAFE 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "distant-diagonal",
+    "criterionId": "safety",
+    "public": false,
+    "description": "열·대각선 검사",
+    "input": "SAFE 5 2 2 0 3\n",
+    "expected": {
+      "stdout": "SAFE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "prior-column",
+    "criterionId": "safety",
+    "public": false,
+    "description": "열·대각선 검사",
+    "input": "SAFE 5 2 0 0 3\n",
+    "expected": {
+      "stdout": "SAFE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "valid-third-row",
+    "criterionId": "safety",
+    "public": false,
+    "description": "열·대각선 검사",
+    "input": "SAFE 4 2 0 1 3\n",
+    "expected": {
+      "stdout": "SAFE 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "valid-last-row",
+    "criterionId": "safety",
+    "public": false,
+    "description": "열·대각선 검사",
+    "input": "SAFE 4 3 2 1 3 0\n",
+    "expected": {
+      "stdout": "SAFE 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "repeat-solves",
+    "criterionId": "restore",
+    "public": false,
+    "description": "복구·반복 호출",
+    "input": "SOLVE 4\nSOLVE 1\nSOLVE 2\nSOLVE 8\nSOLVE 4\n",
+    "expected": {
+      "stdout": "COUNT 2\nCOUNT 1\nCOUNT 0\nCOUNT 92\nCOUNT 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "repeat-prefix",
+    "criterionId": "restore",
+    "public": false,
+    "description": "복구·반복 호출",
+    "input": "CONTINUE 4 1 1\nCONTINUE 4 1 0\nCONTINUE 4 1 1\nSAFE 4 1 3 1\n",
+    "expected": {
+      "stdout": "COUNT 1\nCOUNT 0\nCOUNT 1\nSAFE 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

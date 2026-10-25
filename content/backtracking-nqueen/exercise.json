@@ -1,0 +1,383 @@
+{
+  "id": "backtracking-nqueen",
+  "version": "1.0.0",
+  "title": "백트래킹 — N-Queen",
+  "category": "backtracking",
+  "kind": "algorithm",
+  "description": "같은 열·대각선 충돌을 검사하며 퀸을 배치하고 가능한 해의 개수를 구합니다.",
+  "learning": {
+    "concept": {
+      "title": "충돌하는 분기를 미리 제외하는 N-Queen",
+      "paragraphs": [
+        "N×N 체스판에 퀸 N개를 서로 공격하지 않도록 놓습니다. 각 행에 한 개씩 두면 같은 행 충돌은 구조적으로 제외되고 같은 열과 두 대각선만 검사하면 됩니다.",
+        "columns[row]는 해당 행의 퀸이 놓인 열이며 행·열 번호는 0부터 시작합니다. 아직 놓지 않은 행은 -1입니다. 이전 행 previous와 열이 같거나 열 차이의 절댓값이 row-previous와 같으면 충돌합니다.",
+        "안전한 후보만 배치하고 다음 행을 탐색합니다. 돌아오면 해당 위치를 -1로 복구해 다른 분기를 시도합니다. row==n이면 완성된 해 하나이므로 1을 반환합니다.",
+        "퀸이 구분되지 않는 서로 다른 배치를 모두 셉니다. 회전·대칭으로 얻은 배치도 다른 해입니다. 같은 열을 제외한 탐색은 팩토리얼 규모이며 충돌 검사·후보 순회를 포함한 보수적 시간 상한은 O(N²·N!), 보조 공간은 O(N)입니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "columns",
+        "description": "행별 퀸의 열 번호이며 미배치 행은 -1입니다."
+      },
+      {
+        "name": "row",
+        "description": "이번에 배치할 행입니다. 앞선 행들은 이미 유효하게 배치되어 있습니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "is_safe",
+        "description": "이전 행의 퀸들과 같은 열·대각선에 있지 않으면 1, 충돌하면 0을 반환합니다. 입력 배열은 보존합니다."
+      },
+      {
+        "function": "solve_n_queens",
+        "description": "주어진 유효한 부분 배치에서 나머지 행에 퀸을 놓는 모든 방법의 수를 반환합니다. row==n이면 1입니다. 새로 선택한 행은 -1로 복구하고 입력 배치를 그대로 유지합니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "solve_n_queens",
+        "argument": "n=4, row=0",
+        "result": null,
+        "size": 4,
+        "queens": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "row": 0,
+        "solutions": 0,
+        "description": "첫 행부터 한 행에 퀸 하나씩 배치합니다. 아직 배치하지 않은 행은 -1입니다.",
+        "trace": [
+          "첫 행부터 한 행에 퀸 하나씩 배치합니다. 아직 배치하지 않은 행은 -1입니다."
+        ]
+      },
+      {
+        "operation": "is_safe",
+        "argument": "row=0, column=0",
+        "result": 1,
+        "size": 4,
+        "queens": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "row": 0,
+        "solutions": 0,
+        "description": "0행 0열은 이전 퀸이 없으므로 배치할 수 있습니다.",
+        "trace": [
+          "0행 0열은 이전 퀸이 없으므로 배치할 수 있습니다."
+        ],
+        "candidateColumn": 0,
+        "safe": true
+      },
+      {
+        "operation": "is_safe",
+        "argument": "row=1, column=0",
+        "result": 0,
+        "size": 4,
+        "queens": [
+          0,
+          -1,
+          -1,
+          -1
+        ],
+        "row": 1,
+        "solutions": 0,
+        "description": "1행 0열은 같은 열의 퀸과 충돌하므로 재귀 호출하지 않습니다.",
+        "trace": [
+          "1행 0열은 같은 열의 퀸과 충돌하므로 재귀 호출하지 않습니다."
+        ],
+        "candidateColumn": 0,
+        "safe": false
+      },
+      {
+        "operation": "is_safe",
+        "argument": "row=1, column=1",
+        "result": 0,
+        "size": 4,
+        "queens": [
+          0,
+          -1,
+          -1,
+          -1
+        ],
+        "row": 1,
+        "solutions": 0,
+        "description": "1행 1열은 대각선에서 충돌합니다.",
+        "trace": [
+          "1행 1열은 대각선에서 충돌합니다."
+        ],
+        "candidateColumn": 1,
+        "safe": false
+      },
+      {
+        "operation": "is_safe",
+        "argument": "row=1, column=2",
+        "result": 1,
+        "size": 4,
+        "queens": [
+          0,
+          -1,
+          -1,
+          -1
+        ],
+        "row": 1,
+        "solutions": 0,
+        "description": "1행 2열은 안전합니다. 배치한 뒤 다음 행으로 내려갑니다.",
+        "trace": [
+          "1행 2열은 안전합니다. 배치한 뒤 다음 행으로 내려갑니다."
+        ],
+        "candidateColumn": 2,
+        "safe": true
+      },
+      {
+        "operation": "is_safe",
+        "argument": "row=2, column=1",
+        "result": 0,
+        "size": 4,
+        "queens": [
+          0,
+          2,
+          -1,
+          -1
+        ],
+        "row": 2,
+        "solutions": 0,
+        "description": "2행 1열은 1행의 퀸과 대각선에서 충돌합니다.",
+        "trace": [
+          "2행 1열은 1행의 퀸과 대각선에서 충돌합니다."
+        ],
+        "candidateColumn": 1,
+        "safe": false
+      },
+      {
+        "operation": "solve_n_queens",
+        "argument": "n=4, row=1",
+        "result": null,
+        "size": 4,
+        "queens": [
+          0,
+          -1,
+          -1,
+          -1
+        ],
+        "row": 1,
+        "solutions": 0,
+        "description": "이 분기에서 다음 행에 놓을 곳이 없어 복귀합니다. 1행의 선택을 -1로 지운 뒤 다른 열을 시도합니다.",
+        "trace": [
+          "이 분기에서 다음 행에 놓을 곳이 없어 복귀합니다. 1행의 선택을 -1로 지운 뒤 다른 열을 시도합니다."
+        ]
+      },
+      {
+        "operation": "solve_n_queens",
+        "argument": "n=4, row=0",
+        "result": null,
+        "size": 4,
+        "queens": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "row": 0,
+        "solutions": 0,
+        "description": "0열로 시작한 모든 분기가 막혔습니다. 첫 행도 복구하고 다음 열로 이동합니다.",
+        "trace": [
+          "0열로 시작한 모든 분기가 막혔습니다. 첫 행도 복구하고 다음 열로 이동합니다."
+        ]
+      },
+      {
+        "operation": "is_safe",
+        "argument": "row=1, column=3",
+        "result": 1,
+        "size": 4,
+        "queens": [
+          1,
+          -1,
+          -1,
+          -1
+        ],
+        "row": 1,
+        "solutions": 0,
+        "description": "첫 행 1열을 선택했습니다. 두 번째 행 3열은 안전합니다.",
+        "trace": [
+          "첫 행 1열을 선택했습니다. 두 번째 행 3열은 안전합니다."
+        ],
+        "candidateColumn": 3,
+        "safe": true
+      },
+      {
+        "operation": "is_safe",
+        "argument": "row=2, column=0",
+        "result": 1,
+        "size": 4,
+        "queens": [
+          1,
+          3,
+          -1,
+          -1
+        ],
+        "row": 2,
+        "solutions": 0,
+        "description": "세 번째 행은 0열을 선택합니다.",
+        "trace": [
+          "세 번째 행은 0열을 선택합니다."
+        ],
+        "candidateColumn": 0,
+        "safe": true
+      },
+      {
+        "operation": "is_safe",
+        "argument": "row=3, column=2",
+        "result": 1,
+        "size": 4,
+        "queens": [
+          1,
+          3,
+          0,
+          -1
+        ],
+        "row": 3,
+        "solutions": 0,
+        "description": "네 번째 행의 2열이 안전합니다.",
+        "trace": [
+          "네 번째 행의 2열이 안전합니다."
+        ],
+        "candidateColumn": 2,
+        "safe": true
+      },
+      {
+        "operation": "solve_n_queens",
+        "argument": "n=4, row=4",
+        "result": 1,
+        "size": 4,
+        "queens": [
+          1,
+          3,
+          0,
+          2
+        ],
+        "row": 4,
+        "solutions": 1,
+        "description": "row == n이면 모든 행의 배치가 끝났으므로 1을 반환해 해의 개수에 더합니다.",
+        "trace": [
+          "row == n이면 모든 행의 배치가 끝났으므로 1을 반환해 해의 개수에 더합니다."
+        ]
+      },
+      {
+        "operation": "solve_n_queens",
+        "argument": "n=4, row=0",
+        "result": 2,
+        "size": 4,
+        "queens": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "row": 0,
+        "solutions": 2,
+        "description": "나머지 분기까지 탐색한 결과 해는 2개입니다. 모든 임시 배치를 -1로 복구했습니다.",
+        "trace": [
+          "해 1: columns = {1, 3, 0, 2}",
+          "해 2: columns = {2, 0, 3, 1}",
+          "반환값 = 2 · columns = {-1, -1, -1, -1}"
+        ]
+      }
+    ],
+    "notes": [
+      {
+        "title": "해가 없는 크기",
+        "description": "N=1은 해가 1개, N=2·3은 0개, N=4는 2개입니다. 해가 없어도 정상적인 탐색 결과입니다."
+      },
+      {
+        "title": "부분 배치와 복구",
+        "description": "이미 놓인 이전 행의 퀸은 바꾸지 않습니다. 함수가 끝나면 새로 탐색한 행도 모두 -1이어야 합니다. 재귀 사용 여부 자체는 정적으로 검사하지 않습니다."
+      }
+    ]
+  },
+  "contract": {
+    "capacity": 10,
+    "scope": "제공된 MAX_N을 사용해 is_safe와 solve_n_queens 함수의 정의와 본문 전체를 구현합니다. 입력·배열 초기화·결과 출력은 호출 코드가 담당합니다.",
+    "functions": [
+      {
+        "name": "is_safe",
+        "signature": "int is_safe(const int columns[], int row, int column)",
+        "behavior": "이전 행의 퀸들과 같은 열·대각선에 있지 않으면 1, 충돌하면 0을 반환합니다. 입력 배열은 보존합니다."
+      },
+      {
+        "name": "solve_n_queens",
+        "signature": "int solve_n_queens(int n, int row, int columns[])",
+        "behavior": "주어진 유효한 부분 배치에서 나머지 행에 퀸을 놓는 모든 방법의 수를 반환합니다. row==n이면 1입니다. 새로 선택한 행은 -1로 복구하고 입력 배치를 그대로 유지합니다."
+      }
+    ],
+    "requirements": [
+      "1≤n≤10입니다. 행과 열은 0~n-1이며 대칭·회전 배치를 별도로 셉니다. 함수는 배치를 출력하지 않고 개수만 반환합니다.",
+      "solve_n_queens는 0≤row≤n으로 호출됩니다. columns[0..row-1]은 서로 공격하지 않는 유효한 배치이고 나머지 칸은 -1입니다. 일반 전체 탐색은 row=0에서 시작합니다.",
+      "is_safe는 0≤row<n, 0≤column<n으로 호출됩니다. 이전 행만 검사하고 입력 배열을 변경하지 않습니다.",
+      "columns는 MAX_N칸이며 n 이상 인덱스도 -1입니다. 모든 함수는 호출 전 배열을 그대로 보존해야 합니다. solver는 재귀 호출 뒤 선택을 -1로 복구합니다."
+    ]
+  },
+  "prerequisites": [
+    "exhaustive-permutations"
+  ],
+  "criteria": [
+    {
+      "id": "safety",
+      "order": 1,
+      "title": "열·대각선 검사",
+      "description": "이전 행과의 같은 열 및 양쪽 대각선 충돌을 구분합니다."
+    },
+    {
+      "id": "basic",
+      "order": 2,
+      "title": "해의 개수",
+      "description": "각 행에 퀸을 배치해 모든 해를 빠짐없이 셉니다."
+    },
+    {
+      "id": "pruning",
+      "order": 3,
+      "title": "가지치기·부분 배치",
+      "description": "충돌하는 후보를 제외하고 주어진 유효한 부분 배치에서 탐색합니다."
+    },
+    {
+      "id": "boundary",
+      "order": 4,
+      "title": "경계·종료 조건",
+      "description": "완성된 배치와 최대 10×10 체스판을 처리합니다."
+    },
+    {
+      "id": "restore",
+      "order": 5,
+      "title": "복구·반복 호출",
+      "description": "호출 전 배치를 보존하고 새로 선택한 위치를 -1로 복구합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "is_safe",
+          "description": "이전 행의 퀸들과 같은 열·대각선에 있지 않으면 1, 충돌하면 0을 반환합니다. 입력 배열은 보존합니다."
+        },
+        {
+          "function": "solve_n_queens",
+          "description": "주어진 유효한 부분 배치에서 나머지 행에 퀸을 놓는 모든 방법의 수를 반환합니다. row==n이면 1입니다. 새로 선택한 행은 -1로 복구하고 입력 배치를 그대로 유지합니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "SOLVE n은 빈 판에서 COUNT 해의개수를 출력합니다. CONTINUE n row 다음에는 앞선 row개 행의 열 번호를 입력합니다. SAFE n row column 다음에도 앞선 row개 행의 열 번호를 입력하며 SAFE 0/1을 출력합니다. 호출 전후 배열과 경계를 함께 검사합니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

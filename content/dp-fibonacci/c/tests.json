@@ -1,0 +1,278 @@
+[
+  {
+    "id": "fibonacci-example",
+    "criterionId": "memo",
+    "public": true,
+    "description": "같은 F(5)를 두 방식으로 계산",
+    "input": "MEMO 5\nCACHE 5\nTABLE 5\nVALUES 5\n",
+    "expected": {
+      "stdout": "MEMO 5\nCACHE 0 1 1 2 3 5\nTABLE 5\nVALUES 0 1 1 2 3 5\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "zero-example",
+    "criterionId": "base",
+    "public": true,
+    "description": "0은 미계산이 아닌 유효한 저장값",
+    "input": "MEMO 0\nCACHE 1\nTABLE 0\nVALUES 1\n",
+    "expected": {
+      "stdout": "MEMO 0\nCACHE 0 1\nTABLE 0\nVALUES 0 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "one-base",
+    "criterionId": "base",
+    "public": false,
+    "description": "기저값",
+    "input": "MEMO 1\nCACHE 1\nTABLE 1\nVALUES 2\n",
+    "expected": {
+      "stdout": "MEMO 1\nCACHE 0 1\nTABLE 1\nVALUES 0 1 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memo-2",
+    "criterionId": "memo",
+    "public": false,
+    "description": "메모이제이션 저장",
+    "input": "MEMO 2\nCACHE 2\n",
+    "expected": {
+      "stdout": "MEMO 1\nCACHE 0 1 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "table-2",
+    "criterionId": "table",
+    "public": false,
+    "description": "타뷸레이션 순서",
+    "input": "TABLE 2\nVALUES 2\n",
+    "expected": {
+      "stdout": "TABLE 1\nVALUES 0 1 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memo-3",
+    "criterionId": "memo",
+    "public": false,
+    "description": "메모이제이션 저장",
+    "input": "MEMO 3\nCACHE 3\n",
+    "expected": {
+      "stdout": "MEMO 2\nCACHE 0 1 1 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "table-3",
+    "criterionId": "table",
+    "public": false,
+    "description": "타뷸레이션 순서",
+    "input": "TABLE 3\nVALUES 3\n",
+    "expected": {
+      "stdout": "TABLE 2\nVALUES 0 1 1 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memo-10",
+    "criterionId": "memo",
+    "public": false,
+    "description": "메모이제이션 저장",
+    "input": "MEMO 10\nCACHE 10\n",
+    "expected": {
+      "stdout": "MEMO 55\nCACHE 0 1 1 2 3 5 8 13 21 34 55\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "table-10",
+    "criterionId": "table",
+    "public": false,
+    "description": "타뷸레이션 순서",
+    "input": "TABLE 10\nVALUES 10\n",
+    "expected": {
+      "stdout": "TABLE 55\nVALUES 0 1 1 2 3 5 8 13 21 34 55\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memo-20",
+    "criterionId": "memo",
+    "public": false,
+    "description": "메모이제이션 저장",
+    "input": "MEMO 20\nCACHE 20\n",
+    "expected": {
+      "stdout": "MEMO 6765\nCACHE 0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "table-20",
+    "criterionId": "table",
+    "public": false,
+    "description": "타뷸레이션 순서",
+    "input": "TABLE 20\nVALUES 20\n",
+    "expected": {
+      "stdout": "TABLE 6765\nVALUES 0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memo-30",
+    "criterionId": "memo",
+    "public": false,
+    "description": "메모이제이션 저장",
+    "input": "MEMO 30\nCACHE 30\n",
+    "expected": {
+      "stdout": "MEMO 832040\nCACHE 0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765 10946 17711 28657 46368 75025 121393 196418 317811 514229 832040\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "table-30",
+    "criterionId": "table",
+    "public": false,
+    "description": "타뷸레이션 순서",
+    "input": "TABLE 30\nVALUES 30\n",
+    "expected": {
+      "stdout": "TABLE 832040\nVALUES 0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765 10946 17711 28657 46368 75025 121393 196418 317811 514229 832040\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "cached-result",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "캐시 재사용·보존",
+    "input": "SEED 8\nCACHE 8\nMEMO 8\nCACHE 8\n",
+    "expected": {
+      "stdout": "CACHE 0 1 -1 -1 -1 -1 -1 -1 21\nMEMO 21\nCACHE 0 1 -1 -1 -1 -1 -1 -1 21\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "seeded-dependencies",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "캐시 재사용·보존",
+    "input": "SEED 7\nSEED 6\nMEMO 8\nCACHE 8\n",
+    "expected": {
+      "stdout": "MEMO 21\nCACHE 0 1 -1 -1 -1 -1 8 13 21\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "preserve-larger-cache",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "캐시 재사용·보존",
+    "input": "SEED 40\nMEMO 6\nCACHE 40\n",
+    "expected": {
+      "stdout": "MEMO 8\nCACHE 0 1 1 2 3 5 8 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 102334155\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "repeated-cache-hit",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "캐시 재사용·보존",
+    "input": "MEMO 12\nCACHE 12\nMEMO 12\nCACHE 12\n",
+    "expected": {
+      "stdout": "MEMO 144\nCACHE 0 1 1 2 3 5 8 13 21 34 55 89 144\nMEMO 144\nCACHE 0 1 1 2 3 5 8 13 21 34 55 89 144\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "maximum-input",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "최대 입력",
+    "input": "MEMO 46\nCACHE 46\nTABLE 46\nVALUES 46\n",
+    "expected": {
+      "stdout": "MEMO 1836311903\nCACHE 0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765 10946 17711 28657 46368 75025 121393 196418 317811 514229 832040 1346269 2178309 3524578 5702887 9227465 14930352 24157817 39088169 63245986 102334155 165580141 267914296 433494437 701408733 1134903170 1836311903\nTABLE 1836311903\nVALUES 0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765 10946 17711 28657 46368 75025 121393 196418 317811 514229 832040 1346269 2178309 3524578 5702887 9227465 14930352 24157817 39088169 63245986 102334155 165580141 267914296 433494437 701408733 1134903170 1836311903\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "near-maximum",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "최대 입력",
+    "input": "MEMO 45\nTABLE 45\nCACHE 45\nVALUES 45\n",
+    "expected": {
+      "stdout": "MEMO 1134903170\nTABLE 1134903170\nCACHE 0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765 10946 17711 28657 46368 75025 121393 196418 317811 514229 832040 1346269 2178309 3524578 5702887 9227465 14930352 24157817 39088169 63245986 102334155 165580141 267914296 433494437 701408733 1134903170\nVALUES 0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765 10946 17711 28657 46368 75025 121393 196418 317811 514229 832040 1346269 2178309 3524578 5702887 9227465 14930352 24157817 39088169 63245986 102334155 165580141 267914296 433494437 701408733 1134903170\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "seeded-maximum",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "최대 입력",
+    "input": "SEED 45\nSEED 44\nMEMO 46\nCACHE 46\n",
+    "expected": {
+      "stdout": "MEMO 1836311903\nCACHE 0 1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 701408733 1134903170 1836311903\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "large-then-small",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "초기화·반복 호출",
+    "input": "TABLE 12\nVALUES 12\nTABLE 3\nVALUES 12\nMEMO 10\nMEMO 2\nCACHE 12\n",
+    "expected": {
+      "stdout": "TABLE 144\nVALUES 0 1 1 2 3 5 8 13 21 34 55 89 144\nTABLE 2\nVALUES 0 1 1 2 3 5 8 13 21 34 55 89 144\nMEMO 55\nMEMO 1\nCACHE 0 1 1 2 3 5 8 13 21 34 55 -1 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "separate-arrays",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "초기화·반복 호출",
+    "input": "MEMO 8\nVALUES 8\nTABLE 3\nCACHE 8\nVALUES 8\n",
+    "expected": {
+      "stdout": "MEMO 21\nVALUES -1 -1 -1 -1 -1 -1 -1 -1 -1\nTABLE 2\nCACHE 0 1 1 2 3 5 8 13 21\nVALUES 0 1 1 2 -1 -1 -1 -1 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reset-reuse",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "초기화·반복 호출",
+    "input": "MEMO 20\nTABLE 10\nRESET\nCACHE 10\nVALUES 10\nMEMO 5\nTABLE 5\n",
+    "expected": {
+      "stdout": "MEMO 6765\nTABLE 55\nRESET\nCACHE 0 1 -1 -1 -1 -1 -1 -1 -1 -1 -1\nVALUES -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1\nMEMO 5\nTABLE 5\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

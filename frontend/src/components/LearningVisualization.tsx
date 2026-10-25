@@ -2,6 +2,18 @@ import type { ReactNode } from 'react'
 import type { ExerciseDetails, TreeStep, SearchStep, SetStep, HashStep } from '../api/exercises'
 import ArraySequenceDiagram from './ArraySequenceDiagram'
 import LinkedSequenceDiagram from './LinkedSequenceDiagram'
+import SortDiagram from './SortDiagram'
+import GraphDiagram from './GraphDiagram'
+import StringDiagram from './StringDiagram'
+import TrieDiagram from './TrieDiagram'
+import ExhaustiveDiagram from './ExhaustiveDiagram'
+import NQueenDiagram from './NQueenDiagram'
+import ActivityDiagram from './ActivityDiagram'
+import FibonacciDiagram from './FibonacciDiagram'
+import KnapsackDiagram from './KnapsackDiagram'
+import LcsDiagram from './LcsDiagram'
+import TwoPointerDiagram from './TwoPointerDiagram'
+import SlidingWindowDiagram from './SlidingWindowDiagram'
 
 // 과제별 학습 상태 시각화
 function SearchDiagram({ step }: { step: SearchStep }) {
@@ -205,6 +217,158 @@ export default function LearningVisualization({ exercise, stepIndex }: {
 
     // 과제 분류에 맞는 그림·현재 값·실행 과정 선택
     switch (exercise.category) {
+        case 'dp': {
+            const step = exercise.learning.steps[stepIndex]
+            switch (step.problem) {
+                case 'lcs':
+                    diagram = <LcsDiagram step={step} />
+                    details = (
+                        <>
+                            <span>a 길이 <strong>{step.a.length}</strong></span>
+                            <span>b 길이 <strong>{step.b.length}</strong></span>
+                        </>
+                    )
+                    break
+                case 'knapsack':
+                    diagram = <KnapsackDiagram step={step} />
+                    details = (
+                        <>
+                            <span>물건 수 <strong>{step.items.length}</strong></span>
+                            <span>배낭 용량 <strong>{step.capacity}</strong></span>
+                        </>
+                    )
+                    break
+                default:
+                    diagram = <FibonacciDiagram step={step} />
+                    details = (
+                        <>
+                            <span>목표 n <strong>{step.target}</strong></span>
+                            <span>현재 항 <strong>{step.activeIndex ?? '—'}</strong></span>
+                        </>
+                    )
+            }
+            trace = step.trace
+            traceLabel = '동적 계획법 계산 과정'
+            break
+        }
+        case 'greedy': {
+            const step = exercise.learning.steps[stepIndex]
+            diagram = <ActivityDiagram step={step} />
+            details = (
+                <>
+                    <span>검사 <strong>{step.processed} / {step.activities.length}</strong></span>
+                    <span>선택 <strong>{step.selected.length}</strong></span>
+                    <span>마지막 종료 <strong>{step.lastEnd ?? '—'}</strong></span>
+                </>
+            )
+            trace = step.trace
+            traceLabel = '그리디 선택 과정'
+            break
+        }
+        case 'backtracking': {
+            const step = exercise.learning.steps[stepIndex]
+            diagram = <NQueenDiagram step={step} />
+            details = (
+                <>
+                    <span>다음 행 <strong>{step.row === step.size ? '완성' : step.row}</strong></span>
+                    <span>찾은 해 <strong>{step.solutions}</strong></span>
+                </>
+            )
+            trace = step.trace
+            traceLabel = '백트래킹 과정'
+            break
+        }
+        case 'exhaustive': {
+            const step = exercise.learning.steps[stepIndex]
+            diagram = <ExhaustiveDiagram step={step} />
+            details = (
+                <>
+                    <span>탐색 깊이 <strong>{step.depth}</strong></span>
+                    <span>선택 개수 <strong>{step.selected.length}</strong></span>
+                </>
+            )
+            trace = step.trace
+            traceLabel = '완전 탐색 과정'
+            break
+        }
+        case 'string': {
+            const step = exercise.learning.steps[stepIndex]
+            diagram = <StringDiagram step={step} />
+            details = <span>본문 길이 <strong>{step.text.length}</strong></span>
+            trace = step.trace
+            traceLabel = '문자열 처리 과정'
+            break
+        }
+        case 'trie': {
+            const step = exercise.learning.steps[stepIndex]
+            diagram = <TrieDiagram step={step} />
+            details = (
+                <>
+                    <span>노드 <strong>{step.nodes.length}</strong></span>
+                    <span>단어 <strong>{step.nodes.filter(node => node.terminal).length}</strong></span>
+                </>
+            )
+            trace = step.trace
+            traceLabel = '트라이 연산 과정'
+            break
+        }
+        case 'graph': {
+            const step = exercise.learning.steps[stepIndex]
+            const directed = Boolean(exercise.contract.directed)
+            const edgeCount = step.adjacency.reduce((count, neighbors) => count + neighbors.length, 0) / (directed ? 1 : 2)
+            const representation = exercise.contract.representation ?? (exercise.contract.storage === 'linked' ? 'list' : 'matrix')
+            diagram = <GraphDiagram step={step} representation={representation} directed={directed} />
+            details = (
+                <>
+                    <span>정점 <strong>{step.adjacency.length}</strong></span>
+                    <span>간선 <strong>{edgeCount}</strong></span>
+                    {step.totalWeight != null && <span>선택 비용 <strong>{step.totalWeight}</strong></span>}
+                    {step.source != null && <span>시작점 <strong>{step.source}</strong></span>}
+                    {step.intermediate != null && <span>경유 정점 <strong>{step.intermediate}</strong></span>}
+                </>
+            )
+            trace = step.trace
+            traceLabel = '그래프 연산 과정'
+            break
+        }
+        case 'sort': {
+            const step = exercise.learning.steps[stepIndex]
+            diagram = <SortDiagram step={step} />
+            details = <span>원소 수 <strong>{step.values.length}</strong></span>
+            trace = step.trace
+            traceLabel = '정렬 과정'
+            break
+        }
+        case 'sliding-window': {
+            const step = exercise.learning.steps[stepIndex]
+            diagram = <SlidingWindowDiagram step={step} />
+            details = (
+                <>
+                    <span>구간 길이 K <strong>{step.k}</strong></span>
+                    <span>현재 범위 <strong>{step.start}~{step.end}</strong></span>
+                    <span>현재 합 <strong>{step.sum}</strong></span>
+                    <span>최대 합 <strong>{step.best ?? '—'}</strong></span>
+                </>
+            )
+            trace = step.trace
+            traceLabel = '슬라이딩 윈도 계산 과정'
+            break
+        }
+        case 'two-pointer': {
+            const step = exercise.learning.steps[stepIndex]
+            diagram = <TwoPointerDiagram step={step} />
+            details = (
+                <>
+                    <span>목표 합 <strong>{step.target}</strong></span>
+                    <span>현재 합 <strong>{step.sum ?? '—'}</strong></span>
+                    <span>left <strong>{step.left}</strong></span>
+                    <span>right <strong>{step.right}</strong></span>
+                </>
+            )
+            trace = step.trace
+            traceLabel = '투 포인터 탐색 과정'
+            break
+        }
         case 'search': {
             const step = exercise.learning.steps[stepIndex]
             diagram = <SearchDiagram step={step} />

@@ -861,6 +861,809 @@ class ExerciseContentDockerTests {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"selection", "bubble", "insertion", "merge", "quick", "heap"})
+    @DisplayName("정렬의 반복 범위·값 손실·재귀 누락·힙 복원 오답을 구분합니다.")
+    void execute_success_detectsSortMistakes(String algorithm) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/sort-" + algorithm + "/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (algorithm) {
+            case "selection" -> reference.replace("i < n - 1", "i < n - 2");
+            case "bubble" -> reference.replace("i < n - 1", "i < 1");
+            case "insertion" -> reference.replace("list[j + 1] = key;", "list[j + 1] = key + 1;");
+            case "merge" -> reference.replace("sorted[k++] = list[j++];", "j++;");
+            case "quick" -> reference.replace("quick_sort(list, left, q - 1);", "(void)left;");
+            case "heap" -> reference.replace("list[child] < list[child + 1]", "list[child] > list[child + 1]");
+            default -> throw new IllegalArgumentException(algorithm);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals("sort-example"))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput("sort-example", test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && expected.path("exitCode").asInt() == actual.exitCode()
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), algorithm);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"matrix", "list", "dfs", "bfs"})
+    @DisplayName("그래프의 역방향 간선·노드 해제·방문 순서·FIFO 오답을 구분합니다.")
+    void execute_success_detectsGraphMistakes(String implementation) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/graph-" + implementation + "/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (implementation) {
+            case "matrix" -> reference.replace("g->adj_mat[v][u] = 1;", "g->adj_mat[v][u] = 0;");
+            case "list" -> reference.replace("free(p);", "(void)p;");
+            case "dfs" -> reference.replace("for (int w = 0; w < g->n; w++)", "for (int w = g->n - 1; w >= 0; w--)");
+            case "bfs" -> reference.replace("return q->data[q->front];", "return q->data[q->rear];");
+            default -> throw new IllegalArgumentException(implementation);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = switch (implementation) {
+            case "list" -> "free-nodes";
+            case "bfs" -> "branch-depth";
+            default -> "graph-example";
+        };
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && expected.path("exitCode").asInt() == actual.exitCode()
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), implementation);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"kruskal-cycle", "kruskal-cost", "prim-path", "prim-zero", "prim-disconnected"})
+    @DisplayName("최소 신장 트리의 사이클·최소 비용·0 가중치·연결 실패 오답을 구분합니다.")
+    void execute_success_detectsMstMistakes(String scenario) throws Exception {
+        // given
+        String algorithm = scenario.startsWith("kruskal") ? "kruskal" : "prim";
+        Path contentDirectory = Path.of("../content/graph-" + algorithm + "/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "kruskal-cycle" -> reference.replace("parent[start_root] = end_root;", "(void)end_root;");
+            case "kruskal-cost" -> reference.replace("(a->weight > b->weight) - (a->weight < b->weight)", "(a->weight < b->weight) - (a->weight > b->weight)");
+            case "prim-path" -> reference.replace("distance[next] = g->weight[vertex][next];", "distance[next] = distance[vertex] + g->weight[vertex][next];");
+            case "prim-zero" -> reference.replace("!selected[next] && g->weight", "!selected[next] && g->weight[vertex][next] != 0 && g->weight");
+            case "prim-disconnected" -> reference.replace("distance[vertex] == INF) return -1;", "distance[vertex] == INF) return count;");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = switch (scenario) {
+            case "kruskal-cycle" -> "cycle-choice";
+            case "prim-path" -> "edge-key-not-path";
+            case "prim-zero" -> "zero-weight";
+            case "prim-disconnected" -> "isolated-vertex";
+            default -> "weighted-example";
+        };
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && expected.path("exitCode").asInt() == actual.exitCode()
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"kruskal", "prim"})
+    @DisplayName("동률에서 다른 간선을 선택한 최소 신장 트리도 허용합니다.")
+    void execute_success_withAlternativeMst(String algorithm) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/graph-" + algorithm + "/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String alternative;
+        if (algorithm.equals("kruskal")) {
+            alternative = reference.replace("return (a->weight > b->weight) - (a->weight < b->weight);",
+                    "if (a->weight == b->weight) return b->start - a->start; return (a->weight > b->weight) - (a->weight < b->weight);");
+        } else {
+            alternative = reference.replace("distance[i] < distance[vertex]", "distance[i] <= distance[vertex]")
+                    .replace("g->weight[vertex][next] < distance[next]", "g->weight[vertex][next] != INF && g->weight[vertex][next] <= distance[next]");
+        }
+        Assertions.assertNotEquals(reference, alternative);
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals("equal-weights"))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, alternative, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput("equal-weights", test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+        Assertions.assertEquals(test.path("expected").path("stdout").asString(), actual.stdout());
+        Assertions.assertEquals(0, actual.exitCode());
+        Assertions.assertTrue(actual.stderr().isBlank());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"dijkstra-edge", "dijkstra-zero", "bellman-passes", "bellman-infinity", "bellman-cycle", "bellman-unreachable-cycle"})
+    @DisplayName("최단 경로의 누적 거리·0 가중치·완화 횟수·음수 사이클 판정 오답을 구분합니다.")
+    void execute_success_detectsShortestPathMistakes(String scenario) throws Exception {
+        // given
+        String algorithm = scenario.startsWith("dijkstra") ? "dijkstra" : "bellman-ford";
+        Path contentDirectory = Path.of("../content/graph-" + algorithm + "/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "dijkstra-edge" -> reference.replace("distance[next] = distance[vertex] + g->weight[vertex][next];", "distance[next] = g->weight[vertex][next];");
+            case "dijkstra-zero" -> reference.replace("g->weight[vertex][next] != INF", "g->weight[vertex][next] != INF && g->weight[vertex][next] != 0");
+            case "bellman-passes" -> reference.replace("pass < g->n - 1", "pass < 1");
+            case "bellman-infinity", "bellman-unreachable-cycle" -> reference.replace("distance[edge.from] != INF", "1");
+            case "bellman-cycle" -> reference.replace("return 0;", "return 1;");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = switch (scenario) {
+            case "dijkstra-edge" -> "edge-not-total";
+            case "dijkstra-zero" -> "zero-weight";
+            case "bellman-passes" -> "reverse-chain";
+            case "bellman-infinity" -> "separate-components";
+            case "bellman-cycle" -> "reachable-negative-cycle";
+            case "bellman-unreachable-cycle" -> "unreachable-negative-cycle";
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && expected.path("exitCode").asInt() == actual.exitCode()
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"loop-order", "infinity-left", "infinity-right", "isolated-negative-cycle", "initialization"})
+    @DisplayName("플로이드–워셜의 반복 순서·INF 처리·음수 사이클·초기화 오답을 구분합니다.")
+    void execute_success_detectsFloydWarshallMistakes(String scenario) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/graph-floyd-warshall/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "loop-order" -> reference.replace("for (int k = 0; k < g->n; k++) {\n        for (int i = 0; i < g->n; i++) {",
+                    "for (int i = 0; i < g->n; i++) {\n        for (int k = 0; k < g->n; k++) {");
+            case "infinity-left" -> reference.replace("distance[i][k] != INF", "1");
+            case "infinity-right" -> reference.replace("distance[k][j] != INF", "1");
+            case "isolated-negative-cycle" -> reference.replace("return 0;", "return 1;");
+            case "initialization" -> reference.replace("distance[i][j] = g->weight[i][j];", "distance[i][j] = 0;");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = scenario.equals("initialization") ? "all-pairs-example" : scenario;
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && expected.path("exitCode").asInt() == actual.exitCode()
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"direction", "decrement", "early-enqueue", "partial-cycle", "missing-vertex"})
+    @DisplayName("위상 정렬의 진입 차수 방향·감소·조기 삽입·부분 사이클·정점 누락 오답을 구분합니다.")
+    void execute_success_detectsTopologicalMistakes(String scenario) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/graph-topological/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "direction" -> reference.replace("in_degree[to]++;", "in_degree[from]++;");
+            case "decrement" -> reference.replace("in_degree[next]--;", "(void)next;");
+            case "early-enqueue" -> reference.replace("if (in_degree[next] == 0)", "if (in_degree[next] >= 0)");
+            case "partial-cycle" -> reference.replace("if (count != g->n) return -1;", "if (count == 0) return -1;");
+            case "missing-vertex" -> reference.replace("order[count++] = vertex;", "order[count++] = 0;");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = switch (scenario) {
+            case "direction" -> "reverse-chain";
+            case "partial-cycle" -> "source-before-cycle";
+            default -> "diamond";
+        };
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && expected.path("exitCode").asInt() == actual.exitCode()
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
+    @Test
+    @DisplayName("기준 코드와 다른 유효한 위상 정렬 순서도 허용합니다.")
+    void execute_success_withAlternativeTopologicalOrder() throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/graph-topological/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String alternative = reference.replace("for (int v = 0; v < g->n; v++)", "for (int v = g->n - 1; v >= 0; v--)")
+                .replace("for (int next = 0; next < g->n; next++)", "for (int next = g->n - 1; next >= 0; next--)");
+        Assertions.assertNotEquals(reference, alternative);
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        List<TestInput> inputs = new ArrayList<>();
+        tests.forEach(test -> inputs.add(new TestInput(test.path("id").asString(), test.path("input").asString())));
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, alternative, Files.readString(contentDirectory.resolve("harness.c")), inputs);
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        Assertions.assertEquals(tests.size(), result.tests().size());
+        for (int index = 0; index < tests.size(); index++) {
+            TestExecutionResult actual = result.tests().get(index);
+            Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+            Assertions.assertEquals(tests.get(index).path("expected").path("stdout").asString(), actual.stdout(), actual.testId());
+            Assertions.assertEquals(0, actual.exitCode(), actual.testId());
+            Assertions.assertTrue(actual.stderr().isBlank(), actual.testId());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"search-end", "search-empty", "split-delimiter", "join-terminator", "reverse-terminator", "sort-order", "trie-prefix", "trie-shared", "trie-free"})
+    @DisplayName("문자열 경계·널 종료·정렬과 트라이 접두사·공유 경로·노드 해제 오답을 구분합니다.")
+    void execute_success_detectsStringAndTrieMistakes(String scenario) throws Exception {
+        // given
+        String exerciseId;
+        if (scenario.startsWith("search")) {
+            exerciseId = "string-brute-force";
+        } else if (scenario.startsWith("trie")) {
+            exerciseId = "trie-basic";
+        } else {
+            exerciseId = "string-transform";
+        }
+        Path contentDirectory = Path.of("../content/" + exerciseId + "/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "search-end" -> reference.replace("start <= n - m", "start < n - m");
+            case "search-empty" -> reference.replace("int m = (int)strlen(pattern);", "int m = (int)strlen(pattern); if (m == 0) return -1;");
+            case "split-delimiter" -> reference.replace("while (text[index] == delimiter)", "if (text[index] == delimiter)");
+            case "join-terminator" -> reference.replace("result[length] = '\\0';", "(void)length;");
+            case "reverse-terminator" -> reference.replace("(int)strlen(text) - 1", "(int)strlen(text)");
+            case "sort-order" -> reference.replace("strcmp(words[j], words[j + 1]) > 0", "strcmp(words[j], words[j + 1]) < 0");
+            case "trie-prefix" -> reference.replace("return node->is_end;", "return 1;");
+            case "trie-shared" -> reference.replace("!child->is_end && !has_children(child)", "!child->is_end");
+            case "trie-free" -> reference.replace("free(child);", "(void)child;");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = switch (scenario) {
+            case "search-end" -> "at-end";
+            case "search-empty" -> "empty-pattern";
+            case "split-delimiter" -> "split-example";
+            case "join-terminator" -> "join-example";
+            case "reverse-terminator" -> "reverse-odd";
+            case "sort-order" -> "sort-example";
+            case "trie-prefix" -> "prefix-example";
+            case "trie-shared" -> "delete-prefix";
+            case "trie-free" -> "free-leaf";
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && expected.path("exitCode").asInt() == actual.exitCode()
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"permutation-duplicate", "permutation-restore", "combination-start", "combination-empty", "subset-branch", "subset-restore"})
+    @DisplayName("완전 탐색의 원소 재사용·상태 복구·조합 중복·빈 선택·분기 누락 오답을 구분합니다.")
+    void execute_success_detectsEnumerationMistakes(String scenario) throws Exception {
+        // given
+        String kind;
+        if (scenario.startsWith("permutation")) {
+            kind = "permutations";
+        } else if (scenario.startsWith("combination")) {
+            kind = "combinations";
+        } else {
+            kind = "subsets";
+        }
+        Path contentDirectory = Path.of("../content/exhaustive-" + kind + "/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "permutation-duplicate" -> reference.replace("if (used[value]) continue;", "(void)used;");
+            case "permutation-restore" -> reference.replace("used[value] = 0;", "used[value] = 1;");
+            case "combination-start" -> reference.replace("value + 1, depth + 1", "value, depth + 1");
+            case "combination-empty" -> reference.replace("if (depth == r) {", "if (depth == r) { if (r == 0) return;");
+            case "subset-branch" -> reference.replace("selected[index] = 1;", "selected[index] = 0;");
+            case "subset-restore" -> reference.replace("selected[index] = 0;\n}", "selected[index] = 1;\n}");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = scenario.equals("combination-empty") ? "empty-choice" : "generation-example";
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && expected.path("exitCode").asInt() == actual.exitCode()
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"column", "diagonal", "base", "pruning", "restore", "sum"})
+    @DisplayName("N-Queen의 열·대각선 검사·종료 조건·가지치기·상태 복구·합산 오답을 구분합니다.")
+    void execute_success_detectsNQueenMistakes(String scenario) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/backtracking-nqueen/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "column" -> reference.replace("columns[previous] == column", "0");
+            case "diagonal" -> reference.replace("abs(columns[previous] - column) == row - previous", "0");
+            case "base" -> reference.replace("if (row == n) return 1;", "if (row == n) return 0;");
+            case "pruning" -> reference.replace("if (!is_safe(columns, row, column)) continue;", "(void)row;");
+            case "restore" -> reference.replace("columns[row] = -1;", "columns[row] = 0;");
+            case "sum" -> reference.replace("count += solve_n_queens", "count = solve_n_queens");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = switch (scenario) {
+            case "column" -> "same-column";
+            case "diagonal" -> "left-diagonal";
+            default -> "nqueen-example";
+        };
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && expected.path("exitCode").asInt() == actual.exitCode()
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"unsorted", "start", "duration", "endpoint", "negative", "identity", "last-end"})
+    @DisplayName("활동 선택의 정렬·그리디 기준·경계 시각·음수 시각·원래 ID·종료 갱신 오답을 구분합니다.")
+    void execute_success_detectsActivitySelectionMistakes(String scenario) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/greedy-activity-selection/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "unsorted" -> reference.replace("qsort(activities, n, sizeof(Activity), compare_activities);", "(void)compare_activities;");
+            case "start" -> reference.replace("a->end", "a->start").replace("b->end", "b->start");
+            case "duration" -> reference.replace("(a->end > b->end) - (a->end < b->end)",
+                    "(a->end - a->start > b->end - b->start) - (a->end - a->start < b->end - b->start)");
+            case "endpoint" -> reference.replace("activities[i].start >= last_end", "activities[i].start > last_end");
+            case "negative" -> reference.replace("count == 0 || ", "");
+            case "identity" -> reference.replace("selected[count++] = activities[i].id;", "selected[count++] = i;");
+            case "last-end" -> reference.replace("last_end = activities[i].end;", "last_end = activities[i].start;");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = switch (scenario) {
+            case "unsorted", "identity" -> "original-ids";
+            case "start" -> "earliest-start-trap";
+            case "duration" -> "shortest-duration-trap";
+            case "endpoint" -> "touching-endpoints";
+            case "negative" -> "negative-times";
+            case "last-end" -> "overlap-by-one";
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && expected.path("exitCode").asInt() == actual.exitCode()
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
+    @Test
+    @DisplayName("동률에서 다른 활동 ID를 선택한 최적해도 허용합니다.")
+    void execute_success_withAlternativeActivitySelection() throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/greedy-activity-selection/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String alternative = reference.replace("return a->id - b->id;", "return b->id - a->id;");
+        Assertions.assertNotEquals(reference, alternative);
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        List<JsonNode> tiedTests = tests.valueStream()
+                .filter(test -> test.path("criterionId").asString().equals("ties"))
+                .toList();
+        Assertions.assertFalse(tiedTests.isEmpty());
+        List<TestInput> inputs = new ArrayList<>();
+        tiedTests.forEach(test -> inputs.add(new TestInput(test.path("id").asString(), test.path("input").asString())));
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, alternative, Files.readString(contentDirectory.resolve("harness.c")), inputs);
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        Assertions.assertEquals(tiedTests.size(), result.tests().size());
+        for (int index = 0; index < tiedTests.size(); index++) {
+            TestExecutionResult actual = result.tests().get(index);
+            Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+            Assertions.assertEquals(tiedTests.get(index).path("expected").path("stdout").asString(), actual.stdout());
+            Assertions.assertEquals(0, actual.exitCode());
+            Assertions.assertTrue(actual.stderr().isBlank());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"memo-store", "memo-reuse", "table-base", "table-zero-range", "table-loop", "table-preserve"})
+    @DisplayName("DP 피보나치의 저장·캐시 재사용·기저값·반복 범위·표 보존 오답을 구분합니다.")
+    void execute_success_detectsDpFibonacciMistakes(String scenario) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/dp-fibonacci/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "memo-store" -> reference.replace("memo[n] = previous + before_previous;", "return previous + before_previous;");
+            case "memo-reuse" -> reference.replace("if (memo[n] != -1)", "if (n < 2)");
+            case "table-base" -> reference.replace("table[0] = 0;", "table[0] = 1;");
+            case "table-zero-range" -> reference.replace("if (n >= 1)", "if (n >= 0)");
+            case "table-loop" -> reference.replace("i <= n", "i < n");
+            case "table-preserve" -> reference.replace("table[0] = 0;", "for (int i = 0; i <= MAX_N; i++) table[i] = -1; table[0] = 0;");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = switch (scenario) {
+            case "memo-reuse" -> "cached-result";
+            case "table-base", "table-zero-range" -> "zero-example";
+            case "table-preserve" -> "large-then-small";
+            default -> "fibonacci-example";
+        };
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && Integer.valueOf(expected.path("exitCode").asInt()).equals(actual.exitCode())
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"reuse", "include-only", "exact-fit", "missing-item", "base", "preserve"})
+    @DisplayName("0/1 배낭의 중복 사용·최대 선택·경계·기저값·표 보존 오답을 구분합니다.")
+    void execute_success_detectsKnapsackMistakes(String scenario) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/dp-knapsack/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "reuse" -> reference.replace("table[i - 1][w - items[i - 1].weight]", "table[i][w - items[i - 1].weight]");
+            case "include-only" -> reference.replace("if (included > best)", "if (1)");
+            case "exact-fit" -> reference.replace("items[i - 1].weight <= w", "items[i - 1].weight < w");
+            case "missing-item" -> reference.replace("i <= n", "i < n");
+            case "base" -> reference.replace("table[0][w] = 0;", "table[0][w] = 1;");
+            case "preserve" -> reference.replace("// 물건이 없는 기저 행 초기화", "for (int i = 0; i <= MAX_ITEMS; i++) for (int w = 0; w <= MAX_CAPACITY; w++) table[i][w] = 0;");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = switch (scenario) {
+            case "reuse" -> "no-reuse";
+            case "include-only" -> "skip-better";
+            case "exact-fit" -> "exact-fit";
+            case "base" -> "empty-example";
+            case "preserve" -> "smaller-then-larger";
+            default -> "knapsack-example";
+        };
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && Integer.valueOf(expected.path("exitCode").asInt()).equals(actual.exitCode())
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"substring", "diagonal", "up-only", "left-only", "base", "loop", "preserve"})
+    @DisplayName("LCS의 부분 문자열·대각선·위·왼쪽·기저값·계산 범위 오답을 구분합니다.")
+    void execute_success_detectsLcsMistakes(String scenario) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/dp-lcs/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "substring" -> reference.replace("table[i][j] = best;", "table[i][j] = 0;");
+            case "diagonal" -> reference.replace("table[i - 1][j - 1] + 1", "table[i - 1][j] + 1");
+            case "up-only" -> reference.replace("if (table[i][j - 1] > best)", "if (0)");
+            case "left-only" -> reference.replace("int best = table[i - 1][j];", "int best = table[i][j - 1];");
+            case "base" -> reference.replace("table[0][j] = 0;", "table[0][j] = 1;");
+            case "loop" -> reference.replace("j <= n", "j < n");
+            case "preserve" -> reference.replace("// 빈 접두사의 기저 행·열 초기화", "for (int i = 0; i <= MAX_LENGTH; i++) for (int j = 0; j <= MAX_LENGTH; j++) table[i][j] = 0;");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = switch (scenario) {
+            case "substring" -> "no-reset";
+            case "diagonal" -> "repeated";
+            case "up-only" -> "left-better";
+            case "left-only" -> "up-better";
+            case "base" -> "empty-first";
+            case "preserve" -> "large-then-small";
+            default -> "lcs-example";
+        };
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && Integer.valueOf(expected.path("exitCode").asInt()).equals(actual.exitCode())
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"reuse", "move-left", "move-right", "adjacent", "values", "missing", "mutate"})
+    @DisplayName("투 포인터의 같은 위치 재사용·이동 방향·인접 쌍·반환값·입력 변경 오답을 구분합니다.")
+    void execute_success_detectsTwoPointerMistakes(String scenario) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/two-pointer-pair/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "reuse" -> reference.replace("left < right", "left <= right");
+            case "move-left" -> reference.replace("left++;", "right--;");
+            case "move-right" -> reference.replace("right--;", "left++;");
+            case "adjacent" -> reference.replace("left < right", "left + 1 < right");
+            case "values" -> reference.replace("(Pair){left, right}", "(Pair){values[left], values[right]}");
+            case "missing" -> reference.replace("(Pair){-1, -1}", "(Pair){0, 0}");
+            case "mutate" -> reference.replace("int left = 0;", "((int *)values)[0] = 99; int left = 0;");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = switch (scenario) {
+            case "reuse" -> "single-no-reuse";
+            case "move-left" -> "move-left";
+            case "move-right" -> "move-right";
+            case "adjacent" -> "adjacent";
+            case "missing" -> "absent-example";
+            default -> "pair-example";
+        };
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && Integer.valueOf(expected.path("exitCode").asInt()).equals(actual.exitCode())
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
+    @Test
+    @DisplayName("다른 유효한 인덱스 쌍을 반환하는 구현도 허용합니다.")
+    void execute_success_withAlternativePair() throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/two-pointer-pair/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String alternative = reference.substring(0, reference.indexOf("Pair two_sum(")) + """
+                Pair two_sum(const int values[], int n, int target)
+                {
+                    for (int right = 1; right < n; right++) {
+                        for (int left = 0; left < right; left++) {
+                            if (values[left] + values[right] == target) return (Pair){left, right};
+                        }
+                    }
+                    return (Pair){-1, -1};
+                }
+                """;
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals("many-solutions"))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, alternative, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput("many-solutions", test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        Assertions.assertEquals(TestExecutionResult.Status.COMPLETED, actual.status());
+        Assertions.assertEquals(test.path("expected").path("stdout").asString(), actual.stdout());
+        Assertions.assertEquals(0, actual.exitCode());
+        Assertions.assertTrue(actual.stderr().isBlank());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"zero-best", "outgoing", "incoming", "last-window", "length", "overwrite", "mutate"})
+    @DisplayName("슬라이딩 윈도의 음수 초기화·교체 인덱스·마지막 구간·고정 길이·입력 변경 오답을 구분합니다.")
+    void execute_success_detectsSlidingWindowMistakes(String scenario) throws Exception {
+        // given
+        Path contentDirectory = Path.of("../content/sliding-window-max-sum/c");
+        String reference = Files.readString(contentDirectory.resolve("reference.c"));
+        String mistake = switch (scenario) {
+            case "zero-best" -> reference.replace("int best = sum;", "int best = 0;");
+            case "outgoing" -> reference.replace("values[i - k]", "values[i - k + 1]");
+            case "incoming" -> reference.replace("+ values[i];", "+ values[i - 1];");
+            case "last-window" -> reference.replace("i < n", "i < n - 1");
+            case "length" -> reference.replace("i < k", "i <= k");
+            case "overwrite" -> reference.replace("if (sum > best)", "if (1)");
+            case "mutate" -> reference.replace("int sum = 0;", "((int *)values)[0] = 99; int sum = 0;");
+            default -> throw new IllegalArgumentException(scenario);
+        };
+        Assertions.assertNotEquals(reference, mistake);
+        String testId = switch (scenario) {
+            case "zero-best" -> "negative-example";
+            case "outgoing" -> "outgoing";
+            case "incoming" -> "incoming";
+            case "last-window" -> "last-best";
+            case "overwrite" -> "first-best";
+            default -> "window-example";
+        };
+        JsonNode tests = JsonMapper.builder().build().readTree(Files.readString(contentDirectory.resolve("tests.json")));
+        JsonNode test = tests.valueStream()
+                .filter(item -> item.path("id").asString().equals(testId))
+                .findFirst()
+                .orElseThrow();
+        ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, mistake, Files.readString(contentDirectory.resolve("harness.c")),
+                List.of(new TestInput(testId, test.path("input").asString())));
+
+        // when
+        ExecutionResult result = fixture.codeExecutionService.execute(request, actual -> {});
+
+        // then
+        Assertions.assertEquals(PreparationResult.Status.SUCCEEDED, result.preparation().status(), result.preparation().toString());
+        TestExecutionResult actual = result.tests().getFirst();
+        JsonNode expected = test.path("expected");
+        Assertions.assertFalse(expected.path("stdout").asString().equals(actual.stdout())
+                && Integer.valueOf(expected.path("exitCode").asInt()).equals(actual.exitCode())
+                && expected.path("stderrRequired").asBoolean() == !actual.stderr().isBlank(), scenario);
+    }
+
     @AfterEach
     void leavesNoContainersOrWorkspaces() throws Exception {
         fixture.assertCleanedUp();

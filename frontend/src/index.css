@@ -518,8 +518,148 @@ h1 {
 .simulation[data-category="heap"],
 .simulation[data-category="hash"],
 .simulation[data-category="set"],
-.simulation[data-category="search"] {
+.simulation[data-category="search"],
+.simulation[data-category="two-pointer"],
+.simulation[data-category="sliding-window"],
+.simulation[data-category="sort"],
+.simulation[data-category="graph"] {
     grid-template-columns: minmax(0, 1fr);
+}
+
+.graph-diagram {
+    min-width: 0;
+}
+
+.graph-diagram .graph-picture svg {
+    min-width: 320px;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.graph-matrix-scroll {
+    overflow-x: auto;
+}
+
+.graph-matrix {
+    border-collapse: collapse;
+    margin: 0 auto;
+    font-size: 13px;
+}
+
+.graph-matrix th, .graph-matrix td {
+    min-width: 36px;
+    padding: 7px;
+    border: 1px solid #e1e3e8;
+    text-align: center;
+}
+
+.graph-matrix td[data-edge="true"] {
+    background: #e5f3eb;
+    color: #26724b;
+    font-weight: 600;
+}
+
+.graph-matrix tr[data-active="true"] th,
+.graph-adjacency li[data-active="true"] strong {
+    background: #e8e2fb;
+    color: #6259c9;
+}
+
+.graph-adjacency {
+    display: grid;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 0;
+    list-style: none;
+}
+
+.graph-adjacency li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    white-space: nowrap;
+}
+
+.graph-adjacency strong {
+    padding: 7px 12px;
+    border: 1px solid #e1e3e8;
+    border-radius: 6px;
+}
+
+/* 방향 그래프의 간선과 현재 완화 상태 */
+.graph-picture .graph-edge > path {
+    fill: none;
+    stroke: #bbb0db;
+    stroke-width: 1.2px;
+}
+
+.graph-picture .graph-edge[data-active="true"] > path {
+    stroke: #d88a29;
+    stroke-width: 3px;
+}
+
+/* 가중치와 최소 신장 트리 선택 상태 */
+.graph-edge text {
+    fill: #4d485e;
+    font-size: 14px;
+    font-weight: 700;
+    text-anchor: middle;
+    stroke: white;
+    stroke-width: 5px;
+    paint-order: stroke;
+}
+
+.graph-picture .graph-edge[data-selected="true"] line {
+    stroke: #27966c;
+    stroke-width: 4px;
+}
+
+.graph-picture .graph-edge[data-active="true"]:not([data-selected="true"]) line {
+    stroke: #d88a29;
+    stroke-width: 4px;
+}
+
+.graph-matrix tr[data-selected="true"] td,
+.graph-matrix tr[data-selected="true"] th {
+    color: #207453;
+    background: #e6f4ed;
+}
+
+.graph-frontier, .graph-visited {
+    color: #766c9b;
+    font-size: 13px;
+}
+
+.sort-array {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 2px;
+}
+
+.sort-slot {
+    display: flex;
+    flex: 0 0 64px;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 6px;
+    border: 2px solid #e1e3e8;
+    border-radius: 10px;
+}
+
+.sort-slot[data-sorted="true"] {
+    background: #e5f4ec;
+    color: #26724b;
+}
+
+.sort-slot[data-active="true"] {
+    border-color: #6259c9;
+}
+
+.sort-legend {
+    color: #747681;
+    font-size: 12px;
 }
 
 .tree-diagram {
@@ -1304,6 +1444,371 @@ h1 {
     font-size: 12px;
 }
 
+/* 문자열 비교·토큰과 트라이 학습 */
+.string-diagram,
+.trie-diagram {
+    min-width: 0;
+}
+
+.simulation[data-category="string"],
+.simulation[data-category="trie"] {
+    grid-template-columns: 1fr;
+}
+
+.string-scroll {
+    overflow-x: auto;
+    padding-bottom: 12px;
+}
+
+.string-label {
+    margin: 12px 0 8px;
+    color: #82758f;
+    font-size: 12px;
+}
+
+.string-row {
+    display: flex;
+    width: max-content;
+    min-height: 60px;
+}
+
+.string-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    border: 1px solid #e4dfea;
+    background: #f7f6fa;
+}
+
+.string-cell small {
+    color: #90879d;
+    font-size: 10px;
+}
+
+.string-cell[data-active="true"] {
+    background: #eae5fc;
+    border-color: #ac9bdc;
+}
+
+.string-tokens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.string-tokens li,
+.string-result {
+    padding: 12px;
+    background: #f7f6fa;
+    border-radius: 5px;
+    overflow-wrap: anywhere;
+}
+
+.string-tokens small {
+    margin-right: 8px;
+    color: #90879d;
+}
+
+.trie-diagram .tree-diagram svg {
+    min-width: 280px;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.trie-diagram .trie-terminal {
+    fill: none;
+    stroke-width: 1.5px;
+}
+
+.trie-words {
+    overflow-wrap: anywhere;
+}
+
+.trie-diagram > p {
+    margin: 12px 0;
+    color: #82758f;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+/* 완전 탐색의 후보·선택 경로 */
+.simulation[data-category="exhaustive"] {
+    grid-template-columns: 1fr;
+}
+
+.exhaustive-diagram {
+    min-width: 0;
+}
+
+.exhaustive-diagram p {
+    color: #82758f;
+    font-size: 12px;
+    margin: 12px 0;
+}
+
+.exhaustive-values,
+.exhaustive-path {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+}
+
+.exhaustive-value,
+.exhaustive-path li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    min-height: 48px;
+    padding: 8px;
+    border: 1px solid #e4dfea;
+    border-radius: 5px;
+    background: #f7f6fa;
+}
+
+.exhaustive-value[data-selected="true"] {
+    color: #207453;
+    background: #e6f4ed;
+}
+
+.exhaustive-value[data-active="true"] {
+    color: #70569b;
+    background: #eae5fc;
+    border-color: #ac9bdc;
+}
+
+.exhaustive-path li {
+    flex-direction: column;
+    gap: 4px;
+}
+
+.exhaustive-path small {
+    color: #90879d;
+    font-size: 10px;
+}
+
+/* N-Queen의 배치·충돌·가지치기 */
+.simulation[data-category="backtracking"] {
+    grid-template-columns: 1fr;
+}
+
+.nqueen-diagram {
+    min-width: 0;
+}
+
+.nqueen-scroll {
+    overflow-x: auto;
+}
+
+.nqueen-board {
+    margin: 0 auto;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.nqueen-board th {
+    padding: 8px;
+    color: #82758f;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.nqueen-board td {
+    min-width: 44px;
+    height: 44px;
+    border: 1px solid #e4dfea;
+    background: #faf9fc;
+    font-size: 26px;
+    line-height: 1;
+}
+
+.nqueen-board td[data-dark="true"] {
+    background: #eeebf4;
+}
+
+.nqueen-board td[data-queen="true"] {
+    color: #207453;
+    background: #e6f4ed;
+}
+
+.nqueen-board td[data-candidate="true"] {
+    color: #70569b;
+    background: #eae5fc;
+}
+
+.nqueen-board td[data-conflict="true"],
+.nqueen-board td[data-safe="false"] {
+    color: #b84c52;
+    background: #fbe9e9;
+}
+
+.nqueen-diagram p {
+    margin: 12px 0;
+    color: #82758f;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.nqueen-columns {
+    overflow-wrap: anywhere;
+    font-family: monospace;
+}
+
+/* 그리디 활동 선택의 시간 구간과 판정 */
+.simulation[data-category="greedy"] {
+    grid-template-columns: 1fr;
+}
+
+.activity-diagram {
+    min-width: 0;
+}
+
+.activity-diagram p,
+.activity-axis {
+    color: #82758f;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.activity-axis {
+    display: flex;
+    justify-content: space-between;
+}
+
+.activity-list {
+    display: grid;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+}
+
+.activity-list li {
+    padding: 10px;
+    border: 1px solid #e4dfea;
+    border-radius: 5px;
+}
+
+.activity-list li[data-active="true"] {
+    border-color: #a48dd3;
+}
+
+.activity-heading {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    font-size: 12px;
+}
+
+.activity-heading > span {
+    margin-left: auto;
+    color: #90879d;
+}
+
+.activity-track {
+    position: relative;
+    height: 12px;
+    margin-top: 8px;
+    background: #f7f6fa;
+    border-radius: 3px;
+}
+
+.activity-track > span {
+    position: absolute;
+    height: 100%;
+    background: #c7bfd9;
+    border-radius: 3px;
+}
+
+.activity-list li[data-status="selected"] .activity-track > span {
+    background: #58a787;
+}
+
+.activity-list li[data-status="skipped"] .activity-track > span {
+    background: #ce7b80;
+}
+
+.activity-selected {
+    overflow-wrap: anywhere;
+}
+
+/* 피보나치 메모이제이션·타뷸레이션의 저장 상태 */
+.simulation[data-category="dp"] {
+    grid-template-columns: 1fr;
+}
+
+.fibonacci-diagram {
+    min-width: 0;
+}
+
+.fibonacci-diagram h3 {
+    margin: 0 0 20px;
+    font-size: 15px;
+}
+
+.fibonacci-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.fibonacci-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 72px;
+    min-height: 84px;
+    padding: 8px;
+    border: 1px dashed #dcd6e6;
+    border-radius: 5px;
+    background: #faf9fc;
+}
+
+.fibonacci-cell small {
+    color: #90879d;
+    font-size: 12px;
+}
+
+.fibonacci-cell strong {
+    font-size: 16px;
+    overflow-wrap: anywhere;
+}
+
+.fibonacci-cell[data-known="true"] {
+    border-style: solid;
+    background: #f3f0f8;
+}
+
+.fibonacci-cell[data-active="true"] {
+    border-color: #a48dd3;
+    background: #eae5fc;
+}
+
+.fibonacci-cell[data-reused="true"] {
+    color: #207453;
+    border-color: #6aab8c;
+    background: #e6f4ed;
+}
+
+.fibonacci-diagram p {
+    color: #82758f;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.fibonacci-stack {
+    overflow-wrap: anywhere;
+}
+
 @media (max-width: 1000px) {
     .workspace {
         padding: 28px 24px 0;
@@ -1440,4 +1945,221 @@ h1 {
         grid-template-columns: 1fr;
     }
 
+}
+
+/* 0/1 배낭의 물건·계산 표·선택 비교 */
+.knapsack-diagram { min-width: 0; }
+.knapsack-items { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.knapsack-items > div { display: grid; gap: 6px; padding: 10px 12px; border: 1px solid #dfdce8; border-radius: 8px; font-size: 12px; }
+.knapsack-items > div[data-active="true"] { border-color: #7761b5; background: #f1edf9; }
+.knapsack-scroll { overflow-x: auto; }
+.knapsack-table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; }
+.knapsack-table caption { margin-bottom: 12px; text-align: left; font-weight: 600; }
+.knapsack-table th, .knapsack-table td { min-width: 32px; padding: 10px 5px; border: 1px solid #dfdce8; }
+.knapsack-table th { background: #f5f3fa; }
+.knapsack-table td[data-reference="true"] { background: #e3f3e8; color: #277044; }
+.knapsack-table td[data-active="true"] { background: #7761b5; color: #fff; font-weight: 700; }
+.knapsack-diagram > p { font-size: 12px; line-height: 1.7; }
+.knapsack-comparison { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; }
+.knapsack-comparison strong { margin-left: 6px; }
+
+/* LCS의 문자열·접두사 표·참조 위치 */
+.lcs-diagram {
+    min-width: 0;
+}
+
+.lcs-strings {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.lcs-strings > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.lcs-strings strong {
+    margin-right: 6px;
+}
+
+.lcs-strings span {
+    padding: 6px 10px;
+    border: 1px solid #dfdce8;
+    border-radius: 6px;
+}
+
+.lcs-strings span[data-active="true"] {
+    border-color: #7761b5;
+    background: #f1edf9;
+}
+
+.lcs-scroll {
+    overflow-x: auto;
+}
+
+.lcs-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 13px;
+}
+
+.lcs-table caption {
+    margin-bottom: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.lcs-table th,
+.lcs-table td {
+    min-width: 38px;
+    padding: 10px 5px;
+    border: 1px solid #dfdce8;
+}
+
+.lcs-table th {
+    background: #f5f3fa;
+    white-space: nowrap;
+}
+
+.lcs-table td[data-reference="true"] {
+    background: #e3f3e8;
+    color: #277044;
+}
+
+.lcs-table td[data-active="true"] {
+    background: #7761b5;
+    color: #fff;
+    font-weight: 700;
+}
+
+.lcs-diagram > p {
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* 투 포인터의 후보 범위·합 비교·반환 쌍 */
+.two-pointer-diagram {
+    min-width: 0;
+}
+
+.two-pointer-array {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 18px 0;
+}
+
+.two-pointer-slot {
+    display: grid;
+    gap: 8px;
+    min-width: 66px;
+    padding: 12px 8px;
+    border: 1px solid #dfdce8;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.two-pointer-slot small,
+.two-pointer-slot span {
+    font-size: 11px;
+}
+
+.two-pointer-slot[data-in-range="false"] {
+    opacity: 0.4;
+}
+
+.two-pointer-slot[data-active="true"] {
+    border-color: #7761b5;
+    background: #f1edf9;
+}
+
+.two-pointer-slot[data-found="true"] {
+    border-color: #277044;
+    background: #e3f3e8;
+    color: #277044;
+}
+
+.two-pointer-diagram > p {
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.two-pointer-equation,
+.two-pointer-decision {
+    font-weight: 600;
+}
+
+/* 고정 길이 윈도의 범위·교체 원소·현재 합 */
+.window-diagram {
+    min-width: 0;
+}
+
+.window-array {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 18px 0;
+}
+
+.window-slot {
+    display: grid;
+    gap: 8px;
+    min-width: 66px;
+    padding: 12px 8px;
+    border: 1px solid #dfdce8;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.window-slot small,
+.window-slot span {
+    font-size: 11px;
+}
+
+.window-slot[data-window="false"] {
+    opacity: 0.4;
+}
+
+.window-slot[data-window="true"] {
+    border-color: #7761b5;
+    background: #f1edf9;
+}
+
+.window-slot[data-outgoing="true"] {
+    opacity: 1;
+    border-color: #be5b63;
+    background: #fbecee;
+    color: #a1414b;
+}
+
+.window-slot[data-incoming="true"] {
+    border-color: #277044;
+    background: #e3f3e8;
+    color: #277044;
+}
+
+.window-diagram > p {
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.window-phase,
+.window-equation {
+    font-weight: 600;
+}
+
+.window-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 12px 0;
+    font-size: 13px;
+}
+
+.window-summary strong {
+    margin-left: 6px;
 }

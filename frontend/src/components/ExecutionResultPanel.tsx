@@ -2,13 +2,14 @@ import type { Job } from '../api/runs'
 import { getJobPresentation } from '../jobPresentation'
 
 // 실습·제출 상세의 결과 상태와 실행 시간 표시
-export default function ExecutionResultPanel({ variant, job, kind, pending = false, error = '', currentCode }: {
+export default function ExecutionResultPanel({ variant, job, kind, pending = false, error = '', currentCode, exampleNumber }: {
     variant: 'practice' | 'history'
     job: Job | null
     kind: Job['kind']
     pending?: boolean
     error?: string
     currentCode?: string
+    exampleNumber?: number
 }) {
     const { resultKind, resultPending, resultTests, preparation, compilationFailed, resultStatus, resultLabel, executionSeconds, failedTest } = getJobPresentation(job, kind, pending, error)
     const practice = variant === 'practice'
@@ -18,6 +19,9 @@ export default function ExecutionResultPanel({ variant, job, kind, pending = fal
     let pendingMessage: string
     if (practice) {
         resultTitle = resultKind === 'GRADING' ? '제출 결과' : '실행 결과'
+        if (resultKind === 'RUN' && exampleNumber !== undefined) {
+            resultTitle = `실행 결과 · 예제 ${exampleNumber}`
+        }
         timeTitle = resultKind === 'GRADING' ? '테스트 실행 시간 합계' : '코드 실행 시간'
         pendingMessage = resultKind === 'GRADING' ? '전체 테스트를 채점하고 있습니다.' : '선택한 예제를 실행하고 있습니다.'
     } else {

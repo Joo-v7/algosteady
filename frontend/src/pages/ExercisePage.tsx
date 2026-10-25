@@ -4,7 +4,7 @@ import Editor, { loader } from '@monaco-editor/react'
 import * as monaco from 'monaco-editor'
 import EditorWorker from 'monaco-editor/editor/editor.worker?worker'
 import { Link, useParams, useSearchParams } from 'react-router'
-import { getExercise, getReference } from '../api/exercises'
+import { ApiError, getExercise, getReference } from '../api/exercises'
 import type { ExerciseDetails } from '../api/exercises'
 import { createRun, getJob } from '../api/runs'
 import type { Job } from '../api/runs'
@@ -45,6 +45,7 @@ function ExercisePage() {
     const [referenceLoading, setReferenceLoading] = useState(false)
     const [referenceError, setReferenceError] = useState('')
     const [executionError, setExecutionError] = useState('')
+    const [gradingError, setGradingError] = useState('')
     const [jobId, setJobId] = useState<string | null>(null)
     const [gradingJobId, setGradingJobId] = useState<string | null>(null)
     const [gradingJob, setGradingJob] = useState<Job | null>(null)
@@ -79,6 +80,7 @@ function ExercisePage() {
                 setJob(null)
                 setGradingJob(null)
                 setExecutionError('')
+                setGradingError('')
                 setRequestKind(null)
                 // 과제·버전별 저장된 초안과 마지막 작업 ID 복구
                 let draft = content.starterCode
@@ -105,58 +107,87 @@ function ExercisePage() {
         return () => controller.abort()
     }, [exerciseId])
 
-    // 마지막 실행·채점 결과 복구 및 진행 중인 작업 재조회
+    // 실행·제출별 독립 조회, 한쪽 실패 시 다른 쪽 폴링 유지
     useEffect(() => {
         if ((!jobId && !gradingJobId) || !exercise || exercise.id !== exerciseId) {
             return
         }
         const controller = new AbortController()
-        const pendingIds = new Set([jobId, gradingJobId].filter((id): id is string => Boolean(id)))
-        let timer: ReturnType<typeof setTimeout>
+        const ids = new Set([jobId, gradingJobId].filter((id): id is string => Boolean(id)))
+        const timers = new Map<string, ReturnType<typeof setTimeout>>()
 
-        async function poll() {
+        async function poll(id: string) {
             try {
-                const responses = await Promise.all([...pendingIds].map(id => getJob(id, controller.signal)))
+                const result = await getJob(id, controller.signal)
                 if (controller.signal.aborted) {
                     return
                 }
-                // 현재 과제의 작업만 화면과 채점 기준에 반영
-                for (const result of responses) {
-                    if (result.exerciseId !== exercise!.id || result.contentVersion !== exercise!.version || result.language !== 'c') {
-                        throw new Error('현재 과제와 실행 작업의 정보가 다릅니다.')
-                    }
-                    if (result.jobId === jobId) {
-                        setJob(result)
-                    }
-                    if (result.jobId === gradingJobId) {
-                        setGradingJob(result)
-                    }
-                    // 종료된 작업을 재조회 대상에서 제외
-                    if (result.status === 'COMPLETED' || result.status === 'FAILED') {
-                        pendingIds.delete(result.jobId)
-                        if (result.jobId === jobId) {
-                            setRunBusy(false)
-                        }
-                    }
+                // 현재 과제의 작업만 해당 결과 영역에 반영
+                if (result.exerciseId !== exercise!.id || result.contentVersion !== exercise!.version || result.language !== 'c') {
+                    throw new Error('현재 과제와 실행 작업의 정보가 다릅니다.')
                 }
-                if (pendingIds.size > 0) {
-                    timer = setTimeout(poll, 500)
+                if (id === jobId) {
+                    setJob(result)
+                    setExecutionError('')
                 }
+                if (id === gradingJobId) {
+                    setGradingJob(result)
+                    setGradingError('')
+                }
+                if (result.status === 'COMPLETED' || result.status === 'FAILED') {
+                    if (id === jobId) {
+                        setRunBusy(false)
+                    }
+                    return
+                }
+                timers.set(id, setTimeout(() => void poll(id), 500))
             } catch (error) {
-                if (!controller.signal.aborted) {
-                    setExecutionError(error instanceof Error ? error.message : '실행 결과를 조회하지 못했습니다.')
+                if (controller.signal.aborted) {
+                    return
+                }
+                const message = error instanceof Error ? error.message : '작업 결과를 조회하지 못했습니다.'
+                if (id === jobId) {
+                    setExecutionError(message)
                     setRunBusy(false)
+                }
+                if (id === gradingJobId) {
+                    setGradingError(`제출 결과를 조회하지 못했습니다. ${message}`)
+                }
+
+                // 없는 작업의 복구 ID만 제거, 통신·서버 오류의 ID는 보존
+                if (error instanceof ApiError && error.status === 404) {
+                    if (id === jobId) {
+                        setRequestKind(id === gradingJobId ? 'GRADING' : 'RUN')
+                        setJobId(null)
+                        setJob(null)
+                    }
+                    if (id === gradingJobId) {
+                        setGradingJobId(null)
+                        setGradingJob(null)
+                    }
+                    try {
+                        if (id === jobId && localStorage.getItem(jobKey) === id) {
+                            localStorage.removeItem(jobKey)
+                        }
+                        if (id === gradingJobId && localStorage.getItem(gradingJobKey) === id) {
+                            localStorage.removeItem(gradingJobKey)
+                        }
+                    } catch {
+                        setSaveError('없는 작업의 복구 ID를 브라우저에서 지우지 못했습니다.')
+                    }
                 }
             }
         }
 
-        void poll()
+        for (const id of ids) {
+            void poll(id)
+        }
 
         return () => {
             controller.abort()
-            clearTimeout(timer)
+            timers.forEach(timer => clearTimeout(timer))
         }
-    }, [jobId, gradingJobId, exercise, exerciseId])
+    }, [jobId, gradingJobId, exercise, exerciseId, jobKey, gradingJobKey])
 
     // 공개 예제 실행 또는 전체 테스트 채점 제출 등록
     async function handleRun(kind: 'RUN' | 'GRADING') {
@@ -170,6 +201,7 @@ function ExercisePage() {
         setJob(null)
         setJobId(null)
         if (kind === 'GRADING') {
+            setGradingError('')
             setGradingJob(null)
             setGradingJobId(null)
         }
@@ -280,6 +312,8 @@ function ExercisePage() {
 
     const publicExamples = exercise.publicExamples
     const example = publicExamples[exampleIndex]
+    const executedExampleIndex = publicExamples.findIndex(item => item.id === job?.exampleId)
+    const resultExampleNumber = job?.kind === 'RUN' && executedExampleIndex >= 0 ? executedExampleIndex + 1 : undefined
     const isQueue = exercise.category === 'queue'
     const isDeque = exercise.category === 'deque'
     const isLinkedStack = exercise.category === 'stack' && exercise.contract.storage === 'linked'
@@ -530,6 +564,7 @@ function ExercisePage() {
                                     pending={runBusy}
                                     error={executionError}
                                     currentCode={code}
+                                    exampleNumber={resultExampleNumber}
                                 />
                             )}
                         </>
@@ -567,6 +602,7 @@ function ExercisePage() {
                         <section className="panel criteria-panel">
                             <div className="section-label">실습 체크포인트</div>
                             <h2>채점 기준 <span>{exercise.criteria.length}</span></h2>
+                            {gradingError && <p role="alert">{gradingError}</p>}
                             <p>각 기준에 연결된 테스트로<br />구현을 확인합니다.</p>
                             <ol className="criteria-list">
                                 {exercise.criteria.map(criterion => {

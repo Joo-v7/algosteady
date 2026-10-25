@@ -1,0 +1,607 @@
+{
+  "id": "graph-floyd-warshall",
+  "version": "1.0.0",
+  "title": "플로이드–워셜 — 모든 정점 쌍의 최단 경로",
+  "category": "graph",
+  "kind": "algorithm",
+  "description": "경유 정점을 하나씩 허용하며 모든 정점 쌍의 최단 거리를 계산합니다.",
+  "learning": {
+    "concept": {
+      "title": "플로이드–워셜의 경유 정점과 거리 행렬",
+      "paragraphs": [
+        "한 시작점의 거리 배열 대신 모든 출발·도착 정점 쌍의 거리 행렬을 계산합니다. 시작 행렬은 직접 간선 비용이며 대각선은 0, 간선 없음은 INF입니다.",
+        "경유 정점 k를 가장 바깥 반복문에 둡니다. distance[i][k] + distance[k][j]가 더 작으면 distance[i][j]를 갱신합니다. k단계가 끝나면 0부터 k까지를 중간 정점으로 허용한 최단 거리가 반영됩니다.",
+        "음수 간선도 허용하지만 음수 사이클이 있으면 최단 거리가 정의되지 않습니다. 대각선이 음수가 되면 0을 반환하고 중단합니다. 모든 쌍을 계산하므로 다른 연결 요소의 음수 사이클도 검사합니다.",
+        "두 부분 경로 중 하나라도 INF이면 더하지 않습니다. 이 기준 코드는 매 k단계에서 음수 대각선을 확인해 음수 사이클로 인한 불필요한 거리 감소를 중단합니다. 시간은 O(V³), 결과 행렬 공간은 O(V²)입니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "GraphType",
+        "description": "방향 그래프의 정점 수와 원본 가중치 행렬입니다."
+      },
+      {
+        "name": "distance",
+        "description": "행은 출발 정점, 열은 도착 정점인 최단 거리 행렬입니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "floyd_warshall",
+        "description": "distance[i][j]에 i에서 j까지 최단 거리를 저장하고 1을 반환합니다. 도달 불가는 INF입니다. 그래프 어디에든 음수 사이클이 있으면 0을 반환하며 이때 거리 행렬 내용은 자유입니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "floyd_warshall",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [
+            1,
+            3
+          ],
+          [
+            2
+          ],
+          [
+            3
+          ],
+          [
+            1
+          ]
+        ],
+        "weights": [
+          [
+            0,
+            5,
+            null,
+            12
+          ],
+          [
+            null,
+            0,
+            -2,
+            null
+          ],
+          [
+            null,
+            null,
+            0,
+            3
+          ],
+          [
+            null,
+            4,
+            null,
+            0
+          ]
+        ],
+        "visited": [],
+        "distanceMatrix": [
+          [
+            0,
+            5,
+            null,
+            12
+          ],
+          [
+            null,
+            0,
+            -2,
+            null
+          ],
+          [
+            null,
+            null,
+            0,
+            3
+          ],
+          [
+            null,
+            4,
+            null,
+            0
+          ]
+        ],
+        "trace": [
+          "distance[i][j] = weight[i][j]",
+          "대각선 = 0, 간선 없음 = INF"
+        ],
+        "description": "원본 가중치를 거리 행렬에 복사합니다. 행은 출발 정점, 열은 도착 정점입니다."
+      },
+      {
+        "operation": "floyd_warshall",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [
+            1,
+            3
+          ],
+          [
+            2
+          ],
+          [
+            3
+          ],
+          [
+            1
+          ]
+        ],
+        "weights": [
+          [
+            0,
+            5,
+            null,
+            12
+          ],
+          [
+            null,
+            0,
+            -2,
+            null
+          ],
+          [
+            null,
+            null,
+            0,
+            3
+          ],
+          [
+            null,
+            4,
+            null,
+            0
+          ]
+        ],
+        "visited": [],
+        "distanceMatrix": [
+          [
+            0,
+            5,
+            null,
+            12
+          ],
+          [
+            null,
+            0,
+            -2,
+            null
+          ],
+          [
+            null,
+            null,
+            0,
+            3
+          ],
+          [
+            null,
+            4,
+            null,
+            0
+          ]
+        ],
+        "trace": [
+          "갱신 없음"
+        ],
+        "description": "0번까지를 경유 정점으로 허용해 모든 출발·도착 쌍을 갱신합니다.",
+        "intermediate": 0,
+        "activeNode": 0
+      },
+      {
+        "operation": "floyd_warshall",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [
+            1,
+            3
+          ],
+          [
+            2
+          ],
+          [
+            3
+          ],
+          [
+            1
+          ]
+        ],
+        "weights": [
+          [
+            0,
+            5,
+            null,
+            12
+          ],
+          [
+            null,
+            0,
+            -2,
+            null
+          ],
+          [
+            null,
+            null,
+            0,
+            3
+          ],
+          [
+            null,
+            4,
+            null,
+            0
+          ]
+        ],
+        "visited": [],
+        "distanceMatrix": [
+          [
+            0,
+            5,
+            3,
+            12
+          ],
+          [
+            null,
+            0,
+            -2,
+            null
+          ],
+          [
+            null,
+            null,
+            0,
+            3
+          ],
+          [
+            null,
+            4,
+            2,
+            0
+          ]
+        ],
+        "trace": [
+          "d[0][2]: INF → 3 (0 → 1 → 2)",
+          "d[3][2]: INF → 2 (3 → 1 → 2)"
+        ],
+        "description": "1번까지를 경유 정점으로 허용해 모든 출발·도착 쌍을 갱신합니다.",
+        "intermediate": 1,
+        "activeNode": 1
+      },
+      {
+        "operation": "floyd_warshall",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [
+            1,
+            3
+          ],
+          [
+            2
+          ],
+          [
+            3
+          ],
+          [
+            1
+          ]
+        ],
+        "weights": [
+          [
+            0,
+            5,
+            null,
+            12
+          ],
+          [
+            null,
+            0,
+            -2,
+            null
+          ],
+          [
+            null,
+            null,
+            0,
+            3
+          ],
+          [
+            null,
+            4,
+            null,
+            0
+          ]
+        ],
+        "visited": [],
+        "distanceMatrix": [
+          [
+            0,
+            5,
+            3,
+            6
+          ],
+          [
+            null,
+            0,
+            -2,
+            1
+          ],
+          [
+            null,
+            null,
+            0,
+            3
+          ],
+          [
+            null,
+            4,
+            2,
+            0
+          ]
+        ],
+        "trace": [
+          "d[0][3]: 12 → 6 (0 → 2 → 3)",
+          "d[1][3]: INF → 1 (1 → 2 → 3)"
+        ],
+        "description": "2번까지를 경유 정점으로 허용해 모든 출발·도착 쌍을 갱신합니다.",
+        "intermediate": 2,
+        "activeNode": 2
+      },
+      {
+        "operation": "floyd_warshall",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [
+            1,
+            3
+          ],
+          [
+            2
+          ],
+          [
+            3
+          ],
+          [
+            1
+          ]
+        ],
+        "weights": [
+          [
+            0,
+            5,
+            null,
+            12
+          ],
+          [
+            null,
+            0,
+            -2,
+            null
+          ],
+          [
+            null,
+            null,
+            0,
+            3
+          ],
+          [
+            null,
+            4,
+            null,
+            0
+          ]
+        ],
+        "visited": [],
+        "distanceMatrix": [
+          [
+            0,
+            5,
+            3,
+            6
+          ],
+          [
+            null,
+            0,
+            -2,
+            1
+          ],
+          [
+            null,
+            7,
+            0,
+            3
+          ],
+          [
+            null,
+            4,
+            2,
+            0
+          ]
+        ],
+        "trace": [
+          "d[2][1]: INF → 7 (2 → 3 → 1)"
+        ],
+        "description": "3번까지를 경유 정점으로 허용해 모든 출발·도착 쌍을 갱신합니다.",
+        "intermediate": 3,
+        "activeNode": 3
+      },
+      {
+        "operation": "floyd_warshall",
+        "argument": null,
+        "result": 1,
+        "adjacency": [
+          [
+            1,
+            3
+          ],
+          [
+            2
+          ],
+          [
+            3
+          ],
+          [
+            1
+          ]
+        ],
+        "weights": [
+          [
+            0,
+            5,
+            null,
+            12
+          ],
+          [
+            null,
+            0,
+            -2,
+            null
+          ],
+          [
+            null,
+            null,
+            0,
+            3
+          ],
+          [
+            null,
+            4,
+            null,
+            0
+          ]
+        ],
+        "visited": [],
+        "distanceMatrix": [
+          [
+            0,
+            5,
+            3,
+            6
+          ],
+          [
+            null,
+            0,
+            -2,
+            1
+          ],
+          [
+            null,
+            7,
+            0,
+            3
+          ],
+          [
+            null,
+            4,
+            2,
+            0
+          ]
+        ],
+        "trace": [
+          "대각선에 음수 없음 → 1 반환"
+        ],
+        "description": "모든 정점 쌍의 최단 거리를 계산했습니다. 간선이 없어도 경유 경로가 생기면 INF가 유한 거리로 바뀝니다."
+      }
+    ],
+    "notes": [
+      {
+        "title": "반복 순서",
+        "description": "k가 바깥 반복문이어야 합니다. i·j 순서로 한 번만 갱신하면 나중에 발견한 경유 경로가 앞선 쌍에 반영되지 않을 수 있습니다."
+      },
+      {
+        "title": "음수 사이클 검사 범위",
+        "description": "벨만–포드는 시작점에서 도달 가능한 음수 사이클을 검사합니다. 플로이드–워셜은 모든 연결 요소를 검사합니다."
+      }
+    ]
+  },
+  "contract": {
+    "storage": "array",
+    "capacity": 50,
+    "weighted": true,
+    "directed": true,
+    "representation": "matrix",
+    "scope": "제공된 GraphType을 사용해 floyd_warshall 함수의 정의와 본문 전체를 구현합니다. 입력·그래프 구성·행렬 출력은 호출 코드가 담당합니다.",
+    "functions": [
+      {
+        "name": "floyd_warshall",
+        "signature": "int floyd_warshall(GraphType *g, int distance[][MAX_VERTICES])",
+        "behavior": "distance[i][j]에 i에서 j까지 최단 거리를 저장하고 1을 반환합니다. 도달 불가는 INF입니다. 그래프 어디에든 음수 사이클이 있으면 0을 반환하며 이때 거리 행렬 내용은 자유입니다."
+      }
+    ],
+    "requirements": [
+      "방향 가중치 단순 그래프이며 정점은 1~50개, 번호는 0~n-1입니다. 자기 간선은 없고 같은 방향 간선의 재입력은 가중치를 갱신합니다.",
+      "가중치는 -1,000~1,000이고 INF는 1,000,000,000입니다. 음수 사이클 발견 시 중단하는 기준 코드의 계산은 int 범위입니다.",
+      "원본 그래프를 보존하고 매 호출 시 distance의 n×n 영역을 원본 가중치로 초기화합니다. n×n 바깥의 칸은 변경하지 않습니다.",
+      "정상은 1, 그래프 어느 곳이든 음수 사이클이 있으면 0을 반환합니다. 결과 출력은 호출 코드가 담당합니다."
+    ]
+  },
+  "prerequisites": [
+    "graph-bellman-ford"
+  ],
+  "criteria": [
+    {
+      "id": "basic",
+      "order": 1,
+      "title": "거리 행렬 초기화",
+      "description": "직접 간선·대각선·도달 불가 값을 초기화합니다."
+    },
+    {
+      "id": "via",
+      "order": 2,
+      "title": "경유 정점 갱신",
+      "description": "경유 정점을 바깥 반복문에 두고 여러 단계의 우회 경로를 반영합니다."
+    },
+    {
+      "id": "weights",
+      "order": 3,
+      "title": "0·음수·방향",
+      "description": "0·음수 가중치와 간선 방향을 보존합니다."
+    },
+    {
+      "id": "unreachable",
+      "order": 4,
+      "title": "도달 불가",
+      "description": "INF를 경유하는 가짜 경로를 만들지 않습니다."
+    },
+    {
+      "id": "cycles",
+      "order": 5,
+      "title": "음수 사이클",
+      "description": "연결 요소와 무관하게 음수 사이클을 판정합니다."
+    },
+    {
+      "id": "boundary",
+      "order": 6,
+      "title": "최대 크기",
+      "description": "최대 50개 정점의 모든 쌍을 계산합니다."
+    },
+    {
+      "id": "repeat",
+      "order": 7,
+      "title": "반복 호출·그래프 보존",
+      "description": "재실행·가중치 갱신·초기화 시 원본과 결과를 구분합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "floyd_warshall",
+          "description": "distance[i][j]에 i에서 j까지 최단 거리를 저장하고 1을 반환합니다. 도달 불가는 INF입니다. 그래프 어디에든 음수 사이클이 있으면 0을 반환하며 이때 거리 행렬 내용은 자유입니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "INIT n으로 초기화하고 EDGE from to weight로 방향 간선을 추가·갱신합니다. ALL은 DIST 다음 n행의 최단 거리 행렬을 출력합니다. 도달 불가는 INF, 음수 사이클은 NEGATIVE_CYCLE로 출력합니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

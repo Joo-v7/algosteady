@@ -1,0 +1,439 @@
+{
+  "id": "deque-linked",
+  "version": "1.0.0",
+  "title": "이중 연결 리스트 덱",
+  "category": "deque",
+  "kind": "data-structure",
+  "description": "이전·다음 노드를 연결해 양쪽 끝에서 삽입·삭제하는 덱입니다. front와 rear로 양 끝 노드에 바로 접근합니다.",
+  "learning": {
+    "concept": {
+      "title": "양 끝에서 연결하고 끊기",
+      "paragraphs": [
+        "덱은 앞과 뒤 양쪽에서 삽입·삭제·조회할 수 있습니다. 각 노드는 llink로 이전 노드, rlink로 다음 노드를 가리킵니다. front는 첫 노드, rear는 마지막 노드의 주소입니다.",
+        "이 구현은 별도의 헤드 노드 없이 데이터 노드만 연결합니다. 첫 노드의 llink와 마지막 노드의 rlink는 NULL이며, 빈 덱은 front와 rear가 모두 NULL입니다. 원형 헤드 노드를 둔 이중 연결 리스트와 구분합니다.",
+        "삽입 시 노드를 할당하고 삭제 시 해제합니다. 고정 용량이 없어 is_full은 항상 0이며, 메모리 할당 실패는 삽입 함수가 처리합니다. 양 끝 삽입·삭제·조회는 O(1), 전체 순회와 저장 공간은 O(n)입니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "DequeNode",
+        "description": "정수 data와 이전·다음 노드의 주소를 저장합니다."
+      },
+      {
+        "name": "llink",
+        "description": "이전 노드의 주소입니다. 첫 노드에서는 NULL입니다."
+      },
+      {
+        "name": "rlink",
+        "description": "다음 노드의 주소입니다. 마지막 노드에서는 NULL입니다."
+      },
+      {
+        "name": "front",
+        "description": "첫 데이터 노드의 주소입니다. 빈 덱에서는 NULL입니다."
+      },
+      {
+        "name": "rear",
+        "description": "마지막 데이터 노드의 주소입니다. 빈 덱에서는 NULL입니다."
+      },
+      {
+        "name": "LinkedDequeType",
+        "description": "양 끝 포인터를 묶어 여러 덱을 독립적으로 관리합니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "init_deque",
+        "description": "front와 rear를 모두 NULL로 설정합니다. 남은 노드는 호출 코드가 정리한 뒤 초기화를 호출합니다."
+      },
+      {
+        "function": "is_empty",
+        "description": "front가 NULL이면 1, 아니면 0을 반환하며 덱을 바꾸지 않습니다."
+      },
+      {
+        "function": "is_full",
+        "description": "고정 용량이 없으므로 항상 0을 반환합니다. 할당 실패는 삽입 함수에서 처리합니다."
+      },
+      {
+        "function": "add_front",
+        "description": "노드 하나를 malloc으로 생성해 앞에 연결합니다. 새 노드의 llink는 NULL, rlink는 기존 front입니다. 빈 덱이면 rear도 새 노드로 설정하고, 그 외에는 기존 front의 llink를 갱신합니다. front를 새 노드로 옮깁니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "function": "add_rear",
+        "description": "노드 하나를 malloc으로 생성해 뒤에 연결합니다. 새 노드의 llink는 기존 rear, rlink는 NULL입니다. 빈 덱이면 front도 새 노드로 설정하고, 그 외에는 기존 rear의 rlink를 갱신합니다. rear를 새 노드로 옮깁니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "function": "delete_front",
+        "description": "첫 값을 보관하고 front를 다음 노드로 옮깁니다. 빈 덱이 되면 rear도 NULL, 그 외에는 새 front의 llink를 NULL로 설정합니다. 제거한 노드를 free로 해제하고 값을 반환합니다. 빈 덱이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "function": "delete_rear",
+        "description": "마지막 값을 보관하고 rear를 이전 노드로 옮깁니다. 빈 덱이 되면 front도 NULL, 그 외에는 새 rear의 rlink를 NULL로 설정합니다. 제거한 노드를 free로 해제하고 값을 반환합니다. 빈 덱이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "function": "get_front",
+        "description": "첫 값을 반환하며 연결·포인터·할당 상태를 바꾸지 않습니다. 빈 덱이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "function": "get_rear",
+        "description": "마지막 값을 반환하며 연결·포인터·할당 상태를 바꾸지 않습니다. 빈 덱이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "init_deque",
+        "argument": null,
+        "result": null,
+        "values": [],
+        "description": "빈 덱에서는 front와 rear가 모두 NULL입니다. 별도의 헤드 노드를 두지 않습니다."
+      },
+      {
+        "operation": "add_rear",
+        "argument": 10,
+        "result": null,
+        "values": [
+          10
+        ],
+        "description": "첫 노드의 양쪽 링크는 NULL이며 front와 rear가 같은 10 노드를 가리킵니다."
+      },
+      {
+        "operation": "add_front",
+        "argument": 5,
+        "result": null,
+        "values": [
+          5,
+          10
+        ],
+        "description": "5를 앞에 놓고 5의 rlink와 10의 llink를 서로 연결합니다."
+      },
+      {
+        "operation": "add_rear",
+        "argument": 20,
+        "result": null,
+        "values": [
+          5,
+          10,
+          20
+        ],
+        "description": "20을 뒤에 연결합니다. rear는 20, front는 5 노드입니다."
+      },
+      {
+        "operation": "get_front",
+        "argument": null,
+        "result": 5,
+        "values": [
+          5,
+          10,
+          20
+        ],
+        "description": "앞 값만 읽습니다. 노드를 해제하거나 연결을 바꾸지 않습니다."
+      },
+      {
+        "operation": "delete_front",
+        "argument": null,
+        "result": 5,
+        "values": [
+          10,
+          20
+        ],
+        "description": "5를 해제하고 front를 10으로 옮깁니다. 10의 llink는 NULL이 됩니다."
+      },
+      {
+        "operation": "delete_rear",
+        "argument": null,
+        "result": 20,
+        "values": [
+          10
+        ],
+        "description": "20을 해제하고 rear를 10으로 옮깁니다. 10의 rlink는 NULL이 됩니다."
+      },
+      {
+        "operation": "delete_rear",
+        "argument": null,
+        "result": 10,
+        "values": [],
+        "description": "마지막 노드를 해제하고 front와 rear를 모두 NULL로 만듭니다."
+      },
+      {
+        "operation": "add_front",
+        "argument": 30,
+        "result": null,
+        "values": [
+          30
+        ],
+        "description": "빈 덱에 다시 넣으면 양 끝 포인터가 모두 새 노드를 가리킵니다."
+      }
+    ],
+    "notes": [
+      {
+        "title": "헤드 노드가 없는 구조",
+        "description": "데이터 노드만 저장합니다. 빈 덱은 양 끝 포인터가 NULL이며 노드 하나는 두 링크가 모두 NULL입니다."
+      },
+      {
+        "title": "삭제 후 양 끝 링크 복구",
+        "description": "앞 삭제 후 새 front의 llink를, 뒤 삭제 후 새 rear의 rlink를 NULL로 설정합니다. 마지막 노드를 꺼냈으면 양 끝 포인터도 모두 NULL입니다."
+      },
+      {
+        "title": "조회는 연결을 유지",
+        "description": "get_front와 get_rear는 값만 읽습니다. 노드 할당·해제와 포인터 변경은 삽입·삭제 함수에서 처리합니다."
+      }
+    ]
+  },
+  "contract": {
+    "storage": "linked",
+    "doubly": true,
+    "scope": "제공된 DequeNode와 LinkedDequeType을 사용해 9개 함수의 정의와 본문 전체를 구현합니다.",
+    "valueRange": {
+      "min": -1000000,
+      "max": 1000000
+    },
+    "booleanResult": {
+      "true": 1,
+      "false": 0
+    },
+    "functions": [
+      {
+        "name": "init_deque",
+        "signature": "void init_deque(LinkedDequeType *q)",
+        "behavior": "front와 rear를 모두 NULL로 설정합니다. 남은 노드는 호출 코드가 정리한 뒤 초기화를 호출합니다."
+      },
+      {
+        "name": "is_empty",
+        "signature": "int is_empty(LinkedDequeType *q)",
+        "behavior": "front가 NULL이면 1, 아니면 0을 반환하며 덱을 바꾸지 않습니다."
+      },
+      {
+        "name": "is_full",
+        "signature": "int is_full(LinkedDequeType *q)",
+        "behavior": "고정 용량이 없으므로 항상 0을 반환합니다. 할당 실패는 삽입 함수에서 처리합니다."
+      },
+      {
+        "name": "add_front",
+        "signature": "void add_front(LinkedDequeType *q, element item)",
+        "behavior": "노드 하나를 malloc으로 생성해 앞에 연결합니다. 새 노드의 llink는 NULL, rlink는 기존 front입니다. 빈 덱이면 rear도 새 노드로 설정하고, 그 외에는 기존 front의 llink를 갱신합니다. front를 새 노드로 옮깁니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "name": "add_rear",
+        "signature": "void add_rear(LinkedDequeType *q, element item)",
+        "behavior": "노드 하나를 malloc으로 생성해 뒤에 연결합니다. 새 노드의 llink는 기존 rear, rlink는 NULL입니다. 빈 덱이면 front도 새 노드로 설정하고, 그 외에는 기존 rear의 rlink를 갱신합니다. rear를 새 노드로 옮깁니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "name": "delete_front",
+        "signature": "element delete_front(LinkedDequeType *q)",
+        "behavior": "첫 값을 보관하고 front를 다음 노드로 옮깁니다. 빈 덱이 되면 rear도 NULL, 그 외에는 새 front의 llink를 NULL로 설정합니다. 제거한 노드를 free로 해제하고 값을 반환합니다. 빈 덱이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "name": "delete_rear",
+        "signature": "element delete_rear(LinkedDequeType *q)",
+        "behavior": "마지막 값을 보관하고 rear를 이전 노드로 옮깁니다. 빈 덱이 되면 front도 NULL, 그 외에는 새 rear의 rlink를 NULL로 설정합니다. 제거한 노드를 free로 해제하고 값을 반환합니다. 빈 덱이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "name": "get_front",
+        "signature": "element get_front(LinkedDequeType *q)",
+        "behavior": "첫 값을 반환하며 연결·포인터·할당 상태를 바꾸지 않습니다. 빈 덱이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "name": "get_rear",
+        "signature": "element get_rear(LinkedDequeType *q)",
+        "behavior": "마지막 값을 반환하며 연결·포인터·할당 상태를 바꾸지 않습니다. 빈 덱이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      }
+    ],
+    "errorHandling": {
+      "underflow": "stderr에 오류를 출력하고 exit(1)로 종료합니다.",
+      "allocationFailure": "stderr에 오류를 출력하고 exit(1)로 종료합니다.",
+      "exactMessageRequired": false
+    },
+    "requirements": [
+      "제공된 자료형·구조체 필드·함수 호출 규격을 유지합니다.",
+      "정상 연산은 출력하지 않으며 출력은 호출 코드가 담당합니다.",
+      "유효한 덱 포인터를 전달하며 NULL 포인터 처리는 범위에 포함하지 않습니다.",
+      "재초기화 전과 정상 종료 시 남은 노드는 호출 코드가 정리합니다. init_deque는 두 포인터만 NULL로 설정합니다."
+    ]
+  },
+  "prerequisites": [
+    "deque-circular",
+    "list-doubly"
+  ],
+  "criteria": [
+    {
+      "id": "initialization",
+      "order": 1,
+      "title": "초기화",
+      "description": "양 끝 포인터를 NULL로 설정합니다."
+    },
+    {
+      "id": "add-front",
+      "order": 2,
+      "title": "앞 삽입",
+      "description": "새 노드를 앞에 양방향으로 연결합니다."
+    },
+    {
+      "id": "add-rear",
+      "order": 3,
+      "title": "뒤 삽입",
+      "description": "새 노드를 뒤에 양방향으로 연결합니다."
+    },
+    {
+      "id": "delete-front",
+      "order": 4,
+      "title": "앞 삭제",
+      "description": "첫 값을 반환하고 앞쪽 연결을 복구합니다."
+    },
+    {
+      "id": "delete-rear",
+      "order": 5,
+      "title": "뒤 삭제",
+      "description": "마지막 값을 반환하고 뒤쪽 연결을 복구합니다."
+    },
+    {
+      "id": "peek",
+      "order": 6,
+      "title": "양 끝 조회",
+      "description": "값과 연결을 바꾸지 않고 양 끝 값을 읽습니다."
+    },
+    {
+      "id": "empty",
+      "order": 7,
+      "title": "빈 덱 처리",
+      "description": "빈 삭제·조회는 오류를 출력하고 종료 코드 1로 끝납니다."
+    },
+    {
+      "id": "full",
+      "order": 8,
+      "title": "용량 제한 없는 삽입",
+      "description": "포화 판정은 0이며 노드를 계속 삽입합니다."
+    },
+    {
+      "id": "links",
+      "order": 9,
+      "title": "양방향 연결",
+      "description": "정방향·역방향 연결과 양 끝의 NULL을 유지합니다."
+    },
+    {
+      "id": "memory",
+      "order": 10,
+      "title": "메모리 해제",
+      "description": "삽입은 한 노드를 할당하고 삭제는 한 노드를 해제합니다."
+    },
+    {
+      "id": "reuse",
+      "order": 11,
+      "title": "삭제 후 재사용",
+      "description": "전체 삭제·재초기화 후 다시 사용합니다."
+    },
+    {
+      "id": "independence",
+      "order": 12,
+      "title": "덱 독립성",
+      "description": "두 덱의 값과 연결을 독립적으로 관리합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "init_deque",
+          "description": "front와 rear를 모두 NULL로 설정합니다. 남은 노드는 호출 코드가 정리한 뒤 초기화를 호출합니다."
+        },
+        {
+          "function": "is_empty",
+          "description": "front가 NULL이면 1, 아니면 0을 반환하며 덱을 바꾸지 않습니다."
+        },
+        {
+          "function": "is_full",
+          "description": "고정 용량이 없으므로 항상 0을 반환합니다. 할당 실패는 삽입 함수에서 처리합니다."
+        },
+        {
+          "function": "add_front",
+          "description": "노드 하나를 malloc으로 생성해 앞에 연결합니다. 새 노드의 llink는 NULL, rlink는 기존 front입니다. 빈 덱이면 rear도 새 노드로 설정하고, 그 외에는 기존 front의 llink를 갱신합니다. front를 새 노드로 옮깁니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        },
+        {
+          "function": "add_rear",
+          "description": "노드 하나를 malloc으로 생성해 뒤에 연결합니다. 새 노드의 llink는 기존 rear, rlink는 NULL입니다. 빈 덱이면 front도 새 노드로 설정하고, 그 외에는 기존 rear의 rlink를 갱신합니다. rear를 새 노드로 옮깁니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        },
+        {
+          "function": "delete_front",
+          "description": "첫 값을 보관하고 front를 다음 노드로 옮깁니다. 빈 덱이 되면 rear도 NULL, 그 외에는 새 front의 llink를 NULL로 설정합니다. 제거한 노드를 free로 해제하고 값을 반환합니다. 빈 덱이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        },
+        {
+          "function": "delete_rear",
+          "description": "마지막 값을 보관하고 rear를 이전 노드로 옮깁니다. 빈 덱이 되면 front도 NULL, 그 외에는 새 rear의 rlink를 NULL로 설정합니다. 제거한 노드를 free로 해제하고 값을 반환합니다. 빈 덱이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        },
+        {
+          "function": "get_front",
+          "description": "첫 값을 반환하며 연결·포인터·할당 상태를 바꾸지 않습니다. 빈 덱이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        },
+        {
+          "function": "get_rear",
+          "description": "마지막 값을 반환하며 연결·포인터·할당 상태를 바꾸지 않습니다. 빈 덱이면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "명령과덱 번호(0 또는 1)를 입력합니다. INIT은 호출 코드가 남은 노드를 해제한 뒤 초기화합니다. STATE·REVERSE·SIZE·ENDS는 호출 코드가 양방향 연결과 양 끝 포인터를 검사해 출력합니다. STATE는 앞에서 뒤, REVERSE는 뒤에서 앞 순서입니다. STATS는 두 덱 전체의 누적 malloc·free 호출 수입니다.",
+        "commands": [
+          {
+            "syntax": "INIT <dequeId>",
+            "output": null
+          },
+          {
+            "syntax": "ADD_FRONT <dequeId> <value>",
+            "output": null
+          },
+          {
+            "syntax": "ADD_REAR <dequeId> <value>",
+            "output": null
+          },
+          {
+            "syntax": "DELETE_FRONT <dequeId>",
+            "output": "DELETE_FRONT <value>"
+          },
+          {
+            "syntax": "DELETE_REAR <dequeId>",
+            "output": "DELETE_REAR <value>"
+          },
+          {
+            "syntax": "GET_FRONT <dequeId>",
+            "output": "GET_FRONT <value>"
+          },
+          {
+            "syntax": "GET_REAR <dequeId>",
+            "output": "GET_REAR <value>"
+          },
+          {
+            "syntax": "EMPTY <dequeId>",
+            "output": "EMPTY <0|1>"
+          },
+          {
+            "syntax": "FULL <dequeId>",
+            "output": "FULL 0"
+          },
+          {
+            "syntax": "STATE <dequeId>",
+            "output": "STATE <values>"
+          },
+          {
+            "syntax": "REVERSE <dequeId>",
+            "output": "REVERSE <values>"
+          },
+          {
+            "syntax": "SIZE <dequeId>",
+            "output": "SIZE <count>"
+          },
+          {
+            "syntax": "ENDS <dequeId>",
+            "output": "ENDS <frontValue|NULL> <rearValue|NULL>"
+          },
+          {
+            "syntax": "STATS <dequeId>",
+            "output": "STATS <allocations> <releases>"
+          }
+        ],
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

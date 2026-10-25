@@ -1,0 +1,501 @@
+{
+  "id": "graph-dijkstra",
+  "version": "1.0.0",
+  "title": "다익스트라 — 최단 경로",
+  "category": "graph",
+  "kind": "algorithm",
+  "description": "다익스트라 알고리즘으로 시작점에서 각 정점까지 최단 거리를 구합니다.",
+  "learning": {
+    "concept": {
+      "title": "다익스트라의 거리 완화",
+      "paragraphs": [
+        "다익스트라는 미확정 정점 중 누적 거리가 가장 작은 정점을 확정하고 이웃까지의 거리를 완화합니다. 모든 간선 가중치가 0 이상일 때 확정한 거리는 다시 줄어들지 않습니다.",
+        "distance[v]는 시작점에서 v까지의 누적 최단 거리입니다. 프림의 최소 연결 간선 비용과 다르게 distance[u] + weight[u][v]로 갱신합니다.",
+        "이 실습은 방향 그래프의 인접 행렬을 사용합니다. 간선 없음은 INF, 대각선은 0입니다. 도달할 수 없는 정점은 INF로 남기며 0 가중치도 정상 간선입니다. 시간은 O(V²), 보조 공간은 O(V)입니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "GraphType",
+        "description": "정점 수와 방향·가중치 간선을 보관합니다."
+      },
+      {
+        "name": "distance",
+        "description": "시작점에서 각 정점까지의 누적 거리이며 INF는 도달 불가입니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "dijkstra",
+        "description": "distance[0..n-1]에 시작점에서 각 정점까지 최단 거리를 저장합니다. 시작점은 0, 도달 불가는 INF이며 반환값은 없습니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "dijkstra",
+        "argument": 0,
+        "result": null,
+        "description": "시작점 0의 거리는 0, 나머지는 INF로 초기화합니다.",
+        "adjacency": [
+          [
+            1,
+            2
+          ],
+          [
+            3
+          ],
+          [
+            1,
+            3
+          ],
+          [],
+          []
+        ],
+        "weights": [
+          [
+            0,
+            7,
+            2,
+            null,
+            null
+          ],
+          [
+            null,
+            0,
+            null,
+            3,
+            null
+          ],
+          [
+            null,
+            1,
+            0,
+            8,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            0,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            0
+          ]
+        ],
+        "visited": [],
+        "source": 0,
+        "distances": [
+          0,
+          null,
+          null,
+          null,
+          null
+        ],
+        "trace": [
+          "distance = {0, INF, INF, INF, INF}"
+        ]
+      },
+      {
+        "operation": "dijkstra",
+        "argument": 0,
+        "result": null,
+        "description": "0번에서 나가는 간선으로 거리를 갱신합니다.",
+        "adjacency": [
+          [
+            1,
+            2
+          ],
+          [
+            3
+          ],
+          [
+            1,
+            3
+          ],
+          [],
+          []
+        ],
+        "weights": [
+          [
+            0,
+            7,
+            2,
+            null,
+            null
+          ],
+          [
+            null,
+            0,
+            null,
+            3,
+            null
+          ],
+          [
+            null,
+            1,
+            0,
+            8,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            0,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            0
+          ]
+        ],
+        "visited": [
+          0
+        ],
+        "source": 0,
+        "distances": [
+          0,
+          7,
+          2,
+          null,
+          null
+        ],
+        "trace": [
+          "0번 확정",
+          "0 → 1: 0 + 7 = 7",
+          "0 → 2: 0 + 2 = 2"
+        ]
+      },
+      {
+        "operation": "dijkstra",
+        "argument": 0,
+        "result": null,
+        "description": "미확정 최소 거리인 2번을 선택합니다. 1번 거리가 7에서 3으로 줄어듭니다.",
+        "adjacency": [
+          [
+            1,
+            2
+          ],
+          [
+            3
+          ],
+          [
+            1,
+            3
+          ],
+          [],
+          []
+        ],
+        "weights": [
+          [
+            0,
+            7,
+            2,
+            null,
+            null
+          ],
+          [
+            null,
+            0,
+            null,
+            3,
+            null
+          ],
+          [
+            null,
+            1,
+            0,
+            8,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            0,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            0
+          ]
+        ],
+        "visited": [
+          0,
+          2
+        ],
+        "source": 0,
+        "distances": [
+          0,
+          3,
+          2,
+          10,
+          null
+        ],
+        "trace": [
+          "2번 확정",
+          "2 → 1: 2 + 1 = 3 < 7",
+          "2 → 3: 2 + 8 = 10"
+        ],
+        "activeEdge": [
+          2,
+          1
+        ]
+      },
+      {
+        "operation": "dijkstra",
+        "argument": 0,
+        "result": null,
+        "description": "1번을 경유해 3번까지의 누적 거리를 갱신합니다.",
+        "adjacency": [
+          [
+            1,
+            2
+          ],
+          [
+            3
+          ],
+          [
+            1,
+            3
+          ],
+          [],
+          []
+        ],
+        "weights": [
+          [
+            0,
+            7,
+            2,
+            null,
+            null
+          ],
+          [
+            null,
+            0,
+            null,
+            3,
+            null
+          ],
+          [
+            null,
+            1,
+            0,
+            8,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            0,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            0
+          ]
+        ],
+        "visited": [
+          0,
+          2,
+          1
+        ],
+        "source": 0,
+        "distances": [
+          0,
+          3,
+          2,
+          6,
+          null
+        ],
+        "trace": [
+          "1번 확정",
+          "1 → 3: 3 + 3 = 6 < 10"
+        ],
+        "activeEdge": [
+          1,
+          3
+        ]
+      },
+      {
+        "operation": "dijkstra",
+        "argument": 0,
+        "result": null,
+        "description": "4번은 도달할 수 없습니다. 확정 순서와 정점 번호 순서는 다릅니다.",
+        "adjacency": [
+          [
+            1,
+            2
+          ],
+          [
+            3
+          ],
+          [
+            1,
+            3
+          ],
+          [],
+          []
+        ],
+        "weights": [
+          [
+            0,
+            7,
+            2,
+            null,
+            null
+          ],
+          [
+            null,
+            0,
+            null,
+            3,
+            null
+          ],
+          [
+            null,
+            1,
+            0,
+            8,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            0,
+            null
+          ],
+          [
+            null,
+            null,
+            null,
+            null,
+            0
+          ]
+        ],
+        "visited": [
+          0,
+          2,
+          1,
+          3
+        ],
+        "source": 0,
+        "distances": [
+          0,
+          3,
+          2,
+          6,
+          null
+        ],
+        "trace": [
+          "3번 확정",
+          "남은 4번은 INF → 종료"
+        ]
+      }
+    ],
+    "notes": [
+      {
+        "title": "음수 간선은 제외",
+        "description": "음수 간선이 있으면 거리 확정이 성립하지 않습니다. 음수 간선은 벨만–포드로 처리합니다."
+      }
+    ]
+  },
+  "contract": {
+    "storage": "array",
+    "capacity": 50,
+    "weighted": true,
+    "directed": true,
+    "representation": "matrix",
+    "scope": "제공된 구조체를 사용해 dijkstra 함수의 정의와 본문 전체를 구현합니다. 입력·그래프 구성·거리 출력은 호출 코드가 담당합니다.",
+    "functions": [
+      {
+        "name": "dijkstra",
+        "signature": "void dijkstra(GraphType *g, int start, int distance[])",
+        "behavior": "distance[0..n-1]에 시작점에서 각 정점까지 최단 거리를 저장합니다. 시작점은 0, 도달 불가는 INF이며 반환값은 없습니다."
+      }
+    ],
+    "requirements": [
+      "방향 가중치 단순 그래프이며 정점은 1~50개, 번호는 0~n-1입니다. 자기 간선은 없고 같은 방향 간선의 재입력은 가중치를 갱신합니다.",
+      "간선 가중치는 0~1,000입니다. INF는 1,000,000,000이며 int 범위 안에서 계산할 수 있습니다.",
+      "시작점은 유효합니다. 호출할 때마다 거리 배열을 초기화하고 그래프의 정점·간선·비용을 보존합니다.",
+      "distance는 정확히 n개 원소를 저장할 공간입니다. 함수 안에서 결과를 출력하지 않습니다."
+    ]
+  },
+  "prerequisites": [
+    "graph-matrix"
+  ],
+  "criteria": [
+    {
+      "id": "basic",
+      "order": 1,
+      "title": "기본 최단 거리",
+      "description": "시작점에서 각 정점까지 최단 거리를 구합니다."
+    },
+    {
+      "id": "relax",
+      "order": 2,
+      "title": "거리 갱신",
+      "description": "직접 간선보다 짧은 우회 경로와 여러 차례의 갱신을 처리합니다."
+    },
+    {
+      "id": "weights",
+      "order": 3,
+      "title": "가중치·방향",
+      "description": "0 가중치와 간선 방향을 정확히 처리합니다."
+    },
+    {
+      "id": "unreachable",
+      "order": 4,
+      "title": "도달 불가",
+      "description": "도달할 수 없는 정점의 거리는 INF로 유지합니다."
+    },
+    {
+      "id": "boundary",
+      "order": 5,
+      "title": "최대 크기",
+      "description": "최대 50개 정점과 조밀한 그래프를 처리합니다."
+    },
+    {
+      "id": "repeat",
+      "order": 6,
+      "title": "초기화·반복 호출",
+      "description": "시작점과 그래프를 바꾸어도 이전 거리가 남지 않습니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "dijkstra",
+          "description": "distance[0..n-1]에 시작점에서 각 정점까지 최단 거리를 저장합니다. 시작점은 0, 도달 불가는 INF이며 반환값은 없습니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "INIT n으로 초기화하고 EDGE from to weight로 방향 간선을 추가·갱신합니다. PATH start는 정점 번호 순으로 DIST 거리...를 출력합니다. 도달 불가는 INF로 출력합니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

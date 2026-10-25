@@ -1,0 +1,362 @@
+[
+  {
+    "id": "init-empty",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "두 포인터는 NULL이며 공백",
+    "input": "INIT 0\nEMPTY 0\nENDS 0\nSIZE 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "EMPTY 1\nENDS NULL NULL\nSIZE 0\nSTATE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "init-repeat",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "빈 큐의 반복 초기화",
+    "input": "INIT 0\nINIT 0\nINIT 0\nENDS 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "ENDS NULL NULL\nSTATS 0 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "init-both",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "두 큐의 초기 상태",
+    "input": "INIT 0\nINIT 1\nEMPTY 0\nEMPTY 1\nENDS 1\n",
+    "expected": {
+      "stdout": "EMPTY 1\nEMPTY 1\nENDS NULL NULL\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "enqueue-one",
+    "criterionId": "enqueue",
+    "public": false,
+    "description": "첫 노드는 front와 rear 모두에 연결",
+    "input": "INIT 0\nENQUEUE 0 10\nENDS 0\nSTATE 0\nEMPTY 0\n",
+    "expected": {
+      "stdout": "ENDS 10 10\nSTATE 10\nEMPTY 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "enqueue-many",
+    "criterionId": "enqueue",
+    "public": false,
+    "description": "기존 연결을 보존하는 연속 삽입",
+    "input": "INIT 0\nENQUEUE 0 10\nENQUEUE 0 20\nENQUEUE 0 30\nSTATE 0\nENDS 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "STATE 10 20 30\nENDS 10 30\nSIZE 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "enqueue-values",
+    "criterionId": "enqueue",
+    "public": false,
+    "description": "음수·0·중복 값 삽입",
+    "input": "INIT 0\nENQUEUE 0 -1000000\nENQUEUE 0 0\nENQUEUE 0 1000000\nENQUEUE 0 0\nSTATE 0\nENDS 0\n",
+    "expected": {
+      "stdout": "STATE -1000000 0 1000000 0\nENDS -1000000 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "dequeue-fifo",
+    "criterionId": "dequeue",
+    "public": true,
+    "description": "먼저 삽입한 값부터 반환",
+    "input": "INIT 0\nENQUEUE 0 10\nENQUEUE 0 20\nENQUEUE 0 30\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nEMPTY 0\nENDS 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 10\nDEQUEUE 20\nDEQUEUE 30\nEMPTY 1\nENDS NULL NULL\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "dequeue-one",
+    "criterionId": "dequeue",
+    "public": false,
+    "description": "단일 노드 삭제 후 빈 큐",
+    "input": "INIT 0\nENQUEUE 0 -7\nDEQUEUE 0\nSTATE 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "DEQUEUE -7\nSTATE\nSIZE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "dequeue-next",
+    "criterionId": "dequeue",
+    "public": false,
+    "description": "front만 다음 노드로 이동",
+    "input": "INIT 0\nENQUEUE 0 10\nENQUEUE 0 20\nENQUEUE 0 30\nDEQUEUE 0\nSTATE 0\nENDS 0\nDEQUEUE 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 10\nSTATE 20 30\nENDS 20 30\nDEQUEUE 20\nSTATE 30\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "ends-single",
+    "criterionId": "ends",
+    "public": false,
+    "description": "노드가 하나면 두 포인터가 같은 노드",
+    "input": "INIT 0\nENQUEUE 0 8\nENDS 0\nDEQUEUE 0\nENDS 0\n",
+    "expected": {
+      "stdout": "ENDS 8 8\nDEQUEUE 8\nENDS NULL NULL\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "ends-mixed",
+    "criterionId": "ends",
+    "public": false,
+    "description": "교차 삽입·삭제의 양 끝 포인터",
+    "input": "INIT 0\nENQUEUE 0 10\nENQUEUE 0 20\nENQUEUE 0 30\nDEQUEUE 0\nENQUEUE 0 40\nENDS 0\nDEQUEUE 0\nENDS 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 10\nENDS 20 40\nDEQUEUE 20\nENDS 30 40\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "ends-last-delete",
+    "criterionId": "ends",
+    "public": false,
+    "description": "마지막 삭제 시 rear도 NULL",
+    "input": "INIT 0\nENQUEUE 0 1\nENQUEUE 0 2\nDEQUEUE 0\nENDS 0\nDEQUEUE 0\nENDS 0\nEMPTY 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 1\nENDS 2 2\nDEQUEUE 2\nENDS NULL NULL\nEMPTY 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "ends-after-reinsert",
+    "criterionId": "ends",
+    "public": false,
+    "description": "마지막 삭제 후 새 노드로 양 끝 설정",
+    "input": "INIT 0\nENQUEUE 0 1\nDEQUEUE 0\nENQUEUE 0 2\nENQUEUE 0 3\nENDS 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 1\nENDS 2 3\nSTATE 2 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-dequeue",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 큐 삭제 오류",
+    "input": "INIT 0\nDEQUEUE 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-after-delete",
+    "criterionId": "empty",
+    "public": false,
+    "description": "마지막 삭제 후 삭제 오류",
+    "input": "INIT 0\nENQUEUE 0 5\nDEQUEUE 0\nDEQUEUE 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 5\n",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-preserves",
+    "criterionId": "empty",
+    "public": false,
+    "description": "공백 판정은 연결과 할당을 유지",
+    "input": "INIT 0\nEMPTY 0\nENQUEUE 0 6\nEMPTY 0\nEMPTY 0\nENDS 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "EMPTY 1\nEMPTY 0\nEMPTY 0\nENDS 6 6\nSTATS 1 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "full-always-zero",
+    "criterionId": "full",
+    "public": false,
+    "description": "모든 상태에서 포화 판정은 0",
+    "input": "INIT 0\nFULL 0\nENQUEUE 0 1\nFULL 0\nENQUEUE 0 2\nFULL 0\nDEQUEUE 0\nFULL 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "FULL 0\nFULL 0\nFULL 0\nDEQUEUE 1\nFULL 0\nSTATE 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "full-many",
+    "criterionId": "full",
+    "public": false,
+    "description": "120개 노드 삽입 후 FIFO 삭제",
+    "input": "INIT 0\nENQUEUE 0 0\nENQUEUE 0 1\nENQUEUE 0 2\nENQUEUE 0 3\nENQUEUE 0 4\nENQUEUE 0 5\nENQUEUE 0 6\nENQUEUE 0 7\nENQUEUE 0 8\nENQUEUE 0 9\nENQUEUE 0 10\nENQUEUE 0 11\nENQUEUE 0 12\nENQUEUE 0 13\nENQUEUE 0 14\nENQUEUE 0 15\nENQUEUE 0 16\nENQUEUE 0 17\nENQUEUE 0 18\nENQUEUE 0 19\nENQUEUE 0 20\nENQUEUE 0 21\nENQUEUE 0 22\nENQUEUE 0 23\nENQUEUE 0 24\nENQUEUE 0 25\nENQUEUE 0 26\nENQUEUE 0 27\nENQUEUE 0 28\nENQUEUE 0 29\nENQUEUE 0 30\nENQUEUE 0 31\nENQUEUE 0 32\nENQUEUE 0 33\nENQUEUE 0 34\nENQUEUE 0 35\nENQUEUE 0 36\nENQUEUE 0 37\nENQUEUE 0 38\nENQUEUE 0 39\nENQUEUE 0 40\nENQUEUE 0 41\nENQUEUE 0 42\nENQUEUE 0 43\nENQUEUE 0 44\nENQUEUE 0 45\nENQUEUE 0 46\nENQUEUE 0 47\nENQUEUE 0 48\nENQUEUE 0 49\nENQUEUE 0 50\nENQUEUE 0 51\nENQUEUE 0 52\nENQUEUE 0 53\nENQUEUE 0 54\nENQUEUE 0 55\nENQUEUE 0 56\nENQUEUE 0 57\nENQUEUE 0 58\nENQUEUE 0 59\nENQUEUE 0 60\nENQUEUE 0 61\nENQUEUE 0 62\nENQUEUE 0 63\nENQUEUE 0 64\nENQUEUE 0 65\nENQUEUE 0 66\nENQUEUE 0 67\nENQUEUE 0 68\nENQUEUE 0 69\nENQUEUE 0 70\nENQUEUE 0 71\nENQUEUE 0 72\nENQUEUE 0 73\nENQUEUE 0 74\nENQUEUE 0 75\nENQUEUE 0 76\nENQUEUE 0 77\nENQUEUE 0 78\nENQUEUE 0 79\nENQUEUE 0 80\nENQUEUE 0 81\nENQUEUE 0 82\nENQUEUE 0 83\nENQUEUE 0 84\nENQUEUE 0 85\nENQUEUE 0 86\nENQUEUE 0 87\nENQUEUE 0 88\nENQUEUE 0 89\nENQUEUE 0 90\nENQUEUE 0 91\nENQUEUE 0 92\nENQUEUE 0 93\nENQUEUE 0 94\nENQUEUE 0 95\nENQUEUE 0 96\nENQUEUE 0 97\nENQUEUE 0 98\nENQUEUE 0 99\nENQUEUE 0 100\nENQUEUE 0 101\nENQUEUE 0 102\nENQUEUE 0 103\nENQUEUE 0 104\nENQUEUE 0 105\nENQUEUE 0 106\nENQUEUE 0 107\nENQUEUE 0 108\nENQUEUE 0 109\nENQUEUE 0 110\nENQUEUE 0 111\nENQUEUE 0 112\nENQUEUE 0 113\nENQUEUE 0 114\nENQUEUE 0 115\nENQUEUE 0 116\nENQUEUE 0 117\nENQUEUE 0 118\nENQUEUE 0 119\nFULL 0\nSIZE 0\nENDS 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nENDS 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "FULL 0\nSIZE 120\nENDS 0 119\nDEQUEUE 0\nDEQUEUE 1\nDEQUEUE 2\nDEQUEUE 3\nDEQUEUE 4\nDEQUEUE 5\nDEQUEUE 6\nDEQUEUE 7\nDEQUEUE 8\nDEQUEUE 9\nDEQUEUE 10\nDEQUEUE 11\nDEQUEUE 12\nDEQUEUE 13\nDEQUEUE 14\nDEQUEUE 15\nDEQUEUE 16\nDEQUEUE 17\nDEQUEUE 18\nDEQUEUE 19\nDEQUEUE 20\nDEQUEUE 21\nDEQUEUE 22\nDEQUEUE 23\nDEQUEUE 24\nDEQUEUE 25\nDEQUEUE 26\nDEQUEUE 27\nDEQUEUE 28\nDEQUEUE 29\nDEQUEUE 30\nDEQUEUE 31\nDEQUEUE 32\nDEQUEUE 33\nDEQUEUE 34\nDEQUEUE 35\nDEQUEUE 36\nDEQUEUE 37\nDEQUEUE 38\nDEQUEUE 39\nDEQUEUE 40\nDEQUEUE 41\nDEQUEUE 42\nDEQUEUE 43\nDEQUEUE 44\nDEQUEUE 45\nDEQUEUE 46\nDEQUEUE 47\nDEQUEUE 48\nDEQUEUE 49\nDEQUEUE 50\nDEQUEUE 51\nDEQUEUE 52\nDEQUEUE 53\nDEQUEUE 54\nDEQUEUE 55\nDEQUEUE 56\nDEQUEUE 57\nDEQUEUE 58\nDEQUEUE 59\nDEQUEUE 60\nDEQUEUE 61\nDEQUEUE 62\nDEQUEUE 63\nDEQUEUE 64\nDEQUEUE 65\nDEQUEUE 66\nDEQUEUE 67\nDEQUEUE 68\nDEQUEUE 69\nDEQUEUE 70\nDEQUEUE 71\nDEQUEUE 72\nDEQUEUE 73\nDEQUEUE 74\nDEQUEUE 75\nDEQUEUE 76\nDEQUEUE 77\nDEQUEUE 78\nDEQUEUE 79\nDEQUEUE 80\nDEQUEUE 81\nDEQUEUE 82\nDEQUEUE 83\nDEQUEUE 84\nDEQUEUE 85\nDEQUEUE 86\nDEQUEUE 87\nDEQUEUE 88\nDEQUEUE 89\nDEQUEUE 90\nDEQUEUE 91\nDEQUEUE 92\nDEQUEUE 93\nDEQUEUE 94\nDEQUEUE 95\nDEQUEUE 96\nDEQUEUE 97\nDEQUEUE 98\nDEQUEUE 99\nDEQUEUE 100\nDEQUEUE 101\nDEQUEUE 102\nDEQUEUE 103\nDEQUEUE 104\nDEQUEUE 105\nDEQUEUE 106\nDEQUEUE 107\nDEQUEUE 108\nDEQUEUE 109\nDEQUEUE 110\nDEQUEUE 111\nDEQUEUE 112\nDEQUEUE 113\nDEQUEUE 114\nDEQUEUE 115\nDEQUEUE 116\nDEQUEUE 117\nDEQUEUE 118\nDEQUEUE 119\nENDS NULL NULL\nSTATS 120 120\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-empty",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "빈 큐는 NULL 한 줄 출력",
+    "input": "INIT 0\nPRINT 0\n",
+    "expected": {
+      "stdout": "NULL\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-single",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "단일 값 출력 후 상태 유지",
+    "input": "INIT 0\nENQUEUE 0 0\nPRINT 0\nENDS 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "0->NULL\nENDS 0 0\nSTATS 1 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-many",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "front부터 출력하고 연결 보존",
+    "input": "INIT 0\nENQUEUE 0 10\nENQUEUE 0 20\nENQUEUE 0 30\nPRINT 0\nPRINT 0\nSTATE 0\nENDS 0\n",
+    "expected": {
+      "stdout": "10->20->30->NULL\n10->20->30->NULL\nSTATE 10 20 30\nENDS 10 30\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-one",
+    "criterionId": "memory",
+    "public": false,
+    "description": "삽입·삭제 한 번의 할당과 해제",
+    "input": "INIT 0\nENQUEUE 0 5\nSTATS 0\nDEQUEUE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATS 1 0\nDEQUEUE 5\nSTATS 1 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-all",
+    "criterionId": "memory",
+    "public": false,
+    "description": "모든 데이터 노드 해제",
+    "input": "INIT 0\nENQUEUE 0 10\nENQUEUE 0 20\nENQUEUE 0 30\nDEQUEUE 0\nSTATS 0\nDEQUEUE 0\nDEQUEUE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 10\nSTATS 3 1\nDEQUEUE 20\nDEQUEUE 30\nSTATS 3 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-observe",
+    "criterionId": "memory",
+    "public": false,
+    "description": "판정과 출력은 할당·해제하지 않음",
+    "input": "INIT 0\nENQUEUE 0 10\nENQUEUE 0 20\nENQUEUE 0 30\nEMPTY 0\nFULL 0\nPRINT 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "EMPTY 0\nFULL 0\n10->20->30->NULL\nSTATS 3 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-empty",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "전체 삭제 후 재삽입",
+    "input": "INIT 0\nENQUEUE 0 1\nDEQUEUE 0\nENQUEUE 0 2\nENQUEUE 0 3\nSTATE 0\nDEQUEUE 0\nDEQUEUE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 1\nSTATE 2 3\nDEQUEUE 2\nDEQUEUE 3\nSTATS 3 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-init",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "남은 노드 정리 후 재초기화",
+    "input": "INIT 0\nENQUEUE 0 10\nENQUEUE 0 20\nENQUEUE 0 30\nINIT 0\nENDS 0\nEMPTY 0\nSTATS 0\nENQUEUE 0 99\nENDS 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "ENDS NULL NULL\nEMPTY 1\nSTATS 3 3\nENDS 99 99\nSTATE 99\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-repeat",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "삽입·삭제 반복 후 빈 상태",
+    "input": "INIT 0\nENQUEUE 0 0\nDEQUEUE 0\nENQUEUE 0 1\nDEQUEUE 0\nENQUEUE 0 2\nDEQUEUE 0\nENQUEUE 0 3\nDEQUEUE 0\nENQUEUE 0 4\nDEQUEUE 0\nENQUEUE 0 5\nDEQUEUE 0\nENQUEUE 0 6\nDEQUEUE 0\nENQUEUE 0 7\nDEQUEUE 0\nENQUEUE 0 8\nDEQUEUE 0\nENQUEUE 0 9\nDEQUEUE 0\nENQUEUE 0 10\nDEQUEUE 0\nENQUEUE 0 11\nDEQUEUE 0\nENDS 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 0\nDEQUEUE 1\nDEQUEUE 2\nDEQUEUE 3\nDEQUEUE 4\nDEQUEUE 5\nDEQUEUE 6\nDEQUEUE 7\nDEQUEUE 8\nDEQUEUE 9\nDEQUEUE 10\nDEQUEUE 11\nENDS NULL NULL\nSTATS 12 12\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent",
+    "criterionId": "independence",
+    "public": false,
+    "description": "두 큐의 독립적인 FIFO",
+    "input": "INIT 0\nINIT 1\nENQUEUE 0 10\nENQUEUE 1 100\nENQUEUE 0 20\nENQUEUE 1 200\nDEQUEUE 0\nSTATE 0\nSTATE 1\nDEQUEUE 1\nENDS 0\nENDS 1\n",
+    "expected": {
+      "stdout": "DEQUEUE 10\nSTATE 20\nSTATE 100 200\nDEQUEUE 100\nENDS 20 20\nENDS 200 200\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-init",
+    "criterionId": "independence",
+    "public": false,
+    "description": "한 큐 초기화가 다른 큐에 영향 없음",
+    "input": "INIT 0\nINIT 1\nENQUEUE 0 1\nENQUEUE 1 2\nENQUEUE 1 3\nINIT 0\nENQUEUE 0 4\nSTATE 0\nSTATE 1\nENDS 1\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATE 4\nSTATE 2 3\nENDS 2 3\nSTATS 4 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-empty",
+    "criterionId": "independence",
+    "public": false,
+    "description": "한 큐를 비워도 다른 큐의 포인터 유지",
+    "input": "INIT 0\nINIT 1\nENQUEUE 0 1\nENQUEUE 1 9\nDEQUEUE 0\nENDS 0\nENDS 1\nENQUEUE 0 2\nSTATE 0\nSTATE 1\n",
+    "expected": {
+      "stdout": "DEQUEUE 1\nENDS NULL NULL\nENDS 9 9\nSTATE 2\nSTATE 9\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

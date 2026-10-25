@@ -1,0 +1,343 @@
+{
+  "id": "tree-level-order",
+  "version": "1.0.0",
+  "title": "레벨 순회",
+  "category": "tree",
+  "kind": "algorithm",
+  "description": "큐에 방문할 노드를 넣고 같은 깊이의 노드를 왼쪽부터 방문하는 레벨 순회를 구현합니다.",
+  "learning": {
+    "concept": {
+      "title": "큐로 같은 깊이부터 방문하기",
+      "paragraphs": [
+        "레벨 순회는 루트부터 깊이 순서로 방문합니다. 같은 깊이에서는 왼쪽에서 오른쪽으로 진행하며, 재귀 호출 대신 FIFO 큐에 다음에 방문할 노드를 보관합니다.",
+        "루트를 큐에 넣고 하나씩 꺼내 출력합니다. 꺼낸 노드의 왼쪽 자식과 오른쪽 자식을 순서대로 넣으면 앞선 깊이의 노드들이 먼저 처리됩니다. NULL 자식은 큐에 넣지 않습니다.",
+        "노드 n개를 각각 한 번씩 처리하므로 시간은 O(n)입니다. 대기 노드 수는 트리의 최대 너비에 비례합니다. 이번 실습은 최대 63개 노드를 담을 수 있는 고정 원형 큐를 제공하며, 순회 중 트리는 변경하지 않습니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "root",
+        "description": "순회를 시작할 루트입니다. NULL이면 출력 없이 반환합니다."
+      },
+      {
+        "name": "QueueType",
+        "description": "TreeNode 포인터를 보관하는 원형 큐입니다. 배열 크기는 64이며 한 칸을 비워 63개를 저장합니다."
+      },
+      {
+        "name": "front · rear",
+        "description": "제공된 init_queue·is_empty·enqueue·dequeue가 관리합니다. level_order만 직접 구현합니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "level_order",
+        "description": "빈 트리에서는 반환합니다. 루트를 큐에 넣고, 큐가 빌 때까지 노드를 꺼내 \"[%d] \"로 출력한 뒤 왼쪽·오른쪽 자식을 차례로 넣습니다. 줄바꿈은 호출 코드가 담당하며 값과 연결은 바꾸지 않습니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "level_order",
+        "argument": "root",
+        "result": null,
+        "tree": [
+          15,
+          4,
+          20,
+          1,
+          null,
+          16,
+          25
+        ],
+        "visited": [],
+        "trace": [
+          "(출력 없음)",
+          "대기 큐: 15"
+        ],
+        "activeNode": 0,
+        "description": "루트 15를 큐에 넣고 시작합니다."
+      },
+      {
+        "operation": "level_order",
+        "argument": "15 노드",
+        "result": null,
+        "tree": [
+          15,
+          4,
+          20,
+          1,
+          null,
+          16,
+          25
+        ],
+        "visited": [
+          0
+        ],
+        "trace": [
+          "[15] ",
+          "대기 큐: 4 → 20"
+        ],
+        "activeNode": 0,
+        "description": "15을 꺼내 출력하고, 존재하는 왼쪽·오른쪽 자식을 순서대로 큐에 넣습니다."
+      },
+      {
+        "operation": "level_order",
+        "argument": "4 노드",
+        "result": null,
+        "tree": [
+          15,
+          4,
+          20,
+          1,
+          null,
+          16,
+          25
+        ],
+        "visited": [
+          0,
+          1
+        ],
+        "trace": [
+          "[15] [4] ",
+          "대기 큐: 20 → 1"
+        ],
+        "activeNode": 1,
+        "description": "4을 꺼내 출력하고, 존재하는 왼쪽·오른쪽 자식을 순서대로 큐에 넣습니다."
+      },
+      {
+        "operation": "level_order",
+        "argument": "20 노드",
+        "result": null,
+        "tree": [
+          15,
+          4,
+          20,
+          1,
+          null,
+          16,
+          25
+        ],
+        "visited": [
+          0,
+          1,
+          2
+        ],
+        "trace": [
+          "[15] [4] [20] ",
+          "대기 큐: 1 → 16 → 25"
+        ],
+        "activeNode": 2,
+        "description": "20을 꺼내 출력하고, 존재하는 왼쪽·오른쪽 자식을 순서대로 큐에 넣습니다."
+      },
+      {
+        "operation": "level_order",
+        "argument": "1 노드",
+        "result": null,
+        "tree": [
+          15,
+          4,
+          20,
+          1,
+          null,
+          16,
+          25
+        ],
+        "visited": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "trace": [
+          "[15] [4] [20] [1] ",
+          "대기 큐: 16 → 25"
+        ],
+        "activeNode": 3,
+        "description": "1을 꺼내 출력하고, 존재하는 왼쪽·오른쪽 자식을 순서대로 큐에 넣습니다."
+      },
+      {
+        "operation": "level_order",
+        "argument": "16 노드",
+        "result": null,
+        "tree": [
+          15,
+          4,
+          20,
+          1,
+          null,
+          16,
+          25
+        ],
+        "visited": [
+          0,
+          1,
+          2,
+          3,
+          5
+        ],
+        "trace": [
+          "[15] [4] [20] [1] [16] ",
+          "대기 큐: 25"
+        ],
+        "activeNode": 5,
+        "description": "16을 꺼내 출력하고, 존재하는 왼쪽·오른쪽 자식을 순서대로 큐에 넣습니다."
+      },
+      {
+        "operation": "level_order",
+        "argument": "25 노드",
+        "result": null,
+        "tree": [
+          15,
+          4,
+          20,
+          1,
+          null,
+          16,
+          25
+        ],
+        "visited": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6
+        ],
+        "trace": [
+          "[15] [4] [20] [1] [16] [25] ",
+          "대기 큐: (비어 있음)"
+        ],
+        "activeNode": 6,
+        "description": "25을 꺼내 출력하고, 존재하는 왼쪽·오른쪽 자식을 순서대로 큐에 넣습니다."
+      },
+      {
+        "operation": "level_order",
+        "argument": "root",
+        "result": null,
+        "tree": [
+          15,
+          4,
+          20,
+          1,
+          null,
+          16,
+          25
+        ],
+        "visited": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6
+        ],
+        "trace": [
+          "[15] [4] [20] [1] [16] [25] ",
+          "대기 큐: (비어 있음)"
+        ],
+        "description": "큐가 비었습니다. 모든 노드를 깊이 순서로 방문했습니다."
+      }
+    ],
+    "notes": [
+      {
+        "title": "큐에는 노드의 주소",
+        "description": "값이 아닌 TreeNode 포인터를 넣어 꺼낸 노드의 자식에도 접근합니다."
+      },
+      {
+        "title": "왼쪽 자식부터 삽입",
+        "description": "왼쪽·오른쪽 순서로 큐에 넣어 같은 깊이의 방문 순서를 유지합니다."
+      },
+      {
+        "title": "큐와 트리의 수명 구분",
+        "description": "큐는 함수 안에서 매번 초기화합니다. 트리 노드는 할당·해제하거나 변경하지 않습니다."
+      }
+    ]
+  },
+  "contract": {
+    "storage": "linked",
+    "scope": "제공된 TreeNode와 큐 연산을 사용해 level_order 함수의 정의와 본문 전체를 구현합니다.",
+    "functions": [
+      {
+        "name": "level_order",
+        "signature": "void level_order(TreeNode *root)",
+        "behavior": "빈 트리에서는 반환합니다. 루트를 큐에 넣고, 큐가 빌 때까지 노드를 꺼내 \"[%d] \"로 출력한 뒤 왼쪽·오른쪽 자식을 차례로 넣습니다. 줄바꿈은 호출 코드가 담당하며 값과 연결은 바꾸지 않습니다."
+      }
+    ],
+    "requirements": [
+      "루트부터 깊이 순서로, 같은 깊이에서는 왼쪽부터 방문합니다.",
+      "큐 연산은 제공됩니다. 함수 안에서 큐를 초기화하고 NULL 자식은 넣지 않습니다.",
+      "각 값은 \"[%d] \" 형식이며 마지막 값 뒤에도 공백 하나가 있습니다. 줄바꿈은 호출 코드가 추가합니다.",
+      "최대 노드 수는 63입니다. 노드의 값·연결을 변경하거나 노드를 할당·해제하지 않습니다."
+    ],
+    "valueRange": {
+      "min": -1000000,
+      "max": 1000000
+    }
+  },
+  "prerequisites": [
+    "tree-binary",
+    "queue-circular"
+  ],
+  "criteria": [
+    {
+      "id": "empty",
+      "order": 1,
+      "title": "빈 트리",
+      "description": "NULL에서 출력 없이 종료합니다."
+    },
+    {
+      "id": "leaf",
+      "order": 2,
+      "title": "단말 노드",
+      "description": "값이 0인 경우도 한 번 출력합니다."
+    },
+    {
+      "id": "level-order",
+      "order": 3,
+      "title": "깊이 순서",
+      "description": "루트에서 시작해 같은 깊이를 먼저 방문합니다."
+    },
+    {
+      "id": "siblings",
+      "order": 4,
+      "title": "같은 깊이의 방문 순서",
+      "description": "같은 깊이에서는 왼쪽부터 방문합니다."
+    },
+    {
+      "id": "sparse",
+      "order": 5,
+      "title": "다양한 트리 구조",
+      "description": "한쪽 자식과 비대칭 구조를 처리합니다."
+    },
+    {
+      "id": "preservation",
+      "order": 6,
+      "title": "트리 보존",
+      "description": "순회 후 값과 연결을 유지합니다."
+    },
+    {
+      "id": "reuse",
+      "order": 7,
+      "title": "반복 호출과 큐 용량",
+      "description": "여러 호출과 최대 크기의 트리를 처리합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "level_order",
+          "description": "빈 트리에서는 반환합니다. 루트를 큐에 넣고, 큐가 빌 때까지 노드를 꺼내 \"[%d] \"로 출력한 뒤 왼쪽·오른쪽 자식을 차례로 넣습니다. 줄바꿈은 호출 코드가 담당하며 값과 연결은 바꾸지 않습니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "각 입력은 반복 횟수(1~3), 슬롯 수(0~63), 슬롯 값으로 구성합니다. 슬롯은 루트부터 배열 위치 순서이며 i의 왼쪽·오른쪽 자식 위치는 2i+1·2i+2입니다. #은 빈 자리입니다. 슬롯 수 0 또는 루트 #은 빈 트리입니다. 호출 코드는 연결을 구성하고 순회마다 줄바꿈을 추가한 뒤 값과 연결이 유지됐는지 검사합니다. 한 입력에서 여러 트리를 연속으로 전달할 수 있습니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

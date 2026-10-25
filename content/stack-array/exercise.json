@@ -1,0 +1,305 @@
+{
+  "id": "stack-array",
+  "version": "1.0.1",
+  "title": "고정 배열 스택",
+  "category": "stack",
+  "kind": "data-structure",
+  "description": "스택은 가장 나중에 넣은 값을 가장 먼저 꺼내는 LIFO 자료구조입니다. 고정 크기 배열과 맨 위 위치를 나타내는 top으로 구현하며, 삽입과 삭제는 맨 위에서만 수행합니다.",
+  "learning": {
+    "concept": {
+      "title": "스택과 LIFO",
+      "paragraphs": [
+        "접시를 쌓듯이 새 값을 맨 위에 넣고, 꺼낼 때도 맨 위에서 꺼냅니다. 10을 넣은 뒤 20을 넣으면 먼저 꺼내는 값은 20입니다.",
+        "이 과제는 정수 100개를 저장할 수 있는 고정 배열 스택입니다. 용량을 자동으로 늘리지 않습니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "element",
+        "description": "스택에 저장할 정수 타입입니다. typedef로 int에 이름을 붙입니다."
+      },
+      {
+        "name": "data",
+        "description": "값을 아래에서 위 순서로 저장하는 100칸 배열입니다. 유효한 값은 data[0]부터 data[top]까지입니다."
+      },
+      {
+        "name": "top",
+        "description": "마지막으로 삽입한 값의 배열 위치입니다. 빈 상태는 -1, 한 개가 있는 상태는 0, 포화 상태는 99입니다. 저장 개수는 top + 1입니다."
+      },
+      {
+        "name": "StackType",
+        "description": "배열과 top을 묶은 구조체입니다. 함수에 구조체 포인터를 전달하므로 여러 스택을 독립적으로 사용할 수 있습니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "init_stack",
+        "description": "이전 값이 배열에 남아 있어도 top을 -1로 바꾸면 논리적으로 비어 있습니다."
+      },
+      {
+        "function": "push",
+        "description": "공간을 확인한 뒤 top을 먼저 증가시키고 값을 저장합니다. 기존 top에 쓰면 마지막 값을 덮어쓰게 됩니다."
+      },
+      {
+        "function": "pop",
+        "description": "현재 맨 위 값을 꺼내고 top을 감소시킵니다. 제거된 배열 칸을 0으로 지우는 것은 필수가 아닙니다."
+      },
+      {
+        "function": "peek",
+        "description": "맨 위 값을 읽기만 합니다. 조회 다음에도 pop은 같은 값을 반환해야 합니다."
+      },
+      {
+        "function": "is_empty",
+        "description": "top이 -1인지 확인합니다. top이 0이면 값 한 개가 있는 상태입니다."
+      },
+      {
+        "function": "is_full",
+        "description": "배열 인덱스는 0부터 시작하므로 마지막 칸은 99입니다. top이 100이 되기 전에 삽입을 막아야 합니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "init_stack",
+        "argument": null,
+        "result": null,
+        "values": [],
+        "top": -1
+      },
+      {
+        "operation": "push",
+        "argument": 10,
+        "result": null,
+        "values": [
+          10
+        ],
+        "top": 0
+      },
+      {
+        "operation": "push",
+        "argument": 20,
+        "result": null,
+        "values": [
+          10,
+          20
+        ],
+        "top": 1
+      },
+      {
+        "operation": "peek",
+        "argument": null,
+        "result": 20,
+        "values": [
+          10,
+          20
+        ],
+        "top": 1
+      },
+      {
+        "operation": "pop",
+        "argument": null,
+        "result": 20,
+        "values": [
+          10
+        ],
+        "top": 0
+      },
+      {
+        "operation": "pop",
+        "argument": null,
+        "result": 10,
+        "values": [],
+        "top": -1
+      },
+      {
+        "operation": "is_empty",
+        "argument": null,
+        "result": 1,
+        "values": [],
+        "top": -1
+      }
+    ]
+  },
+  "contract": {
+    "scope": "제공된 StackType을 사용해 6개 함수의 정의와 본문 전체를 구현합니다.",
+    "capacity": 100,
+    "valueRange": {
+      "min": -1000000,
+      "max": 1000000
+    },
+    "initialTop": -1,
+    "booleanResult": {
+      "true": 1,
+      "false": 0
+    },
+    "functions": [
+      {
+        "name": "init_stack",
+        "signature": "void init_stack(StackType *s)",
+        "behavior": "top을 -1로 설정해 빈 상태를 만듭니다. 배열을 모두 0으로 채울 필요는 없습니다."
+      },
+      {
+        "name": "is_empty",
+        "signature": "int is_empty(StackType *s)",
+        "behavior": "top이 -1이면 1, 아니면 0을 반환합니다. 스택을 변경하지 않습니다."
+      },
+      {
+        "name": "is_full",
+        "signature": "int is_full(StackType *s)",
+        "behavior": "top이 99이면 1, 아니면 0을 반환합니다. 스택을 변경하지 않습니다."
+      },
+      {
+        "name": "push",
+        "signature": "void push(StackType *s, element item)",
+        "behavior": "포화 여부를 먼저 확인합니다. 공간이 있으면 top을 증가시키고 해당 위치에 값을 저장합니다. 포화 상태라면 stderr에 오류를 출력하고 기존 상태를 유지한 채 반환합니다."
+      },
+      {
+        "name": "pop",
+        "signature": "element pop(StackType *s)",
+        "behavior": "빈 상태인지 먼저 확인합니다. 값이 있으면 현재 top 위치의 값을 반환하고 top을 감소시킵니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      },
+      {
+        "name": "peek",
+        "signature": "element peek(StackType *s)",
+        "behavior": "빈 상태를 검사한 뒤 현재 top 위치의 값만 반환합니다. top과 저장된 값은 변경하지 않습니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+      }
+    ],
+    "errorHandling": {
+      "overflow": "stderr에 오류를 출력하고 기존 상태를 유지한 채 반환합니다.",
+      "underflow": "stderr에 오류를 출력하고 exit(1)로 종료합니다.",
+      "exactMessageRequired": false
+    },
+    "requirements": [
+      "제공된 상수, 자료형, 구조체 필드와 함수 호출 규격을 유지합니다.",
+      "각 함수는 전달받은 스택을 조작하며 다른 스택에 영향을 주지 않습니다.",
+      "정상 연산은 stdout와 stderr에 출력하지 않습니다. 출력은 호출 코드가 담당합니다.",
+      "사용자 main()을 작성하지 않습니다. 테스트 호출 코드와 결합해 실행합니다.",
+      "유효한 구조체 포인터를 전달합니다. NULL 포인터 처리는 훈련 범위에 포함하지 않습니다."
+    ],
+    "assessmentScope": "동작과 제공된 구조체 상태를 검사합니다. 코드 스타일, 시간 복잡도와 배열 외 보조 저장소 사용 여부를 정적으로 검사하지 않습니다."
+  },
+  "prerequisites": [],
+  "criteria": [
+    {
+      "id": "initialization",
+      "order": 1,
+      "title": "초기화",
+      "description": "생성과 재초기화 후 top이 -1이고 빈 상태인지 확인합니다."
+    },
+    {
+      "id": "push",
+      "order": 2,
+      "title": "삽입",
+      "description": "배열에 입력한 값과 top이 올바르게 저장되는지 확인합니다."
+    },
+    {
+      "id": "pop",
+      "order": 3,
+      "title": "LIFO 삭제",
+      "description": "나중에 삽입한 값부터 반환하고 제거하는지 확인합니다."
+    },
+    {
+      "id": "peek",
+      "order": 4,
+      "title": "조회",
+      "description": "맨 위 값을 반환하면서 값과 top을 유지하는지 확인합니다."
+    },
+    {
+      "id": "empty",
+      "order": 5,
+      "title": "빈 스택 처리",
+      "description": "빈 pop과 peek가 오류를 출력하고 종료 코드 1로 끝나는지 확인합니다."
+    },
+    {
+      "id": "full",
+      "order": 6,
+      "title": "포화 상태 처리",
+      "description": "100개에서 포화 상태가 되고 초과 삽입이 기존 값을 변경하지 않는지 확인합니다."
+    },
+    {
+      "id": "reuse",
+      "order": 7,
+      "title": "경계와 재사용",
+      "description": "삭제, 재삽입, 재초기화 후 다시 사용할 수 있는지 확인합니다."
+    },
+    {
+      "id": "independence",
+      "order": 8,
+      "title": "스택 독립성",
+      "description": "두 스택을 교차 조작해도 각 값과 상태가 독립적인지 확인합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "init_stack",
+          "description": "top을 -1로 설정해 빈 상태를 만듭니다. 배열을 모두 0으로 채울 필요는 없습니다."
+        },
+        {
+          "function": "is_empty",
+          "description": "top이 -1이면 1, 아니면 0을 반환합니다. 스택을 변경하지 않습니다."
+        },
+        {
+          "function": "is_full",
+          "description": "top이 99이면 1, 아니면 0을 반환합니다. 스택을 변경하지 않습니다."
+        },
+        {
+          "function": "push",
+          "description": "포화 여부를 먼저 확인합니다. 공간이 있으면 top을 증가시키고 해당 위치에 값을 저장합니다. 포화 상태라면 stderr에 오류를 출력하고 기존 상태를 유지한 채 반환합니다."
+        },
+        {
+          "function": "pop",
+          "description": "빈 상태인지 먼저 확인합니다. 값이 있으면 현재 top 위치의 값을 반환하고 top을 감소시킵니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        },
+        {
+          "function": "peek",
+          "description": "빈 상태를 검사한 뒤 현재 top 위치의 값만 반환합니다. top과 저장된 값은 변경하지 않습니다. 빈 상태라면 stderr에 오류를 출력하고 exit(1)로 종료합니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "한 줄에 명령과 스택 번호(0 또는 1)를 입력합니다. 각 테스트는 INIT으로 사용할 스택을 초기화합니다. INIT과 PUSH는 출력하지 않고 조회 명령은 결과를 한 줄씩 출력합니다. TOP과 DATA는 테스트용 상태 검사 명령입니다.",
+        "commands": [
+          {
+            "syntax": "INIT <stackId>",
+            "output": null
+          },
+          {
+            "syntax": "PUSH <stackId> <value>",
+            "output": null
+          },
+          {
+            "syntax": "POP <stackId>",
+            "output": "POP <value>"
+          },
+          {
+            "syntax": "PEEK <stackId>",
+            "output": "PEEK <value>"
+          },
+          {
+            "syntax": "EMPTY <stackId>",
+            "output": "EMPTY <0|1>"
+          },
+          {
+            "syntax": "FULL <stackId>",
+            "output": "FULL <0|1>"
+          },
+          {
+            "syntax": "TOP <stackId>",
+            "output": "TOP <index>"
+          },
+          {
+            "syntax": "DATA <stackId> <index>",
+            "output": "DATA <index> <value>"
+          }
+        ],
+        "harnessErrorExitCode": 2,
+        "harnessErrors": "잘못된 명령, 스택 번호, 누락된 인자 또는 배열 위치는 호출 코드 입력 오류입니다. 과제 테스트 입력의 오류로 구분합니다."
+      }
+    }
+  }
+}

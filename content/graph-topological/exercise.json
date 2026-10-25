@@ -1,0 +1,510 @@
+{
+  "id": "graph-topological",
+  "version": "1.0.0",
+  "title": "위상 정렬 — 진입 차수 기반",
+  "category": "graph",
+  "kind": "algorithm",
+  "description": "진입 차수가 0인 정점을 큐로 처리해 방향 그래프의 선후 관계를 정렬합니다.",
+  "learning": {
+    "concept": {
+      "title": "진입 차수와 큐로 구하는 위상 순서",
+      "paragraphs": [
+        "위상 정렬은 방향 비순환 그래프(DAG)의 모든 간선 u → v에 대해 u가 v보다 먼저 오도록 정점을 나열합니다. 시작 정점이 여러 개면 정답 순서도 여러 개일 수 있습니다.",
+        "각 정점으로 들어오는 간선 수인 진입 차수를 구하고 0인 정점을 모두 큐에 넣습니다. 큐에서 정점을 꺼내 결과에 기록한 뒤, 나가는 간선의 도착 정점 진입 차수를 하나씩 줄입니다.",
+        "진입 차수가 0이 된 정점만 큐에 넣습니다. 큐가 비었을 때 처리한 정점 수가 전체보다 적으면 사이클이 있습니다. 다른 연결 요소와 고립 정점도 함께 처리해야 합니다.",
+        "이 실습은 인접 행렬을 사용하므로 시간은 O(V²), 진입 차수·큐 등의 보조 공간은 O(V)입니다. 간선을 실제로 삭제하지 않고 지역 진입 차수 배열만 줄여 원본을 보존합니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "in_degree",
+        "description": "아직 처리하지 않은 정점에서 들어오는 간선 수입니다."
+      },
+      {
+        "name": "queue",
+        "description": "진입 차수가 0이 되어 처리 가능한 정점의 FIFO 큐입니다."
+      },
+      {
+        "name": "order",
+        "description": "선후 관계를 만족하는 정점 순서입니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "topological_sort",
+        "description": "진입 차수와 큐를 사용해 order[0..n-1]에 위상 순서를 저장하고 n을 반환합니다. 사이클이 있으면 -1을 반환하며 이때 배열에는 처리한 정점 일부를 저장해도 됩니다. 유효한 위상 순서는 모두 허용합니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "topological_sort",
+        "argument": null,
+        "result": null,
+        "description": "모든 간선을 세어 진입 차수를 구합니다. 0과 1을 대기 큐에 넣습니다.",
+        "adjacency": [
+          [
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            4
+          ],
+          [
+            4
+          ],
+          [
+            5
+          ],
+          []
+        ],
+        "visited": [],
+        "inDegrees": [
+          0,
+          0,
+          2,
+          1,
+          2,
+          1
+        ],
+        "frontier": [
+          0,
+          1
+        ],
+        "frontierLabel": "대기 큐",
+        "trace": [
+          "in_degree = {0, 0, 2, 1, 2, 1}",
+          "queue = [0, 1]"
+        ]
+      },
+      {
+        "operation": "topological_sort",
+        "argument": null,
+        "result": null,
+        "description": "0에서 나가는 간선을 처리합니다. 진입 차수가 0이 된 정점만 큐에 넣습니다.",
+        "adjacency": [
+          [
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            4
+          ],
+          [
+            4
+          ],
+          [
+            5
+          ],
+          []
+        ],
+        "visited": [
+          0
+        ],
+        "inDegrees": [
+          0,
+          0,
+          1,
+          1,
+          2,
+          1
+        ],
+        "frontier": [
+          1
+        ],
+        "frontierLabel": "대기 큐",
+        "trace": [
+          "큐에서 0 꺼내기 → order에 기록",
+          "in_degree[2] → 1"
+        ],
+        "activeNode": 0
+      },
+      {
+        "operation": "topological_sort",
+        "argument": null,
+        "result": null,
+        "description": "1에서 나가는 간선을 처리합니다. 진입 차수가 0이 된 정점만 큐에 넣습니다.",
+        "adjacency": [
+          [
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            4
+          ],
+          [
+            4
+          ],
+          [
+            5
+          ],
+          []
+        ],
+        "visited": [
+          0,
+          1
+        ],
+        "inDegrees": [
+          0,
+          0,
+          0,
+          0,
+          2,
+          1
+        ],
+        "frontier": [
+          2,
+          3
+        ],
+        "frontierLabel": "대기 큐",
+        "trace": [
+          "큐에서 1 꺼내기 → order에 기록",
+          "in_degree[2] → 0",
+          "2을 큐에 추가",
+          "in_degree[3] → 0",
+          "3을 큐에 추가"
+        ],
+        "activeNode": 1
+      },
+      {
+        "operation": "topological_sort",
+        "argument": null,
+        "result": null,
+        "description": "2에서 나가는 간선을 처리합니다. 진입 차수가 0이 된 정점만 큐에 넣습니다.",
+        "adjacency": [
+          [
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            4
+          ],
+          [
+            4
+          ],
+          [
+            5
+          ],
+          []
+        ],
+        "visited": [
+          0,
+          1,
+          2
+        ],
+        "inDegrees": [
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "frontier": [
+          3
+        ],
+        "frontierLabel": "대기 큐",
+        "trace": [
+          "큐에서 2 꺼내기 → order에 기록",
+          "in_degree[4] → 1"
+        ],
+        "activeNode": 2
+      },
+      {
+        "operation": "topological_sort",
+        "argument": null,
+        "result": null,
+        "description": "3에서 나가는 간선을 처리합니다. 진입 차수가 0이 된 정점만 큐에 넣습니다.",
+        "adjacency": [
+          [
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            4
+          ],
+          [
+            4
+          ],
+          [
+            5
+          ],
+          []
+        ],
+        "visited": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "inDegrees": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "frontier": [
+          4
+        ],
+        "frontierLabel": "대기 큐",
+        "trace": [
+          "큐에서 3 꺼내기 → order에 기록",
+          "in_degree[4] → 0",
+          "4을 큐에 추가"
+        ],
+        "activeNode": 3
+      },
+      {
+        "operation": "topological_sort",
+        "argument": null,
+        "result": null,
+        "description": "4에서 나가는 간선을 처리합니다. 진입 차수가 0이 된 정점만 큐에 넣습니다.",
+        "adjacency": [
+          [
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            4
+          ],
+          [
+            4
+          ],
+          [
+            5
+          ],
+          []
+        ],
+        "visited": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "inDegrees": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "frontier": [
+          5
+        ],
+        "frontierLabel": "대기 큐",
+        "trace": [
+          "큐에서 4 꺼내기 → order에 기록",
+          "in_degree[5] → 0",
+          "5을 큐에 추가"
+        ],
+        "activeNode": 4
+      },
+      {
+        "operation": "topological_sort",
+        "argument": null,
+        "result": null,
+        "description": "5에서 나가는 간선을 처리합니다. 진입 차수가 0이 된 정점만 큐에 넣습니다.",
+        "adjacency": [
+          [
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            4
+          ],
+          [
+            4
+          ],
+          [
+            5
+          ],
+          []
+        ],
+        "visited": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "inDegrees": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "frontier": [],
+        "frontierLabel": "대기 큐",
+        "trace": [
+          "큐에서 5 꺼내기 → order에 기록"
+        ],
+        "activeNode": 5
+      },
+      {
+        "operation": "topological_sort",
+        "argument": null,
+        "result": 6,
+        "description": "6개 정점을 모두 처리했습니다. 모든 간선의 선후 관계를 만족합니다.",
+        "adjacency": [
+          [
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            4
+          ],
+          [
+            4
+          ],
+          [
+            5
+          ],
+          []
+        ],
+        "visited": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "inDegrees": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "frontier": [],
+        "frontierLabel": "대기 큐",
+        "trace": [
+          "order = {0, 1, 2, 3, 4, 5}",
+          "count == n → 6 반환"
+        ]
+      }
+    ],
+    "notes": [
+      {
+        "title": "유일한 정답 순서는 없음",
+        "description": "기준 코드는 번호가 작은 초기 정점부터 FIFO로 처리합니다. 제출 코드는 어느 순서든 모든 정점을 한 번씩 포함하고 모든 간선의 선후 관계를 지키면 통과합니다."
+      },
+      {
+        "title": "정렬과 사이클 판정",
+        "description": "시작 가능한 정점이 있어도 다른 부분에 사이클이 남을 수 있습니다. 큐가 비었다는 사실만으로 성공하지 않고 처리한 정점 수를 확인합니다."
+      }
+    ]
+  },
+  "contract": {
+    "storage": "array",
+    "capacity": 50,
+    "directed": true,
+    "representation": "matrix",
+    "scope": "제공된 GraphType을 사용해 topological_sort 함수의 정의와 본문 전체를 구현합니다. 진입 차수와 큐는 함수 안에서 관리하며 입력·그래프 구성·결과 검사는 호출 코드가 담당합니다.",
+    "functions": [
+      {
+        "name": "topological_sort",
+        "signature": "int topological_sort(GraphType *g, int order[])",
+        "behavior": "진입 차수와 큐를 사용해 order[0..n-1]에 위상 순서를 저장하고 n을 반환합니다. 사이클이 있으면 -1을 반환하며 이때 배열에는 처리한 정점 일부를 저장해도 됩니다. 유효한 위상 순서는 모두 허용합니다."
+      }
+    ],
+    "requirements": [
+      "방향·비가중치 단순 그래프이며 정점은 1~50개, 번호는 0~n-1입니다. 자기 간선은 없고 중복 간선은 한 번만 저장합니다.",
+      "order는 n개 정점을 저장할 공간입니다. 중복·누락 없이 각 간선의 출발 정점이 도착 정점보다 앞서야 합니다.",
+      "사이클이 있으면 -1을 반환합니다. 사이클이 없는 다른 연결 요소를 처리했더라도 전체 정렬은 실패입니다.",
+      "매 호출 시 진입 차수·큐·개수를 초기화하고 원본 그래프를 보존합니다. 함수는 결과를 직접 출력하지 않습니다."
+    ]
+  },
+  "prerequisites": [
+    "graph-matrix",
+    "queue-linear"
+  ],
+  "criteria": [
+    {
+      "id": "basic",
+      "order": 1,
+      "title": "정점·진입 차수",
+      "description": "각 정점의 진입 차수와 초기 대기 정점을 구합니다."
+    },
+    {
+      "id": "relations",
+      "order": 2,
+      "title": "선후 관계",
+      "description": "모든 간선의 출발 정점이 도착 정점보다 먼저 오도록 정렬합니다."
+    },
+    {
+      "id": "components",
+      "order": 3,
+      "title": "복수 시작점·연결 요소",
+      "description": "여러 시작 정점과 고립 정점도 빠짐없이 처리합니다."
+    },
+    {
+      "id": "cycles",
+      "order": 4,
+      "title": "사이클 판정",
+      "description": "일부라도 처리하지 못한 정점이 남으면 -1을 반환합니다."
+    },
+    {
+      "id": "boundary",
+      "order": 5,
+      "title": "최대 크기",
+      "description": "최대 50개 정점과 조밀한 그래프를 처리합니다."
+    },
+    {
+      "id": "repeat",
+      "order": 6,
+      "title": "반복 호출·그래프 보존",
+      "description": "이전 상태를 초기화하고 원본 그래프를 보존합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "topological_sort",
+          "description": "진입 차수와 큐를 사용해 order[0..n-1]에 위상 순서를 저장하고 n을 반환합니다. 사이클이 있으면 -1을 반환하며 이때 배열에는 처리한 정점 일부를 저장해도 됩니다. 유효한 위상 순서는 모두 허용합니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "INIT n으로 초기화하고 EDGE from to로 방향 간선을 추가합니다. SORT는 반환된 순서의 중복·누락과 모든 간선의 선후 관계를 검사한 뒤 ORDER_VALID 정점수를 출력합니다. 사이클은 CYCLE로 출력합니다. 특정 정답 순서와의 문자열 비교는 하지 않습니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

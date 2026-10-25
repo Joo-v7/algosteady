@@ -1,0 +1,290 @@
+[
+  {
+    "id": "topological-example",
+    "criterionId": "basic",
+    "public": true,
+    "description": "여러 시작 정점이 있는 위상 정렬",
+    "input": "INIT 6\nEDGE 0 2\nEDGE 1 2\nEDGE 1 3\nEDGE 2 4\nEDGE 3 4\nEDGE 4 5\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 6\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "cycle-example",
+    "criterionId": "cycles",
+    "public": true,
+    "description": "사이클이 있는 그래프",
+    "input": "INIT 3\nEDGE 0 1\nEDGE 1 2\nEDGE 2 0\nSORT\n",
+    "expected": {
+      "stdout": "CYCLE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "single-vertex",
+    "criterionId": "basic",
+    "public": false,
+    "description": "정점·진입 차수",
+    "input": "INIT 1\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reverse-edge",
+    "criterionId": "relations",
+    "public": false,
+    "description": "선후 관계",
+    "input": "INIT 2\nEDGE 1 0\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reverse-chain",
+    "criterionId": "relations",
+    "public": false,
+    "description": "선후 관계",
+    "input": "INIT 6\nEDGE 5 4\nEDGE 4 3\nEDGE 3 2\nEDGE 2 1\nEDGE 1 0\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 6\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "diamond",
+    "criterionId": "relations",
+    "public": false,
+    "description": "선후 관계",
+    "input": "INIT 4\nEDGE 0 1\nEDGE 0 2\nEDGE 1 3\nEDGE 2 3\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 4\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "different-depths",
+    "criterionId": "relations",
+    "public": false,
+    "description": "선후 관계",
+    "input": "INIT 5\nEDGE 0 2\nEDGE 0 1\nEDGE 1 3\nEDGE 3 4\nEDGE 2 4\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 5\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "fanin",
+    "criterionId": "relations",
+    "public": false,
+    "description": "선후 관계",
+    "input": "INIT 6\nEDGE 0 5\nEDGE 1 5\nEDGE 2 5\nEDGE 3 5\nEDGE 4 5\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 6\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "fanout",
+    "criterionId": "relations",
+    "public": false,
+    "description": "선후 관계",
+    "input": "INIT 6\nEDGE 5 0\nEDGE 5 1\nEDGE 5 2\nEDGE 5 3\nEDGE 5 4\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 6\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "duplicate-edge",
+    "criterionId": "basic",
+    "public": false,
+    "description": "정점·진입 차수",
+    "input": "INIT 3\nEDGE 0 1\nEDGE 0 1\nEDGE 1 2\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "no-edges",
+    "criterionId": "components",
+    "public": false,
+    "description": "복수 시작점·연결 요소",
+    "input": "INIT 6\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 6\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "separate-chains",
+    "criterionId": "components",
+    "public": false,
+    "description": "복수 시작점·연결 요소",
+    "input": "INIT 7\nEDGE 0 2\nEDGE 2 4\nEDGE 1 3\nEDGE 3 5\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 7\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "many-sources",
+    "criterionId": "components",
+    "public": false,
+    "description": "복수 시작점·연결 요소",
+    "input": "INIT 6\nEDGE 0 4\nEDGE 1 4\nEDGE 2 5\nEDGE 3 5\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 6\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "two-cycle",
+    "criterionId": "cycles",
+    "public": false,
+    "description": "사이클 판정",
+    "input": "INIT 2\nEDGE 0 1\nEDGE 1 0\nSORT\n",
+    "expected": {
+      "stdout": "CYCLE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "source-before-cycle",
+    "criterionId": "cycles",
+    "public": false,
+    "description": "사이클 판정",
+    "input": "INIT 4\nEDGE 0 1\nEDGE 1 2\nEDGE 2 1\nEDGE 2 3\nSORT\n",
+    "expected": {
+      "stdout": "CYCLE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "isolated-cycle",
+    "criterionId": "cycles",
+    "public": false,
+    "description": "사이클 판정",
+    "input": "INIT 6\nEDGE 0 1\nEDGE 2 3\nEDGE 3 4\nEDGE 4 2\nSORT\n",
+    "expected": {
+      "stdout": "CYCLE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "cycle-and-tail",
+    "criterionId": "cycles",
+    "public": false,
+    "description": "사이클 판정",
+    "input": "INIT 5\nEDGE 0 1\nEDGE 1 2\nEDGE 2 0\nEDGE 2 3\nEDGE 3 4\nSORT\n",
+    "expected": {
+      "stdout": "CYCLE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "maximum-chain",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "최대 크기",
+    "input": "INIT 50\nEDGE 49 48\nEDGE 48 47\nEDGE 47 46\nEDGE 46 45\nEDGE 45 44\nEDGE 44 43\nEDGE 43 42\nEDGE 42 41\nEDGE 41 40\nEDGE 40 39\nEDGE 39 38\nEDGE 38 37\nEDGE 37 36\nEDGE 36 35\nEDGE 35 34\nEDGE 34 33\nEDGE 33 32\nEDGE 32 31\nEDGE 31 30\nEDGE 30 29\nEDGE 29 28\nEDGE 28 27\nEDGE 27 26\nEDGE 26 25\nEDGE 25 24\nEDGE 24 23\nEDGE 23 22\nEDGE 22 21\nEDGE 21 20\nEDGE 20 19\nEDGE 19 18\nEDGE 18 17\nEDGE 17 16\nEDGE 16 15\nEDGE 15 14\nEDGE 14 13\nEDGE 13 12\nEDGE 12 11\nEDGE 11 10\nEDGE 10 9\nEDGE 9 8\nEDGE 8 7\nEDGE 7 6\nEDGE 6 5\nEDGE 5 4\nEDGE 4 3\nEDGE 3 2\nEDGE 2 1\nEDGE 1 0\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 50\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "maximum-dense",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "최대 크기",
+    "input": "INIT 50\nEDGE 0 1\nEDGE 0 2\nEDGE 0 3\nEDGE 0 4\nEDGE 0 5\nEDGE 0 6\nEDGE 0 7\nEDGE 0 8\nEDGE 0 9\nEDGE 0 10\nEDGE 0 11\nEDGE 0 12\nEDGE 0 13\nEDGE 0 14\nEDGE 0 15\nEDGE 0 16\nEDGE 0 17\nEDGE 0 18\nEDGE 0 19\nEDGE 0 20\nEDGE 0 21\nEDGE 0 22\nEDGE 0 23\nEDGE 0 24\nEDGE 0 25\nEDGE 0 26\nEDGE 0 27\nEDGE 0 28\nEDGE 0 29\nEDGE 0 30\nEDGE 0 31\nEDGE 0 32\nEDGE 0 33\nEDGE 0 34\nEDGE 0 35\nEDGE 0 36\nEDGE 0 37\nEDGE 0 38\nEDGE 0 39\nEDGE 0 40\nEDGE 0 41\nEDGE 0 42\nEDGE 0 43\nEDGE 0 44\nEDGE 0 45\nEDGE 0 46\nEDGE 0 47\nEDGE 0 48\nEDGE 0 49\nEDGE 1 2\nEDGE 1 3\nEDGE 1 4\nEDGE 1 5\nEDGE 1 6\nEDGE 1 7\nEDGE 1 8\nEDGE 1 9\nEDGE 1 10\nEDGE 1 11\nEDGE 1 12\nEDGE 1 13\nEDGE 1 14\nEDGE 1 15\nEDGE 1 16\nEDGE 1 17\nEDGE 1 18\nEDGE 1 19\nEDGE 1 20\nEDGE 1 21\nEDGE 1 22\nEDGE 1 23\nEDGE 1 24\nEDGE 1 25\nEDGE 1 26\nEDGE 1 27\nEDGE 1 28\nEDGE 1 29\nEDGE 1 30\nEDGE 1 31\nEDGE 1 32\nEDGE 1 33\nEDGE 1 34\nEDGE 1 35\nEDGE 1 36\nEDGE 1 37\nEDGE 1 38\nEDGE 1 39\nEDGE 1 40\nEDGE 1 41\nEDGE 1 42\nEDGE 1 43\nEDGE 1 44\nEDGE 1 45\nEDGE 1 46\nEDGE 1 47\nEDGE 1 48\nEDGE 1 49\nEDGE 2 3\nEDGE 2 4\nEDGE 2 5\nEDGE 2 6\nEDGE 2 7\nEDGE 2 8\nEDGE 2 9\nEDGE 2 10\nEDGE 2 11\nEDGE 2 12\nEDGE 2 13\nEDGE 2 14\nEDGE 2 15\nEDGE 2 16\nEDGE 2 17\nEDGE 2 18\nEDGE 2 19\nEDGE 2 20\nEDGE 2 21\nEDGE 2 22\nEDGE 2 23\nEDGE 2 24\nEDGE 2 25\nEDGE 2 26\nEDGE 2 27\nEDGE 2 28\nEDGE 2 29\nEDGE 2 30\nEDGE 2 31\nEDGE 2 32\nEDGE 2 33\nEDGE 2 34\nEDGE 2 35\nEDGE 2 36\nEDGE 2 37\nEDGE 2 38\nEDGE 2 39\nEDGE 2 40\nEDGE 2 41\nEDGE 2 42\nEDGE 2 43\nEDGE 2 44\nEDGE 2 45\nEDGE 2 46\nEDGE 2 47\nEDGE 2 48\nEDGE 2 49\nEDGE 3 4\nEDGE 3 5\nEDGE 3 6\nEDGE 3 7\nEDGE 3 8\nEDGE 3 9\nEDGE 3 10\nEDGE 3 11\nEDGE 3 12\nEDGE 3 13\nEDGE 3 14\nEDGE 3 15\nEDGE 3 16\nEDGE 3 17\nEDGE 3 18\nEDGE 3 19\nEDGE 3 20\nEDGE 3 21\nEDGE 3 22\nEDGE 3 23\nEDGE 3 24\nEDGE 3 25\nEDGE 3 26\nEDGE 3 27\nEDGE 3 28\nEDGE 3 29\nEDGE 3 30\nEDGE 3 31\nEDGE 3 32\nEDGE 3 33\nEDGE 3 34\nEDGE 3 35\nEDGE 3 36\nEDGE 3 37\nEDGE 3 38\nEDGE 3 39\nEDGE 3 40\nEDGE 3 41\nEDGE 3 42\nEDGE 3 43\nEDGE 3 44\nEDGE 3 45\nEDGE 3 46\nEDGE 3 47\nEDGE 3 48\nEDGE 3 49\nEDGE 4 5\nEDGE 4 6\nEDGE 4 7\nEDGE 4 8\nEDGE 4 9\nEDGE 4 10\nEDGE 4 11\nEDGE 4 12\nEDGE 4 13\nEDGE 4 14\nEDGE 4 15\nEDGE 4 16\nEDGE 4 17\nEDGE 4 18\nEDGE 4 19\nEDGE 4 20\nEDGE 4 21\nEDGE 4 22\nEDGE 4 23\nEDGE 4 24\nEDGE 4 25\nEDGE 4 26\nEDGE 4 27\nEDGE 4 28\nEDGE 4 29\nEDGE 4 30\nEDGE 4 31\nEDGE 4 32\nEDGE 4 33\nEDGE 4 34\nEDGE 4 35\nEDGE 4 36\nEDGE 4 37\nEDGE 4 38\nEDGE 4 39\nEDGE 4 40\nEDGE 4 41\nEDGE 4 42\nEDGE 4 43\nEDGE 4 44\nEDGE 4 45\nEDGE 4 46\nEDGE 4 47\nEDGE 4 48\nEDGE 4 49\nEDGE 5 6\nEDGE 5 7\nEDGE 5 8\nEDGE 5 9\nEDGE 5 10\nEDGE 5 11\nEDGE 5 12\nEDGE 5 13\nEDGE 5 14\nEDGE 5 15\nEDGE 5 16\nEDGE 5 17\nEDGE 5 18\nEDGE 5 19\nEDGE 5 20\nEDGE 5 21\nEDGE 5 22\nEDGE 5 23\nEDGE 5 24\nEDGE 5 25\nEDGE 5 26\nEDGE 5 27\nEDGE 5 28\nEDGE 5 29\nEDGE 5 30\nEDGE 5 31\nEDGE 5 32\nEDGE 5 33\nEDGE 5 34\nEDGE 5 35\nEDGE 5 36\nEDGE 5 37\nEDGE 5 38\nEDGE 5 39\nEDGE 5 40\nEDGE 5 41\nEDGE 5 42\nEDGE 5 43\nEDGE 5 44\nEDGE 5 45\nEDGE 5 46\nEDGE 5 47\nEDGE 5 48\nEDGE 5 49\nEDGE 6 7\nEDGE 6 8\nEDGE 6 9\nEDGE 6 10\nEDGE 6 11\nEDGE 6 12\nEDGE 6 13\nEDGE 6 14\nEDGE 6 15\nEDGE 6 16\nEDGE 6 17\nEDGE 6 18\nEDGE 6 19\nEDGE 6 20\nEDGE 6 21\nEDGE 6 22\nEDGE 6 23\nEDGE 6 24\nEDGE 6 25\nEDGE 6 26\nEDGE 6 27\nEDGE 6 28\nEDGE 6 29\nEDGE 6 30\nEDGE 6 31\nEDGE 6 32\nEDGE 6 33\nEDGE 6 34\nEDGE 6 35\nEDGE 6 36\nEDGE 6 37\nEDGE 6 38\nEDGE 6 39\nEDGE 6 40\nEDGE 6 41\nEDGE 6 42\nEDGE 6 43\nEDGE 6 44\nEDGE 6 45\nEDGE 6 46\nEDGE 6 47\nEDGE 6 48\nEDGE 6 49\nEDGE 7 8\nEDGE 7 9\nEDGE 7 10\nEDGE 7 11\nEDGE 7 12\nEDGE 7 13\nEDGE 7 14\nEDGE 7 15\nEDGE 7 16\nEDGE 7 17\nEDGE 7 18\nEDGE 7 19\nEDGE 7 20\nEDGE 7 21\nEDGE 7 22\nEDGE 7 23\nEDGE 7 24\nEDGE 7 25\nEDGE 7 26\nEDGE 7 27\nEDGE 7 28\nEDGE 7 29\nEDGE 7 30\nEDGE 7 31\nEDGE 7 32\nEDGE 7 33\nEDGE 7 34\nEDGE 7 35\nEDGE 7 36\nEDGE 7 37\nEDGE 7 38\nEDGE 7 39\nEDGE 7 40\nEDGE 7 41\nEDGE 7 42\nEDGE 7 43\nEDGE 7 44\nEDGE 7 45\nEDGE 7 46\nEDGE 7 47\nEDGE 7 48\nEDGE 7 49\nEDGE 8 9\nEDGE 8 10\nEDGE 8 11\nEDGE 8 12\nEDGE 8 13\nEDGE 8 14\nEDGE 8 15\nEDGE 8 16\nEDGE 8 17\nEDGE 8 18\nEDGE 8 19\nEDGE 8 20\nEDGE 8 21\nEDGE 8 22\nEDGE 8 23\nEDGE 8 24\nEDGE 8 25\nEDGE 8 26\nEDGE 8 27\nEDGE 8 28\nEDGE 8 29\nEDGE 8 30\nEDGE 8 31\nEDGE 8 32\nEDGE 8 33\nEDGE 8 34\nEDGE 8 35\nEDGE 8 36\nEDGE 8 37\nEDGE 8 38\nEDGE 8 39\nEDGE 8 40\nEDGE 8 41\nEDGE 8 42\nEDGE 8 43\nEDGE 8 44\nEDGE 8 45\nEDGE 8 46\nEDGE 8 47\nEDGE 8 48\nEDGE 8 49\nEDGE 9 10\nEDGE 9 11\nEDGE 9 12\nEDGE 9 13\nEDGE 9 14\nEDGE 9 15\nEDGE 9 16\nEDGE 9 17\nEDGE 9 18\nEDGE 9 19\nEDGE 9 20\nEDGE 9 21\nEDGE 9 22\nEDGE 9 23\nEDGE 9 24\nEDGE 9 25\nEDGE 9 26\nEDGE 9 27\nEDGE 9 28\nEDGE 9 29\nEDGE 9 30\nEDGE 9 31\nEDGE 9 32\nEDGE 9 33\nEDGE 9 34\nEDGE 9 35\nEDGE 9 36\nEDGE 9 37\nEDGE 9 38\nEDGE 9 39\nEDGE 9 40\nEDGE 9 41\nEDGE 9 42\nEDGE 9 43\nEDGE 9 44\nEDGE 9 45\nEDGE 9 46\nEDGE 9 47\nEDGE 9 48\nEDGE 9 49\nEDGE 10 11\nEDGE 10 12\nEDGE 10 13\nEDGE 10 14\nEDGE 10 15\nEDGE 10 16\nEDGE 10 17\nEDGE 10 18\nEDGE 10 19\nEDGE 10 20\nEDGE 10 21\nEDGE 10 22\nEDGE 10 23\nEDGE 10 24\nEDGE 10 25\nEDGE 10 26\nEDGE 10 27\nEDGE 10 28\nEDGE 10 29\nEDGE 10 30\nEDGE 10 31\nEDGE 10 32\nEDGE 10 33\nEDGE 10 34\nEDGE 10 35\nEDGE 10 36\nEDGE 10 37\nEDGE 10 38\nEDGE 10 39\nEDGE 10 40\nEDGE 10 41\nEDGE 10 42\nEDGE 10 43\nEDGE 10 44\nEDGE 10 45\nEDGE 10 46\nEDGE 10 47\nEDGE 10 48\nEDGE 10 49\nEDGE 11 12\nEDGE 11 13\nEDGE 11 14\nEDGE 11 15\nEDGE 11 16\nEDGE 11 17\nEDGE 11 18\nEDGE 11 19\nEDGE 11 20\nEDGE 11 21\nEDGE 11 22\nEDGE 11 23\nEDGE 11 24\nEDGE 11 25\nEDGE 11 26\nEDGE 11 27\nEDGE 11 28\nEDGE 11 29\nEDGE 11 30\nEDGE 11 31\nEDGE 11 32\nEDGE 11 33\nEDGE 11 34\nEDGE 11 35\nEDGE 11 36\nEDGE 11 37\nEDGE 11 38\nEDGE 11 39\nEDGE 11 40\nEDGE 11 41\nEDGE 11 42\nEDGE 11 43\nEDGE 11 44\nEDGE 11 45\nEDGE 11 46\nEDGE 11 47\nEDGE 11 48\nEDGE 11 49\nEDGE 12 13\nEDGE 12 14\nEDGE 12 15\nEDGE 12 16\nEDGE 12 17\nEDGE 12 18\nEDGE 12 19\nEDGE 12 20\nEDGE 12 21\nEDGE 12 22\nEDGE 12 23\nEDGE 12 24\nEDGE 12 25\nEDGE 12 26\nEDGE 12 27\nEDGE 12 28\nEDGE 12 29\nEDGE 12 30\nEDGE 12 31\nEDGE 12 32\nEDGE 12 33\nEDGE 12 34\nEDGE 12 35\nEDGE 12 36\nEDGE 12 37\nEDGE 12 38\nEDGE 12 39\nEDGE 12 40\nEDGE 12 41\nEDGE 12 42\nEDGE 12 43\nEDGE 12 44\nEDGE 12 45\nEDGE 12 46\nEDGE 12 47\nEDGE 12 48\nEDGE 12 49\nEDGE 13 14\nEDGE 13 15\nEDGE 13 16\nEDGE 13 17\nEDGE 13 18\nEDGE 13 19\nEDGE 13 20\nEDGE 13 21\nEDGE 13 22\nEDGE 13 23\nEDGE 13 24\nEDGE 13 25\nEDGE 13 26\nEDGE 13 27\nEDGE 13 28\nEDGE 13 29\nEDGE 13 30\nEDGE 13 31\nEDGE 13 32\nEDGE 13 33\nEDGE 13 34\nEDGE 13 35\nEDGE 13 36\nEDGE 13 37\nEDGE 13 38\nEDGE 13 39\nEDGE 13 40\nEDGE 13 41\nEDGE 13 42\nEDGE 13 43\nEDGE 13 44\nEDGE 13 45\nEDGE 13 46\nEDGE 13 47\nEDGE 13 48\nEDGE 13 49\nEDGE 14 15\nEDGE 14 16\nEDGE 14 17\nEDGE 14 18\nEDGE 14 19\nEDGE 14 20\nEDGE 14 21\nEDGE 14 22\nEDGE 14 23\nEDGE 14 24\nEDGE 14 25\nEDGE 14 26\nEDGE 14 27\nEDGE 14 28\nEDGE 14 29\nEDGE 14 30\nEDGE 14 31\nEDGE 14 32\nEDGE 14 33\nEDGE 14 34\nEDGE 14 35\nEDGE 14 36\nEDGE 14 37\nEDGE 14 38\nEDGE 14 39\nEDGE 14 40\nEDGE 14 41\nEDGE 14 42\nEDGE 14 43\nEDGE 14 44\nEDGE 14 45\nEDGE 14 46\nEDGE 14 47\nEDGE 14 48\nEDGE 14 49\nEDGE 15 16\nEDGE 15 17\nEDGE 15 18\nEDGE 15 19\nEDGE 15 20\nEDGE 15 21\nEDGE 15 22\nEDGE 15 23\nEDGE 15 24\nEDGE 15 25\nEDGE 15 26\nEDGE 15 27\nEDGE 15 28\nEDGE 15 29\nEDGE 15 30\nEDGE 15 31\nEDGE 15 32\nEDGE 15 33\nEDGE 15 34\nEDGE 15 35\nEDGE 15 36\nEDGE 15 37\nEDGE 15 38\nEDGE 15 39\nEDGE 15 40\nEDGE 15 41\nEDGE 15 42\nEDGE 15 43\nEDGE 15 44\nEDGE 15 45\nEDGE 15 46\nEDGE 15 47\nEDGE 15 48\nEDGE 15 49\nEDGE 16 17\nEDGE 16 18\nEDGE 16 19\nEDGE 16 20\nEDGE 16 21\nEDGE 16 22\nEDGE 16 23\nEDGE 16 24\nEDGE 16 25\nEDGE 16 26\nEDGE 16 27\nEDGE 16 28\nEDGE 16 29\nEDGE 16 30\nEDGE 16 31\nEDGE 16 32\nEDGE 16 33\nEDGE 16 34\nEDGE 16 35\nEDGE 16 36\nEDGE 16 37\nEDGE 16 38\nEDGE 16 39\nEDGE 16 40\nEDGE 16 41\nEDGE 16 42\nEDGE 16 43\nEDGE 16 44\nEDGE 16 45\nEDGE 16 46\nEDGE 16 47\nEDGE 16 48\nEDGE 16 49\nEDGE 17 18\nEDGE 17 19\nEDGE 17 20\nEDGE 17 21\nEDGE 17 22\nEDGE 17 23\nEDGE 17 24\nEDGE 17 25\nEDGE 17 26\nEDGE 17 27\nEDGE 17 28\nEDGE 17 29\nEDGE 17 30\nEDGE 17 31\nEDGE 17 32\nEDGE 17 33\nEDGE 17 34\nEDGE 17 35\nEDGE 17 36\nEDGE 17 37\nEDGE 17 38\nEDGE 17 39\nEDGE 17 40\nEDGE 17 41\nEDGE 17 42\nEDGE 17 43\nEDGE 17 44\nEDGE 17 45\nEDGE 17 46\nEDGE 17 47\nEDGE 17 48\nEDGE 17 49\nEDGE 18 19\nEDGE 18 20\nEDGE 18 21\nEDGE 18 22\nEDGE 18 23\nEDGE 18 24\nEDGE 18 25\nEDGE 18 26\nEDGE 18 27\nEDGE 18 28\nEDGE 18 29\nEDGE 18 30\nEDGE 18 31\nEDGE 18 32\nEDGE 18 33\nEDGE 18 34\nEDGE 18 35\nEDGE 18 36\nEDGE 18 37\nEDGE 18 38\nEDGE 18 39\nEDGE 18 40\nEDGE 18 41\nEDGE 18 42\nEDGE 18 43\nEDGE 18 44\nEDGE 18 45\nEDGE 18 46\nEDGE 18 47\nEDGE 18 48\nEDGE 18 49\nEDGE 19 20\nEDGE 19 21\nEDGE 19 22\nEDGE 19 23\nEDGE 19 24\nEDGE 19 25\nEDGE 19 26\nEDGE 19 27\nEDGE 19 28\nEDGE 19 29\nEDGE 19 30\nEDGE 19 31\nEDGE 19 32\nEDGE 19 33\nEDGE 19 34\nEDGE 19 35\nEDGE 19 36\nEDGE 19 37\nEDGE 19 38\nEDGE 19 39\nEDGE 19 40\nEDGE 19 41\nEDGE 19 42\nEDGE 19 43\nEDGE 19 44\nEDGE 19 45\nEDGE 19 46\nEDGE 19 47\nEDGE 19 48\nEDGE 19 49\nEDGE 20 21\nEDGE 20 22\nEDGE 20 23\nEDGE 20 24\nEDGE 20 25\nEDGE 20 26\nEDGE 20 27\nEDGE 20 28\nEDGE 20 29\nEDGE 20 30\nEDGE 20 31\nEDGE 20 32\nEDGE 20 33\nEDGE 20 34\nEDGE 20 35\nEDGE 20 36\nEDGE 20 37\nEDGE 20 38\nEDGE 20 39\nEDGE 20 40\nEDGE 20 41\nEDGE 20 42\nEDGE 20 43\nEDGE 20 44\nEDGE 20 45\nEDGE 20 46\nEDGE 20 47\nEDGE 20 48\nEDGE 20 49\nEDGE 21 22\nEDGE 21 23\nEDGE 21 24\nEDGE 21 25\nEDGE 21 26\nEDGE 21 27\nEDGE 21 28\nEDGE 21 29\nEDGE 21 30\nEDGE 21 31\nEDGE 21 32\nEDGE 21 33\nEDGE 21 34\nEDGE 21 35\nEDGE 21 36\nEDGE 21 37\nEDGE 21 38\nEDGE 21 39\nEDGE 21 40\nEDGE 21 41\nEDGE 21 42\nEDGE 21 43\nEDGE 21 44\nEDGE 21 45\nEDGE 21 46\nEDGE 21 47\nEDGE 21 48\nEDGE 21 49\nEDGE 22 23\nEDGE 22 24\nEDGE 22 25\nEDGE 22 26\nEDGE 22 27\nEDGE 22 28\nEDGE 22 29\nEDGE 22 30\nEDGE 22 31\nEDGE 22 32\nEDGE 22 33\nEDGE 22 34\nEDGE 22 35\nEDGE 22 36\nEDGE 22 37\nEDGE 22 38\nEDGE 22 39\nEDGE 22 40\nEDGE 22 41\nEDGE 22 42\nEDGE 22 43\nEDGE 22 44\nEDGE 22 45\nEDGE 22 46\nEDGE 22 47\nEDGE 22 48\nEDGE 22 49\nEDGE 23 24\nEDGE 23 25\nEDGE 23 26\nEDGE 23 27\nEDGE 23 28\nEDGE 23 29\nEDGE 23 30\nEDGE 23 31\nEDGE 23 32\nEDGE 23 33\nEDGE 23 34\nEDGE 23 35\nEDGE 23 36\nEDGE 23 37\nEDGE 23 38\nEDGE 23 39\nEDGE 23 40\nEDGE 23 41\nEDGE 23 42\nEDGE 23 43\nEDGE 23 44\nEDGE 23 45\nEDGE 23 46\nEDGE 23 47\nEDGE 23 48\nEDGE 23 49\nEDGE 24 25\nEDGE 24 26\nEDGE 24 27\nEDGE 24 28\nEDGE 24 29\nEDGE 24 30\nEDGE 24 31\nEDGE 24 32\nEDGE 24 33\nEDGE 24 34\nEDGE 24 35\nEDGE 24 36\nEDGE 24 37\nEDGE 24 38\nEDGE 24 39\nEDGE 24 40\nEDGE 24 41\nEDGE 24 42\nEDGE 24 43\nEDGE 24 44\nEDGE 24 45\nEDGE 24 46\nEDGE 24 47\nEDGE 24 48\nEDGE 24 49\nEDGE 25 26\nEDGE 25 27\nEDGE 25 28\nEDGE 25 29\nEDGE 25 30\nEDGE 25 31\nEDGE 25 32\nEDGE 25 33\nEDGE 25 34\nEDGE 25 35\nEDGE 25 36\nEDGE 25 37\nEDGE 25 38\nEDGE 25 39\nEDGE 25 40\nEDGE 25 41\nEDGE 25 42\nEDGE 25 43\nEDGE 25 44\nEDGE 25 45\nEDGE 25 46\nEDGE 25 47\nEDGE 25 48\nEDGE 25 49\nEDGE 26 27\nEDGE 26 28\nEDGE 26 29\nEDGE 26 30\nEDGE 26 31\nEDGE 26 32\nEDGE 26 33\nEDGE 26 34\nEDGE 26 35\nEDGE 26 36\nEDGE 26 37\nEDGE 26 38\nEDGE 26 39\nEDGE 26 40\nEDGE 26 41\nEDGE 26 42\nEDGE 26 43\nEDGE 26 44\nEDGE 26 45\nEDGE 26 46\nEDGE 26 47\nEDGE 26 48\nEDGE 26 49\nEDGE 27 28\nEDGE 27 29\nEDGE 27 30\nEDGE 27 31\nEDGE 27 32\nEDGE 27 33\nEDGE 27 34\nEDGE 27 35\nEDGE 27 36\nEDGE 27 37\nEDGE 27 38\nEDGE 27 39\nEDGE 27 40\nEDGE 27 41\nEDGE 27 42\nEDGE 27 43\nEDGE 27 44\nEDGE 27 45\nEDGE 27 46\nEDGE 27 47\nEDGE 27 48\nEDGE 27 49\nEDGE 28 29\nEDGE 28 30\nEDGE 28 31\nEDGE 28 32\nEDGE 28 33\nEDGE 28 34\nEDGE 28 35\nEDGE 28 36\nEDGE 28 37\nEDGE 28 38\nEDGE 28 39\nEDGE 28 40\nEDGE 28 41\nEDGE 28 42\nEDGE 28 43\nEDGE 28 44\nEDGE 28 45\nEDGE 28 46\nEDGE 28 47\nEDGE 28 48\nEDGE 28 49\nEDGE 29 30\nEDGE 29 31\nEDGE 29 32\nEDGE 29 33\nEDGE 29 34\nEDGE 29 35\nEDGE 29 36\nEDGE 29 37\nEDGE 29 38\nEDGE 29 39\nEDGE 29 40\nEDGE 29 41\nEDGE 29 42\nEDGE 29 43\nEDGE 29 44\nEDGE 29 45\nEDGE 29 46\nEDGE 29 47\nEDGE 29 48\nEDGE 29 49\nEDGE 30 31\nEDGE 30 32\nEDGE 30 33\nEDGE 30 34\nEDGE 30 35\nEDGE 30 36\nEDGE 30 37\nEDGE 30 38\nEDGE 30 39\nEDGE 30 40\nEDGE 30 41\nEDGE 30 42\nEDGE 30 43\nEDGE 30 44\nEDGE 30 45\nEDGE 30 46\nEDGE 30 47\nEDGE 30 48\nEDGE 30 49\nEDGE 31 32\nEDGE 31 33\nEDGE 31 34\nEDGE 31 35\nEDGE 31 36\nEDGE 31 37\nEDGE 31 38\nEDGE 31 39\nEDGE 31 40\nEDGE 31 41\nEDGE 31 42\nEDGE 31 43\nEDGE 31 44\nEDGE 31 45\nEDGE 31 46\nEDGE 31 47\nEDGE 31 48\nEDGE 31 49\nEDGE 32 33\nEDGE 32 34\nEDGE 32 35\nEDGE 32 36\nEDGE 32 37\nEDGE 32 38\nEDGE 32 39\nEDGE 32 40\nEDGE 32 41\nEDGE 32 42\nEDGE 32 43\nEDGE 32 44\nEDGE 32 45\nEDGE 32 46\nEDGE 32 47\nEDGE 32 48\nEDGE 32 49\nEDGE 33 34\nEDGE 33 35\nEDGE 33 36\nEDGE 33 37\nEDGE 33 38\nEDGE 33 39\nEDGE 33 40\nEDGE 33 41\nEDGE 33 42\nEDGE 33 43\nEDGE 33 44\nEDGE 33 45\nEDGE 33 46\nEDGE 33 47\nEDGE 33 48\nEDGE 33 49\nEDGE 34 35\nEDGE 34 36\nEDGE 34 37\nEDGE 34 38\nEDGE 34 39\nEDGE 34 40\nEDGE 34 41\nEDGE 34 42\nEDGE 34 43\nEDGE 34 44\nEDGE 34 45\nEDGE 34 46\nEDGE 34 47\nEDGE 34 48\nEDGE 34 49\nEDGE 35 36\nEDGE 35 37\nEDGE 35 38\nEDGE 35 39\nEDGE 35 40\nEDGE 35 41\nEDGE 35 42\nEDGE 35 43\nEDGE 35 44\nEDGE 35 45\nEDGE 35 46\nEDGE 35 47\nEDGE 35 48\nEDGE 35 49\nEDGE 36 37\nEDGE 36 38\nEDGE 36 39\nEDGE 36 40\nEDGE 36 41\nEDGE 36 42\nEDGE 36 43\nEDGE 36 44\nEDGE 36 45\nEDGE 36 46\nEDGE 36 47\nEDGE 36 48\nEDGE 36 49\nEDGE 37 38\nEDGE 37 39\nEDGE 37 40\nEDGE 37 41\nEDGE 37 42\nEDGE 37 43\nEDGE 37 44\nEDGE 37 45\nEDGE 37 46\nEDGE 37 47\nEDGE 37 48\nEDGE 37 49\nEDGE 38 39\nEDGE 38 40\nEDGE 38 41\nEDGE 38 42\nEDGE 38 43\nEDGE 38 44\nEDGE 38 45\nEDGE 38 46\nEDGE 38 47\nEDGE 38 48\nEDGE 38 49\nEDGE 39 40\nEDGE 39 41\nEDGE 39 42\nEDGE 39 43\nEDGE 39 44\nEDGE 39 45\nEDGE 39 46\nEDGE 39 47\nEDGE 39 48\nEDGE 39 49\nEDGE 40 41\nEDGE 40 42\nEDGE 40 43\nEDGE 40 44\nEDGE 40 45\nEDGE 40 46\nEDGE 40 47\nEDGE 40 48\nEDGE 40 49\nEDGE 41 42\nEDGE 41 43\nEDGE 41 44\nEDGE 41 45\nEDGE 41 46\nEDGE 41 47\nEDGE 41 48\nEDGE 41 49\nEDGE 42 43\nEDGE 42 44\nEDGE 42 45\nEDGE 42 46\nEDGE 42 47\nEDGE 42 48\nEDGE 42 49\nEDGE 43 44\nEDGE 43 45\nEDGE 43 46\nEDGE 43 47\nEDGE 43 48\nEDGE 43 49\nEDGE 44 45\nEDGE 44 46\nEDGE 44 47\nEDGE 44 48\nEDGE 44 49\nEDGE 45 46\nEDGE 45 47\nEDGE 45 48\nEDGE 45 49\nEDGE 46 47\nEDGE 46 48\nEDGE 46 49\nEDGE 47 48\nEDGE 47 49\nEDGE 48 49\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 50\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "maximum-empty",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "최대 크기",
+    "input": "INIT 50\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 50\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "maximum-cycle",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "최대 크기",
+    "input": "INIT 50\nEDGE 0 1\nEDGE 1 2\nEDGE 2 3\nEDGE 3 4\nEDGE 4 5\nEDGE 5 6\nEDGE 6 7\nEDGE 7 8\nEDGE 8 9\nEDGE 9 10\nEDGE 10 11\nEDGE 11 12\nEDGE 12 13\nEDGE 13 14\nEDGE 14 15\nEDGE 15 16\nEDGE 16 17\nEDGE 17 18\nEDGE 18 19\nEDGE 19 20\nEDGE 20 21\nEDGE 21 22\nEDGE 22 23\nEDGE 23 24\nEDGE 24 25\nEDGE 25 26\nEDGE 26 27\nEDGE 27 28\nEDGE 28 29\nEDGE 29 30\nEDGE 30 31\nEDGE 31 32\nEDGE 32 33\nEDGE 33 34\nEDGE 34 35\nEDGE 35 36\nEDGE 36 37\nEDGE 37 38\nEDGE 38 39\nEDGE 39 40\nEDGE 40 41\nEDGE 41 42\nEDGE 42 43\nEDGE 43 44\nEDGE 44 45\nEDGE 45 46\nEDGE 46 47\nEDGE 47 48\nEDGE 48 49\nEDGE 49 0\nSORT\n",
+    "expected": {
+      "stdout": "CYCLE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "repeat-calculation",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "반복 호출·그래프 보존",
+    "input": "INIT 6\nEDGE 0 2\nEDGE 1 2\nEDGE 1 3\nEDGE 2 4\nEDGE 3 4\nEDGE 4 5\nSORT\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 6\nORDER_VALID 6\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "add-cycle-after-run",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "반복 호출·그래프 보존",
+    "input": "INIT 6\nEDGE 0 2\nEDGE 1 2\nEDGE 1 3\nEDGE 2 4\nEDGE 3 4\nEDGE 4 5\nSORT\nEDGE 5 0\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 6\nCYCLE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reset-graph",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "반복 호출·그래프 보존",
+    "input": "INIT 6\nEDGE 0 2\nEDGE 1 2\nEDGE 1 3\nEDGE 2 4\nEDGE 3 4\nEDGE 4 5\nSORT\nINIT 1\nSORT\nINIT 3\nEDGE 0 1\nEDGE 1 2\nEDGE 2 0\nSORT\nINIT 6\nEDGE 0 2\nEDGE 1 2\nEDGE 1 3\nEDGE 2 4\nEDGE 3 4\nEDGE 4 5\nSORT\n",
+    "expected": {
+      "stdout": "ORDER_VALID 6\nORDER_VALID 1\nCYCLE\nORDER_VALID 6\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

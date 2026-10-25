@@ -1,0 +1,301 @@
+{
+  "id": "list-doubly",
+  "version": "1.0.0",
+  "title": "이중 연결 리스트",
+  "category": "linked-list",
+  "kind": "data-structure",
+  "description": "각 노드가 이전과 다음 노드의 주소를 저장합니다. 헤드 노드를 둔 원형 구조에서 양방향 연결과 삽입·삭제를 구현합니다.",
+  "learning": {
+    "concept": {
+      "title": "두 링크로 앞뒤를 연결하기",
+      "paragraphs": [
+        "단일 연결 리스트는 다음 노드로만 이동하지만 이중 연결 리스트는 llink로 이전 노드, rlink로 다음 노드를 찾습니다. 연결을 바꿀 때는 양쪽 링크를 함께 갱신합니다.",
+        "이 구현은 데이터가 없는 헤드 노드를 두고 원형으로 연결합니다. 빈 리스트에서도 헤드 노드가 존재하며 두 링크는 자기 자신을 가리킵니다. 앞서 구현한 원형 연결 리스트의 마지막 노드 포인터와 구분합니다.",
+        "삽입·삭제할 노드가 주어지면 연산은 O(1), 위치 탐색과 순회는 O(n), 저장 공간은 O(n)입니다. 노드마다 링크 두 개를 저장하므로 단일 연결 리스트보다 메모리를 더 사용합니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "head",
+        "description": "데이터를 저장하지 않는 헤드 노드입니다. 삭제하지 않으며 고리의 시작과 끝을 연결합니다."
+      },
+      {
+        "name": "llink",
+        "description": "이전 노드의 주소입니다. 헤드의 llink는 마지막 데이터 노드를 가리킵니다."
+      },
+      {
+        "name": "rlink",
+        "description": "다음 노드의 주소입니다. 헤드의 rlink는 첫 데이터 노드를 가리킵니다."
+      },
+      {
+        "name": "data",
+        "description": "데이터 노드에 저장하는 정수입니다. 헤드의 data는 사용하지 않습니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "init",
+        "description": "헤드 노드의 llink와 rlink를 모두 자기 자신으로 설정합니다. 데이터 노드가 없는 헤드 노드에 호출합니다."
+      },
+      {
+        "function": "dinsert",
+        "description": "새 데이터 노드를 생성해 before의 오른쪽에 삽입합니다. 새 노드와 양옆 노드의 링크 4개를 연결합니다."
+      },
+      {
+        "function": "ddelete",
+        "description": "removed가 head이면 아무것도 하지 않습니다. 데이터 노드이면 양옆을 서로 연결한 뒤 removed를 free로 해제합니다."
+      },
+      {
+        "function": "print_dlist",
+        "description": "헤드 노드를 제외하고 rlink 방향으로 한 바퀴 순회합니다. 각 값을 \"<-| %d |-> \"로 출력하고 마지막에 줄바꿈합니다. 빈 리스트는 줄바꿈만 출력하며 연결을 바꾸지 않습니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "init",
+        "argument": null,
+        "result": null,
+        "values": [],
+        "description": "데이터가 없는 헤드 노드는 llink와 rlink가 모두 자기 자신을 가리킵니다."
+      },
+      {
+        "operation": "dinsert",
+        "argument": "head, 10",
+        "result": null,
+        "values": [
+          10
+        ],
+        "description": "헤드 오른쪽에 10을 넣습니다. 헤드와 10의 양방향 링크가 서로를 가리킵니다."
+      },
+      {
+        "operation": "dinsert",
+        "argument": "head, 20",
+        "result": null,
+        "values": [
+          20,
+          10
+        ],
+        "description": "헤드 바로 오른쪽에 20을 삽입합니다. 기존 첫 노드 10의 llink도 20으로 바꿉니다."
+      },
+      {
+        "operation": "dinsert",
+        "argument": "20 노드, 15",
+        "result": null,
+        "values": [
+          20,
+          15,
+          10
+        ],
+        "description": "20과 10 사이에 15를 넣습니다. 15는 양옆 노드로, 양옆 노드는 15로 연결됩니다."
+      },
+      {
+        "operation": "ddelete",
+        "argument": "15 노드",
+        "result": null,
+        "values": [
+          20,
+          10
+        ],
+        "description": "20의 rlink와 10의 llink를 서로 연결하고 15 노드를 해제합니다."
+      },
+      {
+        "operation": "ddelete",
+        "argument": "head",
+        "result": null,
+        "values": [
+          20,
+          10
+        ],
+        "description": "헤드 노드를 삭제하려는 요청은 무시합니다. 데이터와 연결이 유지됩니다."
+      },
+      {
+        "operation": "print_dlist",
+        "argument": null,
+        "result": null,
+        "values": [
+          20,
+          10
+        ],
+        "description": "헤드의 rlink부터 오른쪽으로 이동하고 헤드로 돌아오면 출력을 끝냅니다."
+      }
+    ],
+    "notes": [
+      {
+        "title": "헤드 노드와 데이터 노드",
+        "description": "헤드는 항상 남아 있습니다. 빈 리스트는 NULL이 아니라 헤드 하나로 닫힌 고리입니다."
+      },
+      {
+        "title": "연결은 양쪽을 함께",
+        "description": "p->rlink->llink와 p->llink->rlink는 모두 p를 가리켜야 합니다. 순방향만 연결하면 역방향 순회와 삭제가 깨집니다."
+      },
+      {
+        "title": "삭제와 메모리 해제",
+        "description": "삭제할 데이터 노드를 양옆에서 먼저 분리하고 free로 해제합니다. 남은 데이터 노드 정리는 테스트 호출 코드가 담당합니다."
+      }
+    ]
+  },
+  "contract": {
+    "circular": true,
+    "doubly": true,
+    "scope": "제공된 DListNode를 사용해 4개 함수의 정의와 본문 전체를 구현합니다. 헤드 노드 생성, 위치 탐색, 입력 처리와 main()은 테스트 호출 코드가 담당합니다.",
+    "functions": [
+      {
+        "name": "init",
+        "signature": "void init(DListNode *phead);",
+        "behavior": "헤드 노드의 llink와 rlink를 모두 자기 자신으로 설정합니다. 데이터 노드가 없는 헤드 노드에 호출합니다."
+      },
+      {
+        "name": "dinsert",
+        "signature": "void dinsert(DListNode *before, element value);",
+        "behavior": "새 데이터 노드를 생성해 before의 오른쪽에 삽입합니다. 새 노드와 양옆 노드의 링크 4개를 연결합니다."
+      },
+      {
+        "name": "ddelete",
+        "signature": "void ddelete(DListNode *head, DListNode *removed);",
+        "behavior": "removed가 head이면 아무것도 하지 않습니다. 데이터 노드이면 양옆을 서로 연결한 뒤 removed를 free로 해제합니다."
+      },
+      {
+        "name": "print_dlist",
+        "signature": "void print_dlist(DListNode *phead);",
+        "behavior": "헤드 노드를 제외하고 rlink 방향으로 한 바퀴 순회합니다. 각 값을 \"<-| %d |-> \"로 출력하고 마지막에 줄바꿈합니다. 빈 리스트는 줄바꿈만 출력하며 연결을 바꾸지 않습니다."
+      }
+    ],
+    "errors": {
+      "allocationFailure": {
+        "exitCode": 1,
+        "stderrRequired": true
+      }
+    },
+    "inputRange": {
+      "value": {
+        "min": -1000000,
+        "max": 1000000
+      }
+    },
+    "prerequisites": [
+      "list-singly",
+      "list-circular"
+    ]
+  },
+  "criteria": [
+    {
+      "id": "initialization",
+      "order": 1,
+      "title": "초기화",
+      "description": "빈 헤드 노드의 두 링크를 자기 자신으로 연결합니다."
+    },
+    {
+      "id": "insertion",
+      "order": 2,
+      "title": "노드 삽입",
+      "description": "헤드·중간·마지막 노드 오른쪽에 삽입합니다."
+    },
+    {
+      "id": "links",
+      "order": 3,
+      "title": "양방향 연결",
+      "description": "정방향과 역방향에서 같은 노드를 반대 순서로 만납니다."
+    },
+    {
+      "id": "deletion",
+      "order": 4,
+      "title": "노드 삭제",
+      "description": "처음·중간·마지막 데이터 노드를 연결에서 제거합니다."
+    },
+    {
+      "id": "head",
+      "order": 5,
+      "title": "헤드 노드 보호",
+      "description": "헤드 노드는 삭제하지 않고 빈 고리를 유지합니다."
+    },
+    {
+      "id": "traversal",
+      "order": 6,
+      "title": "순회 출력",
+      "description": "헤드를 제외한 데이터 노드를 한 바퀴만 출력합니다."
+    },
+    {
+      "id": "memory",
+      "order": 7,
+      "title": "메모리 해제",
+      "description": "삽입 시 한 노드를 할당하고 삭제 시 한 노드를 해제합니다."
+    },
+    {
+      "id": "reuse",
+      "order": 8,
+      "title": "삭제 후 재사용",
+      "description": "전체 삭제·재초기화 후 다시 삽입합니다."
+    },
+    {
+      "id": "independence",
+      "order": 9,
+      "title": "리스트 독립성",
+      "description": "두 헤드 노드의 고리를 독립적으로 관리합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "init",
+          "description": "헤드 노드의 llink와 rlink를 모두 자기 자신으로 설정합니다. 데이터 노드가 없는 헤드 노드에 호출합니다."
+        },
+        {
+          "function": "dinsert",
+          "description": "새 데이터 노드를 생성해 before의 오른쪽에 삽입합니다. 새 노드와 양옆 노드의 링크 4개를 연결합니다."
+        },
+        {
+          "function": "ddelete",
+          "description": "removed가 head이면 아무것도 하지 않습니다. 데이터 노드이면 양옆을 서로 연결한 뒤 removed를 free로 해제합니다."
+        },
+        {
+          "function": "print_dlist",
+          "description": "헤드 노드를 제외하고 rlink 방향으로 한 바퀴 순회합니다. 각 값을 \"<-| %d |-> \"로 출력하고 마지막에 줄바꿈합니다. 빈 리스트는 줄바꿈만 출력하며 연결을 바꾸지 않습니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "리스트 번호는 0 또는 1입니다. 위치 -1은 헤드 노드, 0부터는 정방향 데이터 노드입니다. INSERT는 해당 위치 노드의 오른쪽에 삽입하고 DELETE는 해당 노드를 삭제합니다. 테스트는 유효한 위치만 전달합니다. INIT은 호출 코드가 남은 데이터를 해제한 뒤 init을 호출합니다. STATE·REVERSE·SIZE는 호출 코드가 양방향 연결을 검사해 출력합니다. STATS는 두 리스트 전체의 데이터 노드 malloc·free 누적 수이며 헤드 노드는 포함하지 않습니다.",
+        "commands": [
+          {
+            "syntax": "INIT <listId>",
+            "output": null
+          },
+          {
+            "syntax": "INSERT <listId> <beforeIndex> <value>",
+            "output": null
+          },
+          {
+            "syntax": "DELETE <listId> <removedIndex>",
+            "output": null
+          },
+          {
+            "syntax": "PRINT <listId>",
+            "output": "<-| <value> |-> ... (끝에 공백과 줄바꿈, 빈 리스트는 줄바꿈만)"
+          },
+          {
+            "syntax": "STATE <listId>",
+            "output": "STATE <values>"
+          },
+          {
+            "syntax": "REVERSE <listId>",
+            "output": "REVERSE <values>"
+          },
+          {
+            "syntax": "SIZE <listId>",
+            "output": "SIZE <count>"
+          },
+          {
+            "syntax": "STATS <listId>",
+            "output": "STATS <allocations> <releases>"
+          }
+        ],
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

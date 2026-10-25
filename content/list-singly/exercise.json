@@ -1,0 +1,319 @@
+{
+  "id": "list-singly",
+  "version": "1.0.0",
+  "title": "단일 연결 리스트",
+  "category": "linked-list",
+  "kind": "data-structure",
+  "description": "각 노드가 다음 노드의 주소를 저장합니다. head에서 시작해 link를 따라가며 삽입·삭제·순회를 구현합니다.",
+  "learning": {
+    "concept": {
+      "title": "노드를 주소로 이어 붙이기",
+      "paragraphs": [
+        "배열은 연속된 칸에 값을 저장하지만 연결 리스트는 각 노드를 동적으로 만들고 link로 연결합니다. head는 첫 노드를 가리키며, 빈 리스트의 head와 마지막 노드의 link는 NULL입니다.",
+        "맨 앞 삽입·삭제는 첫 노드가 바뀌므로 변경된 head를 반환합니다. 호출하는 쪽은 반환값을 다시 head에 저장합니다.",
+        "중간 삽입·삭제는 선행 노드 pre의 link를 바꿉니다. pre가 주어지면 삽입·삭제는 O(1), 순회와 선행 노드 탐색은 O(n), 저장 공간은 O(n)입니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "data",
+        "description": "노드에 저장하는 정수입니다."
+      },
+      {
+        "name": "link",
+        "description": "다음 노드의 주소이며 마지막 노드에서는 NULL입니다."
+      },
+      {
+        "name": "head",
+        "description": "첫 노드의 주소입니다. 빈 리스트이면 NULL입니다."
+      },
+      {
+        "name": "pre",
+        "description": "삽입·삭제 위치의 바로 앞 노드입니다. 테스트 호출 코드가 찾아 전달합니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "insert_first",
+        "description": "malloc으로 노드를 생성하고 value를 저장합니다. link를 기존 head로 연결한 뒤 새 노드를 반환합니다."
+      },
+      {
+        "function": "insert",
+        "description": "유효한 pre 뒤에 새 노드를 연결합니다. 새 노드의 link를 pre의 기존 다음 노드로 설정한 뒤 pre의 link를 바꿉니다. 기존 head를 반환합니다."
+      },
+      {
+        "function": "delete_first",
+        "description": "head가 NULL이면 NULL을 반환합니다. 그렇지 않으면 첫 노드를 free로 해제하고 다음 노드를 새 head로 반환합니다."
+      },
+      {
+        "function": "delete",
+        "description": "유효한 pre의 다음 노드를 제거합니다. pre를 제거할 노드의 다음 노드로 연결한 뒤 제거한 노드를 free로 해제하고 기존 head를 반환합니다."
+      },
+      {
+        "function": "print_list",
+        "description": "head부터 link를 따라가며 각 값을 \"%d->\"로 출력하고 마지막에 \"NULL\\n\"을 출력합니다. 빈 리스트는 \"NULL\\n\"만 출력합니다. 리스트를 변경하지 않습니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "print_list",
+        "argument": null,
+        "result": null,
+        "values": [],
+        "description": "빈 리스트의 head는 NULL이며, 순회 출력은 NULL 한 줄입니다."
+      },
+      {
+        "operation": "insert_first",
+        "argument": 10,
+        "result": "head",
+        "values": [
+          10
+        ],
+        "description": "새 노드의 link를 기존 head인 NULL로 연결합니다."
+      },
+      {
+        "operation": "insert_first",
+        "argument": 20,
+        "result": "head",
+        "values": [
+          20,
+          10
+        ],
+        "description": "새 노드를 앞에 연결하고 head를 새 노드로 바꿉니다."
+      },
+      {
+        "operation": "insert",
+        "argument": "pre=0, value=15",
+        "result": "head 유지",
+        "values": [
+          20,
+          15,
+          10
+        ],
+        "description": "20 노드 뒤에 15를 넣고 원래 다음 노드인 10으로 연결합니다."
+      },
+      {
+        "operation": "delete",
+        "argument": "pre=0",
+        "result": "head 유지",
+        "values": [
+          20,
+          10
+        ],
+        "description": "20의 link를 10으로 바꾸고 15 노드를 해제합니다."
+      },
+      {
+        "operation": "delete_first",
+        "argument": null,
+        "result": "head",
+        "values": [
+          10
+        ],
+        "description": "20 노드를 해제하고 head를 10 노드로 바꿉니다."
+      },
+      {
+        "operation": "print_list",
+        "argument": null,
+        "result": null,
+        "values": [
+          10
+        ],
+        "description": "link를 따라 출력하고 마지막에 NULL을 출력합니다."
+      },
+      {
+        "operation": "delete_first",
+        "argument": null,
+        "result": "NULL",
+        "values": [],
+        "description": "마지막 노드를 해제하면 head는 NULL입니다."
+      }
+    ],
+    "notes": [
+      {
+        "title": "반환값을 head에 저장합니다",
+        "description": "insert_first와 delete_first는 첫 노드를 바꿉니다. insert와 delete는 기존 head를 유지하면서 pre 뒤의 연결만 바꿉니다."
+      },
+      {
+        "title": "삭제한 노드는 해제합니다",
+        "description": "연결을 먼저 복구하고 제거한 노드를 free로 해제합니다. 남은 노드의 정리는 호출 코드가 담당합니다. 빈 delete_first는 오류 없이 NULL을 반환합니다."
+      }
+    ]
+  },
+  "contract": {
+    "scope": "제공된 ListNode로 5개 함수의 정의와 본문 전체를 구현합니다.",
+    "functions": [
+      {
+        "name": "insert_first",
+        "signature": "ListNode *insert_first(ListNode *head, element value)",
+        "behavior": "malloc으로 노드를 생성하고 value를 저장합니다. link를 기존 head로 연결한 뒤 새 노드를 반환합니다."
+      },
+      {
+        "name": "insert",
+        "signature": "ListNode *insert(ListNode *head, ListNode *pre, element value)",
+        "behavior": "유효한 pre 뒤에 새 노드를 연결합니다. 새 노드의 link를 pre의 기존 다음 노드로 설정한 뒤 pre의 link를 바꿉니다. 기존 head를 반환합니다."
+      },
+      {
+        "name": "delete_first",
+        "signature": "ListNode *delete_first(ListNode *head)",
+        "behavior": "head가 NULL이면 NULL을 반환합니다. 그렇지 않으면 첫 노드를 free로 해제하고 다음 노드를 새 head로 반환합니다."
+      },
+      {
+        "name": "delete",
+        "signature": "ListNode *delete(ListNode *head, ListNode *pre)",
+        "behavior": "유효한 pre의 다음 노드를 제거합니다. pre를 제거할 노드의 다음 노드로 연결한 뒤 제거한 노드를 free로 해제하고 기존 head를 반환합니다."
+      },
+      {
+        "name": "print_list",
+        "signature": "void print_list(ListNode *head)",
+        "behavior": "head부터 link를 따라가며 각 값을 \"%d->\"로 출력하고 마지막에 \"NULL\\n\"을 출력합니다. 빈 리스트는 \"NULL\\n\"만 출력합니다. 리스트를 변경하지 않습니다."
+      }
+    ],
+    "valueRange": {
+      "min": -1000000,
+      "max": 1000000
+    },
+    "requirements": [
+      "제공된 자료형, 구조체 필드와 함수 호출 규격을 유지합니다.",
+      "노드는 malloc으로 생성하고 제거한 노드는 free로 해제합니다. 할당 실패 시 stderr에 오류를 출력하고 exit(1)로 종료합니다. 채점에서는 할당 실패를 강제로 발생시키지 않습니다.",
+      "insert에는 리스트에 속한 유효한 pre를 전달합니다. delete에는 다음 노드가 존재하는 유효한 pre를 전달합니다. 잘못된 선행 노드 처리는 실습 범위에 포함하지 않습니다.",
+      "print_list만 출력합니다. 다른 함수는 정상 동작 시 stdout와 stderr에 출력하지 않습니다.",
+      "사용자 main()은 작성하지 않습니다. 호출 코드는 반환값을 head에 저장하고 테스트 종료 시 남은 노드를 해제합니다.",
+      "각 리스트의 연결과 메모리는 다른 리스트와 독립적이어야 합니다."
+    ],
+    "assessmentScope": "연결 순서, head의 변경·유지, 출력과 malloc·free 호출 수를 검사합니다. 코드 스타일과 시간 복잡도는 정적으로 검사하지 않습니다."
+  },
+  "prerequisites": [],
+  "criteria": [
+    {
+      "id": "insert-first",
+      "order": 1,
+      "title": "맨 앞 삽입",
+      "description": "새 head 반환과 기존 연결 보존을 확인합니다."
+    },
+    {
+      "id": "insert-after",
+      "order": 2,
+      "title": "지정 노드 뒤 삽입",
+      "description": "선행 노드와 나머지 연결을 유지합니다."
+    },
+    {
+      "id": "delete-first",
+      "order": 3,
+      "title": "맨 앞 삭제",
+      "description": "첫 노드 제거와 새 head 반환을 확인합니다."
+    },
+    {
+      "id": "delete-after",
+      "order": 4,
+      "title": "지정 노드 뒤 삭제",
+      "description": "지정 노드만 제거하고 head를 유지합니다."
+    },
+    {
+      "id": "traversal",
+      "order": 5,
+      "title": "순회 출력",
+      "description": "정확한 순서·형식과 상태 유지를 확인합니다."
+    },
+    {
+      "id": "empty",
+      "order": 6,
+      "title": "빈 리스트 처리",
+      "description": "빈 출력과 빈 삭제의 반환값을 확인합니다."
+    },
+    {
+      "id": "memory",
+      "order": 7,
+      "title": "메모리 관리",
+      "description": "생성·삭제에 따른 할당·해제를 확인합니다."
+    },
+    {
+      "id": "reuse",
+      "order": 8,
+      "title": "경계와 재사용",
+      "description": "중복 값과 삭제 후 재삽입을 확인합니다."
+    },
+    {
+      "id": "independence",
+      "order": 9,
+      "title": "리스트 독립성",
+      "description": "두 리스트를 독립적으로 조작합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "insert_first",
+          "description": "malloc으로 노드를 생성하고 value를 저장합니다. link를 기존 head로 연결한 뒤 새 노드를 반환합니다."
+        },
+        {
+          "function": "insert",
+          "description": "유효한 pre 뒤에 새 노드를 연결합니다. 새 노드의 link를 pre의 기존 다음 노드로 설정한 뒤 pre의 link를 바꿉니다. 기존 head를 반환합니다."
+        },
+        {
+          "function": "delete_first",
+          "description": "head가 NULL이면 NULL을 반환합니다. 그렇지 않으면 첫 노드를 free로 해제하고 다음 노드를 새 head로 반환합니다."
+        },
+        {
+          "function": "delete",
+          "description": "유효한 pre의 다음 노드를 제거합니다. pre를 제거할 노드의 다음 노드로 연결한 뒤 제거한 노드를 free로 해제하고 기존 head를 반환합니다."
+        },
+        {
+          "function": "print_list",
+          "description": "head부터 link를 따라가며 각 값을 \"%d->\"로 출력하고 마지막에 \"NULL\\n\"을 출력합니다. 빈 리스트는 \"NULL\\n\"만 출력합니다. 리스트를 변경하지 않습니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "명령과 리스트 번호(0 또는 1)를 한 줄씩 입력합니다. INIT으로 빈 리스트를 만듭니다. INSERT_AFTER와 DELETE_AFTER는 0부터 시작하는 선행 노드의 위치를 받습니다. PRINT는 사용자 print_list를 호출합니다. STATE·NODE·HEAD_SAME·STATS는 호출 코드의 상태 검사입니다. HEAD_SAME은 직전 삽입·삭제 전후의 head 주소가 같으면 1입니다. STATS는 두 리스트 전체의 누적 malloc·free 호출 수이며 INIT 정리도 free에 포함합니다.",
+        "commands": [
+          {
+            "syntax": "INIT <listId>",
+            "output": null
+          },
+          {
+            "syntax": "INSERT_FIRST <listId> <value>",
+            "output": null
+          },
+          {
+            "syntax": "INSERT_AFTER <listId> <preIndex> <value>",
+            "output": null
+          },
+          {
+            "syntax": "DELETE_FIRST <listId>",
+            "output": null
+          },
+          {
+            "syntax": "DELETE_AFTER <listId> <preIndex>",
+            "output": null
+          },
+          {
+            "syntax": "PRINT <listId>",
+            "output": "<value>->...->NULL"
+          },
+          {
+            "syntax": "STATE <listId>",
+            "output": "STATE <values>"
+          },
+          {
+            "syntax": "NODE <listId> <index>",
+            "output": "NODE <index> <value>"
+          },
+          {
+            "syntax": "HEAD_SAME <listId>",
+            "output": "HEAD_SAME <0|1>"
+          },
+          {
+            "syntax": "STATS <listId>",
+            "output": "STATS <allocations> <releases>"
+          }
+        ],
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

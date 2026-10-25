@@ -1,0 +1,275 @@
+{
+  "id": "exhaustive-combinations",
+  "version": "1.0.0",
+  "title": "완전 탐색 — 조합 생성",
+  "category": "exhaustive",
+  "kind": "algorithm",
+  "description": "1~n에서 r개를 증가하는 순서로 뽑아 출력합니다. 현재 후보 value를 고른 다음 value+1부터 재귀 호출하여 같은 조합의 순서 중복을 막습니다.",
+  "learning": {
+    "concept": {
+      "title": "조합 생성의 선택과 재귀 복귀",
+      "paragraphs": [
+        "조합은 원소의 순서를 구분하지 않습니다. {1 2}와 {2 1}을 따로 만들지 않도록 선택한 값보다 큰 값만 다음 후보로 사용합니다.",
+        "start는 다음에 시도할 최소 값이고 depth는 현재 고른 개수입니다. depth가 r일 때 selected의 앞 r칸을 출력합니다.",
+        "입력은 0≤r≤n≤10입니다. 결과는 nCr개이고 기준 구현의 탐색 시간 상한은 O(n·2ⁿ), 출력 자체는 O(r·nCr)입니다. 보조 공간은 O(n)입니다. 남은 원소 수를 이용하면 불필요한 분기를 줄일 수 있습니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "selected",
+        "description": "현재 선택한 값 또는 포함 여부를 저장합니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "generate_combinations",
+        "description": "1~n에서 r개를 증가하는 순서로 뽑아 출력합니다. 현재 후보 value를 고른 다음 value+1부터 재귀 호출하여 같은 조합의 순서 중복을 막습니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "generate_combinations",
+        "argument": "n=4, r=2, depth=0",
+        "result": null,
+        "values": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "selected": [],
+        "depth": 0,
+        "trace": [
+          "start=1, depth=0에서 시작합니다."
+        ],
+        "description": "start=1, depth=0에서 시작합니다."
+      },
+      {
+        "operation": "generate_combinations",
+        "argument": "n=4, r=2, depth=1",
+        "result": null,
+        "values": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "selected": [
+          1
+        ],
+        "depth": 1,
+        "trace": [
+          "1을 선택하면 다음 후보는 2부터입니다."
+        ],
+        "description": "1을 선택하면 다음 후보는 2부터입니다.",
+        "activeValue": 1
+      },
+      {
+        "operation": "generate_combinations",
+        "argument": "n=4, r=2, depth=2",
+        "result": null,
+        "values": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "selected": [
+          1,
+          2
+        ],
+        "depth": 2,
+        "trace": [
+          "{1 2}를 출력합니다."
+        ],
+        "description": "{1 2}를 출력합니다.",
+        "activeValue": 2
+      },
+      {
+        "operation": "generate_combinations",
+        "argument": "n=4, r=2, depth=1",
+        "result": null,
+        "values": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "selected": [
+          1
+        ],
+        "depth": 1,
+        "trace": [
+          "복귀해 두 번째 선택을 바꿉니다."
+        ],
+        "description": "복귀해 두 번째 선택을 바꿉니다.",
+        "activeValue": 2
+      },
+      {
+        "operation": "generate_combinations",
+        "argument": "n=4, r=2, depth=2",
+        "result": null,
+        "values": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "selected": [
+          1,
+          3
+        ],
+        "depth": 2,
+        "trace": [
+          "{1 3}을 출력합니다."
+        ],
+        "description": "{1 3}을 출력합니다.",
+        "activeValue": 3
+      },
+      {
+        "operation": "generate_combinations",
+        "argument": "n=4, r=2, depth=1",
+        "result": null,
+        "values": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "selected": [
+          2
+        ],
+        "depth": 1,
+        "trace": [
+          "1의 분기를 마치고 2를 선택합니다. 다음은 3부터입니다."
+        ],
+        "description": "1의 분기를 마치고 2를 선택합니다. 다음은 3부터입니다.",
+        "activeValue": 2
+      },
+      {
+        "operation": "generate_combinations",
+        "argument": "n=4, r=2, depth=2",
+        "result": null,
+        "values": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "selected": [
+          2,
+          3
+        ],
+        "depth": 2,
+        "trace": [
+          "{2 3}은 출력하지만 {2 1}은 생성하지 않습니다."
+        ],
+        "description": "{2 3}은 출력하지만 {2 1}은 생성하지 않습니다.",
+        "activeValue": 3
+      },
+      {
+        "operation": "generate_combinations",
+        "argument": "n=4, r=2, depth=0",
+        "result": null,
+        "values": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "selected": [],
+        "depth": 0,
+        "trace": [
+          "결과 6개",
+          "{1 2}",
+          "{1 3}",
+          "{1 4}",
+          "{2 3}",
+          "{2 4}",
+          "{3 4}"
+        ],
+        "description": "각 조합을 한 번씩 모두 생성했습니다."
+      }
+    ],
+    "notes": [
+      {
+        "title": "출력 함수 제공",
+        "description": "print_sequence는 선택한 정수들을 {1 2} 형식으로 한 줄에 출력합니다. 길이가 0이면 {}입니다. 추가 안내문은 출력하지 않습니다."
+      },
+      {
+        "title": "재귀 사용 여부",
+        "description": "재귀 호출과 상태 복구를 학습 목표로 합니다. 채점은 출력 순서·누락·중복·배열 범위·복구 상태를 검사하며 재귀 사용 여부는 정적으로 검사하지 않습니다."
+      }
+    ]
+  },
+  "contract": {
+    "capacity": 10,
+    "scope": "void generate_combinations(int n, int r, int start, int depth, int selected[]) 함수의 정의와 본문 전체를 구현합니다. print_sequence와 MAX_N은 제공됩니다. main과 입력 처리는 호출 코드가 담당합니다.",
+    "functions": [
+      {
+        "name": "generate_combinations",
+        "signature": "void generate_combinations(int n, int r, int start, int depth, int selected[])",
+        "behavior": "1~n에서 r개를 증가하는 순서로 뽑아 출력합니다. 현재 후보 value를 고른 다음 value+1부터 재귀 호출하여 같은 조합의 순서 중복을 막습니다."
+      }
+    ],
+    "requirements": [
+      "원소는 1~n이며 n의 범위는 0~10입니다. r은 0~n입니다.",
+      "출력은 제공된 print_sequence를 사용합니다. {}는 빈 선택이고 각 결과는 중괄호 안에 공백 한 칸으로 구분해 한 줄에 출력합니다.",
+      "호출 코드는 start=1, depth=0으로 시작합니다. selected의 0~r-1만 변경할 수 있습니다. 호출 종료 시 그 칸의 값은 자유입니다."
+    ]
+  },
+  "prerequisites": [
+    "recursion-factorial"
+  ],
+  "criteria": [
+    {
+      "id": "basic",
+      "order": 1,
+      "title": "선택과 출력",
+      "description": "지정한 개수의 원소를 골라 정해진 순서로 출력합니다."
+    },
+    {
+      "id": "branch",
+      "order": 2,
+      "title": "분기·중복 방지",
+      "description": "모든 선택 분기를 빠짐없이 탐색하고 중복을 방지합니다."
+    },
+    {
+      "id": "empty",
+      "order": 3,
+      "title": "빈 선택",
+      "description": "원소가 없거나 0개를 고를 때 빈 선택을 한 번 출력합니다."
+    },
+    {
+      "id": "boundary",
+      "order": 4,
+      "title": "최대 크기",
+      "description": "최대 입력에서 모든 결과를 생성합니다."
+    },
+    {
+      "id": "repeat",
+      "order": 5,
+      "title": "상태 복구·반복 호출",
+      "description": "임시 상태를 복구하고 여러 입력을 연속 처리합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "generate_combinations",
+          "description": "1~n에서 r개를 증가하는 순서로 뽑아 출력합니다. 현재 후보 value를 고른 다음 value+1부터 재귀 호출하여 같은 조합의 순서 중복을 막습니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "GENERATE n r을 각 줄에 입력합니다. 호출 코드는 초기 재귀 인자와 빈 작업 배열을 제공하며 함수가 결과를 직접 출력합니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

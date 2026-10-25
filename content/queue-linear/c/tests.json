@@ -1,0 +1,254 @@
+[
+  {
+    "id": "init-empty",
+    "criterionId": "initialization",
+    "public": false,
+    "description": "초기 인덱스와 상태",
+    "input": "INIT 0\nFRONT 0\nREAR 0\nEMPTY 0\nFULL 0\n",
+    "expected": {
+      "stdout": "FRONT -1\nREAR -1\nEMPTY 1\nFULL 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "enqueue-one",
+    "criterionId": "enqueue",
+    "public": false,
+    "description": "첫 값을 0번 칸에 저장",
+    "input": "INIT 0\nENQUEUE 0 10\nFRONT 0\nREAR 0\nDATA 0 0\nEMPTY 0\n",
+    "expected": {
+      "stdout": "FRONT -1\nREAR 0\nDATA 0 10\nEMPTY 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "enqueue-values",
+    "criterionId": "enqueue",
+    "public": false,
+    "description": "0과 음수 및 경계값 저장",
+    "input": "INIT 0\nENQUEUE 0 0\nENQUEUE 0 -1000000\nENQUEUE 0 1000000\nDATA 0 0\nDATA 0 1\nDATA 0 2\nREAR 0\n",
+    "expected": {
+      "stdout": "DATA 0 0\nDATA 1 -1000000\nDATA 2 1000000\nREAR 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "public-example",
+    "criterionId": "dequeue",
+    "public": true,
+    "description": "먼저 삽입한 값부터 삭제",
+    "input": "INIT 0\nENQUEUE 0 10\nENQUEUE 0 20\nDEQUEUE 0\nENQUEUE 0 30\nDEQUEUE 0\nDEQUEUE 0\nEMPTY 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 10\nDEQUEUE 20\nDEQUEUE 30\nEMPTY 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "dequeue-one",
+    "criterionId": "dequeue",
+    "public": false,
+    "description": "삭제는 front만 증가",
+    "input": "INIT 0\nENQUEUE 0 7\nDEQUEUE 0\nFRONT 0\nREAR 0\nEMPTY 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 7\nFRONT 0\nREAR 0\nEMPTY 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "dequeue-fifo",
+    "criterionId": "dequeue",
+    "public": false,
+    "description": "중복값과 음수의 순서 유지",
+    "input": "INIT 0\nENQUEUE 0 -7\nENQUEUE 0 20\nENQUEUE 0 20\nENQUEUE 0 8\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\n",
+    "expected": {
+      "stdout": "DEQUEUE -7\nDEQUEUE 20\nDEQUEUE 20\nDEQUEUE 8\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-dequeue",
+    "criterionId": "empty",
+    "public": false,
+    "description": "초기 빈 큐의 삭제 오류",
+    "input": "INIT 0\nDEQUEUE 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-after-drain",
+    "criterionId": "empty",
+    "public": false,
+    "description": "마지막 삭제 후 공백 오류",
+    "input": "INIT 0\nENQUEUE 0 9\nDEQUEUE 0\nEMPTY 0\nDEQUEUE 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 9\nEMPTY 1\n",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "empty-state-preserved",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 상태 검사는 인덱스를 유지",
+    "input": "INIT 0\nENQUEUE 0 1\nDEQUEUE 0\nEMPTY 0\nEMPTY 0\nFRONT 0\nREAR 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 1\nEMPTY 1\nEMPTY 1\nFRONT 0\nREAR 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "full-boundary",
+    "criterionId": "full",
+    "public": false,
+    "description": "네 개와 다섯 개의 포화 경계",
+    "input": "INIT 0\nENQUEUE 0 0\nENQUEUE 0 1\nENQUEUE 0 2\nENQUEUE 0 3\nFULL 0\nENQUEUE 0 4\nFULL 0\nFRONT 0\nREAR 0\nDATA 0 4\n",
+    "expected": {
+      "stdout": "FULL 0\nFULL 1\nFRONT -1\nREAR 4\nDATA 4 4\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "full-enqueue",
+    "criterionId": "full",
+    "public": false,
+    "description": "여섯 번째 삽입은 오류 종료",
+    "input": "INIT 0\nENQUEUE 0 0\nENQUEUE 0 1\nENQUEUE 0 2\nENQUEUE 0 3\nENQUEUE 0 4\nENQUEUE 0 99\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "full-state-preserved",
+    "criterionId": "full",
+    "public": false,
+    "description": "포화 검사는 상태와 값을 유지",
+    "input": "INIT 0\nENQUEUE 0 0\nENQUEUE 0 1\nENQUEUE 0 2\nENQUEUE 0 3\nENQUEUE 0 4\nFULL 0\nFULL 0\nFRONT 0\nREAR 0\nDEQUEUE 0\n",
+    "expected": {
+      "stdout": "FULL 1\nFULL 1\nFRONT -1\nREAR 4\nDEQUEUE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "linear-full-after-delete",
+    "criterionId": "linear",
+    "public": false,
+    "description": "앞 공간을 비워도 포화 유지",
+    "input": "INIT 0\nENQUEUE 0 0\nENQUEUE 0 1\nENQUEUE 0 2\nENQUEUE 0 3\nENQUEUE 0 4\nDEQUEUE 0\nFULL 0\nENQUEUE 0 99\n",
+    "expected": {
+      "stdout": "DEQUEUE 0\nFULL 1\n",
+      "exitCode": 1,
+      "stderrRequired": true
+    }
+  },
+  {
+    "id": "linear-empty-and-full",
+    "criterionId": "linear",
+    "public": false,
+    "description": "모두 삭제하면 공백과 포화가 동시에 참",
+    "input": "INIT 0\nENQUEUE 0 0\nENQUEUE 0 1\nENQUEUE 0 2\nENQUEUE 0 3\nENQUEUE 0 4\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nEMPTY 0\nFULL 0\nFRONT 0\nREAR 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 0\nDEQUEUE 1\nDEQUEUE 2\nDEQUEUE 3\nDEQUEUE 4\nEMPTY 1\nFULL 1\nFRONT 4\nREAR 4\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "linear-no-rewind",
+    "criterionId": "linear",
+    "public": false,
+    "description": "비어도 인덱스를 자동으로 되돌리지 않음",
+    "input": "INIT 0\nENQUEUE 0 10\nDEQUEUE 0\nENQUEUE 0 20\nFRONT 0\nREAR 0\nDATA 0 1\nDEQUEUE 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 10\nFRONT 0\nREAR 1\nDATA 1 20\nDEQUEUE 20\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reset-values",
+    "criterionId": "reset",
+    "public": false,
+    "description": "값이 있는 큐 재초기화",
+    "input": "INIT 0\nENQUEUE 0 10\nENQUEUE 0 20\nINIT 0\nFRONT 0\nREAR 0\nEMPTY 0\nFULL 0\n",
+    "expected": {
+      "stdout": "FRONT -1\nREAR -1\nEMPTY 1\nFULL 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reset-full",
+    "criterionId": "reset",
+    "public": false,
+    "description": "포화 큐 초기화 후 재사용",
+    "input": "INIT 0\nENQUEUE 0 0\nENQUEUE 0 1\nENQUEUE 0 2\nENQUEUE 0 3\nENQUEUE 0 4\nINIT 0\nENQUEUE 0 99\nREAR 0\nDEQUEUE 0\n",
+    "expected": {
+      "stdout": "REAR 0\nDEQUEUE 99\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reset-drained",
+    "criterionId": "reset",
+    "public": false,
+    "description": "모두 삭제한 큐 초기화",
+    "input": "INIT 0\nENQUEUE 0 0\nENQUEUE 0 1\nENQUEUE 0 2\nENQUEUE 0 3\nENQUEUE 0 4\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nDEQUEUE 0\nINIT 0\nFULL 0\nENQUEUE 0 -3\nDEQUEUE 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 0\nDEQUEUE 1\nDEQUEUE 2\nDEQUEUE 3\nDEQUEUE 4\nFULL 0\nDEQUEUE -3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-interleaved",
+    "criterionId": "independence",
+    "public": false,
+    "description": "두 큐의 교차 조작",
+    "input": "INIT 0\nINIT 1\nENQUEUE 0 10\nENQUEUE 1 80\nENQUEUE 0 20\nDEQUEUE 0\nDEQUEUE 1\nDEQUEUE 0\n",
+    "expected": {
+      "stdout": "DEQUEUE 10\nDEQUEUE 80\nDEQUEUE 20\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-reset",
+    "criterionId": "independence",
+    "public": false,
+    "description": "한 큐 초기화가 다른 큐에 영향 없음",
+    "input": "INIT 0\nINIT 1\nENQUEUE 0 10\nENQUEUE 1 80\nINIT 0\nEMPTY 0\nDEQUEUE 1\nFRONT 1\nREAR 1\n",
+    "expected": {
+      "stdout": "EMPTY 1\nDEQUEUE 80\nFRONT 0\nREAR 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-full",
+    "criterionId": "independence",
+    "public": false,
+    "description": "한 큐만 포화 상태",
+    "input": "INIT 0\nENQUEUE 0 0\nENQUEUE 0 1\nENQUEUE 0 2\nENQUEUE 0 3\nENQUEUE 0 4\nINIT 1\nFULL 0\nFULL 1\nENQUEUE 1 90\nDEQUEUE 1\nREAR 0\n",
+    "expected": {
+      "stdout": "FULL 1\nFULL 0\nDEQUEUE 90\nREAR 4\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

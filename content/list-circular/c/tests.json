@@ -1,0 +1,290 @@
+[
+  {
+    "id": "first-one",
+    "criterionId": "insert-first",
+    "public": false,
+    "description": "빈 리스트 앞 삽입",
+    "input": "INIT 0\nINSERT_FIRST 0 10\nHEAD_SAME 0\nFIRST 0\nHEAD 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 0\nFIRST 10\nHEAD 10\nSTATE 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "first-many",
+    "criterionId": "insert-first",
+    "public": false,
+    "description": "앞 삽입은 기존 마지막 head 유지",
+    "input": "INIT 0\nINSERT_FIRST 0 10\nINSERT_FIRST 0 20\nHEAD_SAME 0\nINSERT_FIRST 0 30\nHEAD_SAME 0\nSTATE 0\nHEAD 0\nFIRST 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 1\nHEAD_SAME 1\nSTATE 30 20 10\nHEAD 10\nFIRST 30\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "first-values",
+    "criterionId": "insert-first",
+    "public": false,
+    "description": "0과 입력 범위 경계",
+    "input": "INIT 0\nINSERT_FIRST 0 0\nINSERT_FIRST 0 -1000000\nINSERT_FIRST 0 1000000\nSTATE 0\n",
+    "expected": {
+      "stdout": "STATE 1000000 -1000000 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "last-one",
+    "criterionId": "insert-last",
+    "public": false,
+    "description": "빈 리스트 뒤 삽입",
+    "input": "INIT 0\nINSERT_LAST 0 10\nHEAD_SAME 0\nFIRST 0\nHEAD 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 0\nFIRST 10\nHEAD 10\nSTATE 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "last-many",
+    "criterionId": "insert-last",
+    "public": false,
+    "description": "뒤 삽입마다 head 변경",
+    "input": "INIT 0\nINSERT_LAST 0 10\nINSERT_LAST 0 20\nHEAD_SAME 0\nINSERT_LAST 0 30\nHEAD_SAME 0\nSTATE 0\nHEAD 0\nFIRST 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 0\nHEAD_SAME 0\nSTATE 10 20 30\nHEAD 30\nFIRST 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "last-values",
+    "criterionId": "insert-last",
+    "public": false,
+    "description": "음수와 중복값의 뒤 삽입",
+    "input": "INIT 0\nINSERT_LAST 0 -7\nINSERT_LAST 0 0\nINSERT_LAST 0 -7\nSTATE 0\n",
+    "expected": {
+      "stdout": "STATE -7 0 -7\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "one-self-first",
+    "criterionId": "closure",
+    "public": false,
+    "description": "앞 삽입 노드는 자신을 가리킴",
+    "input": "INIT 0\nINSERT_FIRST 0 9\nSIZE 0\nWALK 0 4\n",
+    "expected": {
+      "stdout": "SIZE 1\nWALK 9 9 9 9\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "one-self-last",
+    "criterionId": "closure",
+    "public": false,
+    "description": "뒤 삽입 노드는 자신을 가리킴",
+    "input": "INIT 0\nINSERT_LAST 0 8\nSIZE 0\nWALK 0 4\n",
+    "expected": {
+      "stdout": "SIZE 1\nWALK 8 8 8 8\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "walk-many",
+    "criterionId": "closure",
+    "public": false,
+    "description": "세 노드의 여러 바퀴 이동",
+    "input": "INIT 0\nINSERT_LAST 0 10\nINSERT_LAST 0 20\nINSERT_LAST 0 30\nWALK 0 8\nSIZE 0\n",
+    "expected": {
+      "stdout": "WALK 10 20 30 10 20 30 10 20\nSIZE 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "walk-mixed",
+    "criterionId": "closure",
+    "public": false,
+    "description": "양쪽 삽입 후 순환",
+    "input": "INIT 0\nINSERT_FIRST 0 10\nINSERT_FIRST 0 5\nINSERT_LAST 0 20\nWALK 0 7\n",
+    "expected": {
+      "stdout": "WALK 5 10 20 5 10 20 5\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "public-example",
+    "criterionId": "traversal",
+    "public": true,
+    "description": "양쪽 삽입과 한 바퀴 출력",
+    "input": "INIT 0\nINSERT_LAST 0 10\nINSERT_LAST 0 20\nINSERT_FIRST 0 5\nPRINT 0\nHEAD 0\nFIRST 0\n",
+    "expected": {
+      "stdout": "5->10->20->\nHEAD 20\nFIRST 5\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-single",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "한 노드를 한 번만 출력",
+    "input": "INIT 0\nINSERT_FIRST 0 7\nPRINT 0\n",
+    "expected": {
+      "stdout": "7->\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-preserves",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "반복 출력 후 연결 유지",
+    "input": "INIT 0\nINSERT_LAST 0 10\nINSERT_FIRST 0 5\nPRINT 0\nPRINT 0\nSTATE 0\nWALK 0 5\n",
+    "expected": {
+      "stdout": "5->10->\n5->10->\nSTATE 5 10\nWALK 5 10 5 10 5\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-boundaries",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "정수 범위 경계 출력",
+    "input": "INIT 0\nINSERT_FIRST 0 -1000000\nINSERT_LAST 0 1000000\nPRINT 0\n",
+    "expected": {
+      "stdout": "-1000000->1000000->\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-print",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 순회는 출력 없음",
+    "input": "INIT 0\nPRINT 0\n",
+    "expected": {
+      "stdout": "",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-state",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 고리의 상태",
+    "input": "INIT 0\nSIZE 0\nSTATE 0\nWALK 0 0\n",
+    "expected": {
+      "stdout": "SIZE 0\nSTATE\nWALK\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-allocation",
+    "criterionId": "memory",
+    "public": false,
+    "description": "양쪽 삽입은 노드 한 개씩 할당",
+    "input": "INIT 0\nINSERT_FIRST 0 1\nINSERT_LAST 0 2\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATS 2 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-clear",
+    "criterionId": "memory",
+    "public": false,
+    "description": "재초기화 시 고리를 끊고 해제",
+    "input": "INIT 0\nINSERT_LAST 0 1\nINSERT_LAST 0 2\nINSERT_FIRST 0 0\nINIT 0\nSTATS 0\nSIZE 0\n",
+    "expected": {
+      "stdout": "STATS 3 3\nSIZE 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-print",
+    "criterionId": "memory",
+    "public": false,
+    "description": "출력은 할당·해제하지 않음",
+    "input": "INIT 0\nINSERT_LAST 0 1\nPRINT 0\nPRINT 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "1->\n1->\nSTATS 1 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-single-reset",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "한 노드 정리 후 재삽입",
+    "input": "INIT 0\nINSERT_LAST 0 1\nINIT 0\nINSERT_FIRST 0 8\nINSERT_LAST 0 9\nPRINT 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "8->9->\nSTATS 3 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-duplicates",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "중복값 노드도 각각 순회",
+    "input": "INIT 0\nINSERT_LAST 0 7\nINSERT_FIRST 0 7\nINSERT_LAST 0 7\nSIZE 0\nPRINT 0\nWALK 0 5\n",
+    "expected": {
+      "stdout": "SIZE 3\n7->7->7->\nWALK 7 7 7 7 7\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-many",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "여러 노드 생성과 전체 정리",
+    "input": "INIT 0\nINSERT_LAST 0 0\nINSERT_LAST 0 1\nINSERT_LAST 0 2\nINSERT_LAST 0 3\nINSERT_LAST 0 4\nINSERT_LAST 0 5\nINSERT_LAST 0 6\nINSERT_LAST 0 7\nINSERT_LAST 0 8\nINSERT_LAST 0 9\nINSERT_LAST 0 10\nINSERT_LAST 0 11\nINSERT_LAST 0 12\nINSERT_LAST 0 13\nINSERT_LAST 0 14\nINSERT_LAST 0 15\nINSERT_LAST 0 16\nINSERT_LAST 0 17\nINSERT_LAST 0 18\nINSERT_LAST 0 19\nINSERT_LAST 0 20\nINSERT_LAST 0 21\nINSERT_LAST 0 22\nINSERT_LAST 0 23\nINSERT_LAST 0 24\nINSERT_LAST 0 25\nINSERT_LAST 0 26\nINSERT_LAST 0 27\nINSERT_LAST 0 28\nINSERT_LAST 0 29\nINSERT_LAST 0 30\nINSERT_LAST 0 31\nINSERT_LAST 0 32\nINSERT_LAST 0 33\nINSERT_LAST 0 34\nINSERT_LAST 0 35\nINSERT_LAST 0 36\nINSERT_LAST 0 37\nINSERT_LAST 0 38\nINSERT_LAST 0 39\nSIZE 0\nFIRST 0\nHEAD 0\nINIT 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "SIZE 40\nFIRST 0\nHEAD 39\nSTATS 40 40\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-interleaved",
+    "criterionId": "independence",
+    "public": false,
+    "description": "두 고리를 교차 조작",
+    "input": "INIT 0\nINIT 1\nINSERT_LAST 0 10\nINSERT_FIRST 1 80\nINSERT_FIRST 0 5\nINSERT_LAST 1 90\nSTATE 0\nSTATE 1\nHEAD 0\nHEAD 1\n",
+    "expected": {
+      "stdout": "STATE 5 10\nSTATE 80 90\nHEAD 10\nHEAD 90\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-clear",
+    "criterionId": "independence",
+    "public": false,
+    "description": "한 고리 정리 후 다른 고리 유지",
+    "input": "INIT 0\nINIT 1\nINSERT_LAST 0 10\nINSERT_LAST 1 80\nINSERT_FIRST 1 70\nINIT 0\nSIZE 0\nPRINT 1\nWALK 1 4\nSTATS 1\n",
+    "expected": {
+      "stdout": "SIZE 0\n70->80->\nWALK 70 80 70 80\nSTATS 3 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

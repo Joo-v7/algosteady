@@ -1,0 +1,302 @@
+[
+  {
+    "id": "insert-first-one",
+    "criterionId": "insert-first",
+    "public": false,
+    "description": "빈 리스트의 첫 삽입",
+    "input": "INIT 0\nINSERT_FIRST 0 10\nHEAD_SAME 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 0\nSTATE 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-first-many",
+    "criterionId": "insert-first",
+    "public": false,
+    "description": "여러 값을 앞에 연결",
+    "input": "INIT 0\nINSERT_FIRST 0 0\nINSERT_FIRST 0 -1000000\nINSERT_FIRST 0 1000000\nHEAD_SAME 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 0\nSTATE 1000000 -1000000 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-after-middle",
+    "criterionId": "insert-after",
+    "public": false,
+    "description": "중간에 노드 연결",
+    "input": "INIT 0\nINSERT_FIRST 0 30\nINSERT_FIRST 0 10\nINSERT_AFTER 0 0 20\nHEAD_SAME 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 1\nSTATE 10 20 30\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-after-tail",
+    "criterionId": "insert-after",
+    "public": false,
+    "description": "마지막 노드 뒤 삽입",
+    "input": "INIT 0\nINSERT_FIRST 0 10\nINSERT_AFTER 0 0 20\nINSERT_AFTER 0 1 30\nHEAD_SAME 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 1\nSTATE 10 20 30\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "insert-after-duplicate",
+    "criterionId": "insert-after",
+    "public": false,
+    "description": "값이 같은 선행 노드 구분",
+    "input": "INIT 0\nINSERT_FIRST 0 7\nINSERT_FIRST 0 7\nINSERT_AFTER 0 1 8\nSTATE 0\n",
+    "expected": {
+      "stdout": "STATE 7 7 8\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-first-one",
+    "criterionId": "delete-first",
+    "public": false,
+    "description": "마지막 노드 삭제",
+    "input": "INIT 0\nINSERT_FIRST 0 9\nDELETE_FIRST 0\nHEAD_SAME 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 0\nSTATE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-first-many",
+    "criterionId": "delete-first",
+    "public": false,
+    "description": "나머지 노드 연결 유지",
+    "input": "INIT 0\nINSERT_FIRST 0 30\nINSERT_FIRST 0 20\nINSERT_FIRST 0 10\nDELETE_FIRST 0\nHEAD_SAME 0\nSTATE 0\nDELETE_FIRST 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 0\nSTATE 20 30\nSTATE 30\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-after-middle",
+    "criterionId": "delete-after",
+    "public": false,
+    "description": "중간 노드만 제거",
+    "input": "INIT 0\nINSERT_FIRST 0 30\nINSERT_FIRST 0 20\nINSERT_FIRST 0 10\nDELETE_AFTER 0 0\nHEAD_SAME 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 1\nSTATE 10 30\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-after-tail",
+    "criterionId": "delete-after",
+    "public": false,
+    "description": "마지막 노드 제거 후 NULL 연결",
+    "input": "INIT 0\nINSERT_FIRST 0 30\nINSERT_FIRST 0 20\nINSERT_FIRST 0 10\nDELETE_AFTER 0 1\nHEAD_SAME 0\nSTATE 0\nPRINT 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 1\nSTATE 10 20\n10->20->NULL\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "public-example",
+    "criterionId": "traversal",
+    "public": true,
+    "description": "삽입·삭제·순회",
+    "input": "INIT 0\nINSERT_FIRST 0 10\nINSERT_FIRST 0 20\nINSERT_AFTER 0 0 15\nPRINT 0\nDELETE_AFTER 0 0\nPRINT 0\nDELETE_FIRST 0\nPRINT 0\n",
+    "expected": {
+      "stdout": "20->15->10->NULL\n20->10->NULL\n10->NULL\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-preserves",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "반복 출력 후 상태 유지",
+    "input": "INIT 0\nINSERT_FIRST 0 -1\nINSERT_FIRST 0 0\nPRINT 0\nPRINT 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "0->-1->NULL\n0->-1->NULL\nSTATE 0 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "print-boundaries",
+    "criterionId": "traversal",
+    "public": false,
+    "description": "정수 경계의 출력",
+    "input": "INIT 0\nINSERT_FIRST 0 -1000000\nINSERT_AFTER 0 0 1000000\nPRINT 0\n",
+    "expected": {
+      "stdout": "-1000000->1000000->NULL\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-print",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 리스트 출력",
+    "input": "INIT 0\nPRINT 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "NULL\nSTATE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-delete-first",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 삭제는 NULL 유지",
+    "input": "INIT 0\nDELETE_FIRST 0\nHEAD_SAME 0\nDELETE_FIRST 0\nPRINT 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "HEAD_SAME 1\nNULL\nSTATS 0 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-after-drain",
+    "criterionId": "empty",
+    "public": false,
+    "description": "마지막 삭제 후 빈 출력",
+    "input": "INIT 0\nINSERT_FIRST 0 1\nDELETE_FIRST 0\nDELETE_FIRST 0\nPRINT 0\n",
+    "expected": {
+      "stdout": "NULL\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-first",
+    "criterionId": "memory",
+    "public": false,
+    "description": "맨 앞 생성·삭제의 할당·해제",
+    "input": "INIT 0\nINSERT_FIRST 0 10\nSTATS 0\nDELETE_FIRST 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATS 1 0\nSTATS 1 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-after",
+    "criterionId": "memory",
+    "public": false,
+    "description": "지정 노드 뒤 생성·삭제의 해제",
+    "input": "INIT 0\nINSERT_FIRST 0 10\nINSERT_AFTER 0 0 20\nINSERT_AFTER 0 1 30\nSTATS 0\nDELETE_AFTER 0 0\nSTATS 0\nDELETE_AFTER 0 0\nSTATS 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "STATS 3 0\nSTATS 3 1\nSTATS 3 2\nSTATE 10\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-print",
+    "criterionId": "memory",
+    "public": false,
+    "description": "순회는 할당·해제하지 않음",
+    "input": "INIT 0\nINSERT_FIRST 0 1\nPRINT 0\nPRINT 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "1->NULL\n1->NULL\nSTATS 1 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-cleanup",
+    "criterionId": "memory",
+    "public": false,
+    "description": "삭제와 호출 코드의 재초기화 정리",
+    "input": "INIT 0\nINSERT_FIRST 0 1\nINSERT_FIRST 0 2\nDELETE_FIRST 0\nINIT 0\nSTATS 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "STATS 2 2\nSTATE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-mixed",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "삭제 후 중간과 맨 앞 재삽입",
+    "input": "INIT 0\nINSERT_FIRST 0 1\nINSERT_AFTER 0 0 2\nDELETE_AFTER 0 0\nINSERT_AFTER 0 0 3\nDELETE_FIRST 0\nINSERT_FIRST 0 4\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "STATE 4 3\nSTATS 4 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-duplicates",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "중복 노드 중 지정 위치만 삭제",
+    "input": "INIT 0\nINSERT_FIRST 0 7\nINSERT_FIRST 0 7\nINSERT_FIRST 0 7\nDELETE_AFTER 0 0\nSTATE 0\nDELETE_FIRST 0\nSTATE 0\n",
+    "expected": {
+      "stdout": "STATE 7 7\nSTATE 7\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-many",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "여러 노드 생성과 전체 삭제",
+    "input": "INIT 0\nINSERT_FIRST 0 0\nINSERT_FIRST 0 1\nINSERT_FIRST 0 2\nINSERT_FIRST 0 3\nINSERT_FIRST 0 4\nINSERT_FIRST 0 5\nINSERT_FIRST 0 6\nINSERT_FIRST 0 7\nINSERT_FIRST 0 8\nINSERT_FIRST 0 9\nINSERT_FIRST 0 10\nINSERT_FIRST 0 11\nINSERT_FIRST 0 12\nINSERT_FIRST 0 13\nINSERT_FIRST 0 14\nINSERT_FIRST 0 15\nINSERT_FIRST 0 16\nINSERT_FIRST 0 17\nINSERT_FIRST 0 18\nINSERT_FIRST 0 19\nINSERT_FIRST 0 20\nINSERT_FIRST 0 21\nINSERT_FIRST 0 22\nINSERT_FIRST 0 23\nINSERT_FIRST 0 24\nINSERT_FIRST 0 25\nINSERT_FIRST 0 26\nINSERT_FIRST 0 27\nINSERT_FIRST 0 28\nINSERT_FIRST 0 29\nINSERT_FIRST 0 30\nINSERT_FIRST 0 31\nINSERT_FIRST 0 32\nINSERT_FIRST 0 33\nINSERT_FIRST 0 34\nINSERT_FIRST 0 35\nINSERT_FIRST 0 36\nINSERT_FIRST 0 37\nINSERT_FIRST 0 38\nINSERT_FIRST 0 39\nNODE 0 0\nNODE 0 39\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nDELETE_FIRST 0\nSTATE 0\nSTATS 0\n",
+    "expected": {
+      "stdout": "NODE 0 39\nNODE 39 0\nSTATE\nSTATS 40 40\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-interleaved",
+    "criterionId": "independence",
+    "public": false,
+    "description": "두 리스트 교차 조작",
+    "input": "INIT 0\nINIT 1\nINSERT_FIRST 0 10\nINSERT_FIRST 1 80\nINSERT_AFTER 0 0 20\nDELETE_FIRST 1\nSTATE 0\nSTATE 1\n",
+    "expected": {
+      "stdout": "STATE 10 20\nSTATE\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-reset",
+    "criterionId": "independence",
+    "public": false,
+    "description": "한 리스트 정리는 다른 리스트에 영향 없음",
+    "input": "INIT 0\nINIT 1\nINSERT_FIRST 0 10\nINSERT_FIRST 1 80\nINIT 0\nPRINT 0\nPRINT 1\nSTATS 0\n",
+    "expected": {
+      "stdout": "NULL\n80->NULL\nSTATS 2 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-after-delete",
+    "criterionId": "independence",
+    "public": false,
+    "description": "각 리스트의 다른 선행 노드 삭제",
+    "input": "INIT 0\nINIT 1\nINSERT_FIRST 0 1\nINSERT_AFTER 0 0 2\nINSERT_FIRST 1 8\nINSERT_AFTER 1 0 9\nDELETE_AFTER 0 0\nSTATE 0\nSTATE 1\nDELETE_FIRST 1\nSTATE 0\nSTATE 1\n",
+    "expected": {
+      "stdout": "STATE 1\nSTATE 8 9\nSTATE 1\nSTATE 9\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

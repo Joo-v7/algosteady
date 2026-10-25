@@ -1,0 +1,423 @@
+{
+  "id": "graph-list",
+  "version": "1.0.0",
+  "title": "인접 리스트",
+  "category": "graph",
+  "kind": "data-structure",
+  "description": "각 정점의 이웃을 연결 리스트로 저장하는 무방향 그래프를 구현합니다.",
+  "learning": {
+    "concept": {
+      "title": "인접 리스트의 정점과 연결",
+      "paragraphs": [
+        "adj_list[v]는 정점 v의 이웃 목록을 가리킵니다. 각 GraphNode는 이웃의 번호 vertex와 다음 노드 link를 저장합니다. 이 실습은 가중치와 자기 간선이 없는 무방향 단순 그래프입니다.",
+        "u-v 간선을 넣으면 u 목록에 v를, v 목록에 u를 추가합니다. 두 목록의 맨 앞에 삽입하므로 나중에 연결한 이웃이 먼저 보입니다.",
+        "같은 간선이나 반대 방향으로 표현한 중복 간선은 새 노드를 만들지 않습니다. free_graph는 모든 노드를 해제하고 포인터와 정점 수를 초기 상태로 돌립니다.",
+        "공간은 O(V+E), 한 정점의 이웃 순회는 O(degree(v))입니다. 이 구현의 간선 추가는 중복 확인 때문에 O(degree(u))가 필요합니다. init_graph는 새 객체 또는 free_graph로 비운 객체에 호출합니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "GraphType",
+        "description": "정점 수 n과 인접 리스트 포인터를 보관합니다."
+      },
+      {
+        "name": "정점 번호",
+        "description": "유효한 정점 번호는 0부터 n-1까지입니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "init_graph",
+        "description": "정점 수를 0, 모든 인접 리스트 포인터를 NULL로 초기화합니다. 새 객체 또는 free_graph로 비운 객체에 호출합니다."
+      },
+      {
+        "function": "insert_vertex",
+        "description": "다음 정점을 추가하고 해당 포인터를 NULL로 설정합니다. 50개를 넘으면 stderr 출력 후 exit(1)로 종료합니다."
+      },
+      {
+        "function": "insert_edge",
+        "description": "중복이 아니면 두 목록의 앞에 노드를 하나씩 삽입합니다. 잘못된 정점·자기 간선·할당 실패는 stderr 출력 후 exit(1)로 종료합니다."
+      },
+      {
+        "function": "free_graph",
+        "description": "모든 간선 노드를 해제하고 포인터를 NULL, 정점 수를 0으로 만듭니다. 빈 그래프에 다시 호출해도 안전합니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "init_graph",
+        "argument": null,
+        "result": null,
+        "adjacency": [],
+        "visited": [],
+        "trace": [
+          "g->n = 0"
+        ],
+        "description": "모든 연결을 비우고 정점 수를 0으로 초기화합니다."
+      },
+      {
+        "operation": "insert_vertex",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "g->n = 1"
+        ],
+        "description": "0번 정점을 추가했습니다. 아직 이 정점에는 간선이 없습니다.",
+        "activeNode": 0
+      },
+      {
+        "operation": "insert_vertex",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "g->n = 2"
+        ],
+        "description": "1번 정점을 추가했습니다. 아직 이 정점에는 간선이 없습니다.",
+        "activeNode": 1
+      },
+      {
+        "operation": "insert_vertex",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [],
+          [],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "g->n = 3"
+        ],
+        "description": "2번 정점을 추가했습니다. 아직 이 정점에는 간선이 없습니다.",
+        "activeNode": 2
+      },
+      {
+        "operation": "insert_vertex",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [],
+          [],
+          [],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "g->n = 4"
+        ],
+        "description": "3번 정점을 추가했습니다. 아직 이 정점에는 간선이 없습니다.",
+        "activeNode": 3
+      },
+      {
+        "operation": "insert_vertex",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "g->n = 5"
+        ],
+        "description": "4번 정점을 추가했습니다. 아직 이 정점에는 간선이 없습니다.",
+        "activeNode": 4
+      },
+      {
+        "operation": "insert_edge",
+        "argument": "0, 1",
+        "result": null,
+        "adjacency": [
+          [
+            1
+          ],
+          [
+            0
+          ],
+          [],
+          [],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "0번 목록의 맨 앞에 1 삽입",
+          "1번 목록의 맨 앞에 0 삽입"
+        ],
+        "description": "0과 1를 양쪽으로 연결합니다.",
+        "activeNode": 1
+      },
+      {
+        "operation": "insert_edge",
+        "argument": "0, 2",
+        "result": null,
+        "adjacency": [
+          [
+            2,
+            1
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "0번 목록의 맨 앞에 2 삽입",
+          "2번 목록의 맨 앞에 0 삽입"
+        ],
+        "description": "0과 2를 양쪽으로 연결합니다.",
+        "activeNode": 2
+      },
+      {
+        "operation": "insert_edge",
+        "argument": "1, 3",
+        "result": null,
+        "adjacency": [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            0
+          ],
+          [
+            1
+          ],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "1번 목록의 맨 앞에 3 삽입",
+          "3번 목록의 맨 앞에 1 삽입"
+        ],
+        "description": "1과 3를 양쪽으로 연결합니다.",
+        "activeNode": 3
+      },
+      {
+        "operation": "insert_edge",
+        "argument": "2, 3",
+        "result": null,
+        "adjacency": [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            2,
+            1
+          ],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "2번 목록의 맨 앞에 3 삽입",
+          "3번 목록의 맨 앞에 2 삽입"
+        ],
+        "description": "2과 3를 양쪽으로 연결합니다.",
+        "activeNode": 3
+      },
+      {
+        "operation": "insert_edge",
+        "argument": "3, 4",
+        "result": null,
+        "adjacency": [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            4,
+            2,
+            1
+          ],
+          [
+            3
+          ]
+        ],
+        "visited": [],
+        "trace": [
+          "3번 목록의 맨 앞에 4 삽입",
+          "4번 목록의 맨 앞에 3 삽입"
+        ],
+        "description": "3과 4를 양쪽으로 연결합니다.",
+        "activeNode": 4
+      },
+      {
+        "operation": "free_graph",
+        "argument": null,
+        "result": null,
+        "adjacency": [],
+        "visited": [],
+        "trace": [
+          "모든 adj_list[i] = NULL",
+          "g->n = 0"
+        ],
+        "description": "모든 간선 노드를 해제하고 빈 그래프로 되돌립니다."
+      }
+    ],
+    "notes": [
+      {
+        "title": "간선 하나에 노드 두 개",
+        "description": "무방향 간선은 양쪽 이웃 목록에 각각 저장합니다."
+      },
+      {
+        "title": "초기화 전에 해제",
+        "description": "이미 노드가 있는 객체는 free_graph로 비운 뒤 init_graph를 호출합니다."
+      }
+    ]
+  },
+  "contract": {
+    "storage": "linked",
+    "capacity": 50,
+    "scope": "제공된 GraphType을 사용해 init_graph, insert_vertex, insert_edge, free_graph 함수의 정의와 본문 전체를 구현합니다.",
+    "functions": [
+      {
+        "name": "init_graph",
+        "signature": "void init_graph(GraphType *g)",
+        "behavior": "정점 수를 0, 모든 인접 리스트 포인터를 NULL로 초기화합니다. 새 객체 또는 free_graph로 비운 객체에 호출합니다."
+      },
+      {
+        "name": "insert_vertex",
+        "signature": "void insert_vertex(GraphType *g)",
+        "behavior": "다음 정점을 추가하고 해당 포인터를 NULL로 설정합니다. 50개를 넘으면 stderr 출력 후 exit(1)로 종료합니다."
+      },
+      {
+        "name": "insert_edge",
+        "signature": "void insert_edge(GraphType *g, int u, int v)",
+        "behavior": "중복이 아니면 두 목록의 앞에 노드를 하나씩 삽입합니다. 잘못된 정점·자기 간선·할당 실패는 stderr 출력 후 exit(1)로 종료합니다."
+      },
+      {
+        "name": "free_graph",
+        "signature": "void free_graph(GraphType *g)",
+        "behavior": "모든 간선 노드를 해제하고 포인터를 NULL, 정점 수를 0으로 만듭니다. 빈 그래프에 다시 호출해도 안전합니다."
+      }
+    ],
+    "requirements": [
+      "무방향·비가중치 단순 그래프이며 정점은 0~n-1, 최대 50개입니다. 자기 간선은 허용하지 않습니다.",
+      "중복 간선은 새로 추가하지 않습니다.",
+      "잘못된 간선 정점과 자기 간선, 50개를 넘는 정점 추가는 stderr 출력 후 exit(1)로 종료합니다.",
+      "정상 생성·추가·해제 중 출력하지 않습니다."
+    ]
+  },
+  "prerequisites": [
+    "graph-matrix",
+    "list-singly"
+  ],
+  "criteria": [
+    {
+      "id": "initial",
+      "order": 1,
+      "title": "초기화",
+      "description": "정점 수와 모든 연결 정보를 비웁니다."
+    },
+    {
+      "id": "vertices",
+      "order": 2,
+      "title": "정점 추가",
+      "description": "정점을 순서대로 추가합니다."
+    },
+    {
+      "id": "edges",
+      "order": 3,
+      "title": "양방향 연결",
+      "description": "간선을 양쪽에 저장합니다."
+    },
+    {
+      "id": "duplicates",
+      "order": 4,
+      "title": "중복 간선",
+      "description": "같은 간선을 다시 추가해도 중복되지 않습니다."
+    },
+    {
+      "id": "errors",
+      "order": 5,
+      "title": "범위·포화 처리",
+      "description": "잘못된 정점·자기 간선·정점 수 초과를 오류 종료합니다."
+    },
+    {
+      "id": "boundary",
+      "order": 6,
+      "title": "최대 크기",
+      "description": "50개 정점의 경계와 많은 간선을 처리합니다."
+    },
+    {
+      "id": "reuse",
+      "order": 7,
+      "title": "초기화·독립성",
+      "description": "다시 초기화하거나 두 그래프를 독립적으로 사용합니다."
+    },
+    {
+      "id": "memory",
+      "order": 8,
+      "title": "노드 해제",
+      "description": "모든 간선 노드를 해제하고 빈 상태로 되돌립니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "init_graph",
+          "description": "정점 수를 0, 모든 인접 리스트 포인터를 NULL로 초기화합니다. 새 객체 또는 free_graph로 비운 객체에 호출합니다."
+        },
+        {
+          "function": "insert_vertex",
+          "description": "다음 정점을 추가하고 해당 포인터를 NULL로 설정합니다. 50개를 넘으면 stderr 출력 후 exit(1)로 종료합니다."
+        },
+        {
+          "function": "insert_edge",
+          "description": "중복이 아니면 두 목록의 앞에 노드를 하나씩 삽입합니다. 잘못된 정점·자기 간선·할당 실패는 stderr 출력 후 exit(1)로 종료합니다."
+        },
+        {
+          "function": "free_graph",
+          "description": "모든 간선 노드를 해제하고 포인터를 NULL, 정점 수를 0으로 만듭니다. 빈 그래프에 다시 호출해도 안전합니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "INIT n으로 현재 그래프를 비우고 정점 n개를 만듭니다. VERTEX는 정점 하나, EDGE u v는 간선을 추가합니다. SHOW는 현재 연결 정보를 출력합니다. USE 0 또는 USE 1로 독립된 두 그래프 중 하나를 선택합니다. FREE는 모든 노드를 해제하고 STATS는 누적 할당·해제 횟수를 출력합니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

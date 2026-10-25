@@ -1,0 +1,430 @@
+{
+  "id": "tree-bst",
+  "version": "1.0.1",
+  "title": "이진 탐색 트리",
+  "category": "tree",
+  "kind": "data-structure",
+  "description": "작은 키는 왼쪽, 큰 키는 오른쪽에 두는 규칙으로 탐색·삽입·삭제를 구현합니다.",
+  "learning": {
+    "concept": {
+      "title": "키의 대소 관계로 내려가는 트리",
+      "paragraphs": [
+        "이진 탐색 트리는 각 노드의 왼쪽 서브트리에 작은 키, 오른쪽 서브트리에 큰 키를 저장합니다. 이번 구현에서는 중복 키를 저장하지 않습니다. 중위 순회하면 키가 오름차순으로 나옵니다.",
+        "탐색은 비교 결과에 따라 한쪽으로 이동하고, 삽입은 NULL 위치에서 노드를 만듭니다. 삭제는 자식이 없는 경우, 한 개인 경우, 두 개인 경우를 구분합니다. 자식이 둘이면 오른쪽 서브트리의 최솟값을 후계자로 사용합니다.",
+        "탐색·삽입·삭제는 높이 h에 비례해 O(h)입니다. 균형에 가까우면 O(log n)이지만, 정렬된 순서로 삽입해 한쪽으로 치우치면 O(n)입니다. 이번 구현은 스스로 균형을 맞추지 않습니다. 노드 저장 공간은 O(n), 재귀 호출 공간은 O(h)입니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "key",
+        "description": "비교에 사용하는 정수 키입니다. 같은 키는 한 번만 저장합니다."
+      },
+      {
+        "name": "left · right",
+        "description": "작은 키와 큰 키를 가진 서브트리의 루트입니다. 자식이 없으면 NULL입니다."
+      },
+      {
+        "name": "root",
+        "description": "빈 트리는 NULL입니다. 삽입·삭제 뒤 반환된 루트로 갱신합니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "search",
+        "description": "키를 비교해 왼쪽 또는 오른쪽으로 탐색합니다. 찾으면 트리에 있는 실제 노드의 주소를, 없으면 NULL을 반환합니다. 값·연결·메모리는 변경하지 않습니다."
+      },
+      {
+        "function": "new_node",
+        "description": "노드 하나를 할당해 key를 item으로, left와 right를 NULL로 초기화합니다. 할당 실패 시 stderr에 오류를 출력하고 종료 코드 1로 끝냅니다."
+      },
+      {
+        "function": "insert_node",
+        "description": "빈 위치에 새 노드를 삽입하고 서브트리의 루트를 반환합니다. 재귀 호출의 반환값을 자식에 연결합니다. 중복 키는 할당 없이 기존 트리를 유지합니다."
+      },
+      {
+        "function": "min_value_node",
+        "description": "비어 있지 않은 서브트리에서 왼쪽 연결을 따라 최솟값 노드의 실제 주소를 반환합니다. 값·연결·메모리는 변경하지 않습니다. NULL은 전달되지 않습니다."
+      },
+      {
+        "function": "delete_node",
+        "description": "키를 찾아 삭제하고 바뀐 서브트리의 루트를 반환합니다. 자식이 0·1개이면 노드를 해제하고 남은 자식을 반환합니다. 자식이 둘이면 오른쪽 서브트리 최솟값을 복사한 뒤 그 후계자 노드를 삭제합니다. 없는 키는 그대로 둡니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "root",
+        "argument": null,
+        "result": null,
+        "tree": [],
+        "trace": [
+          "빈 트리"
+        ],
+        "description": "빈 트리는 root = NULL입니다."
+      },
+      {
+        "operation": "insert_node",
+        "argument": "root, 30",
+        "result": "30 노드 주소",
+        "tree": [
+          30
+        ],
+        "trace": [
+          "root = insert_node(root, 30)"
+        ],
+        "description": "빈 위치에 노드를 만들고 반환된 루트를 저장합니다.",
+        "activeNode": 0
+      },
+      {
+        "operation": "insert_node",
+        "argument": "root, 20",
+        "result": "30 노드 주소",
+        "tree": [
+          30,
+          20
+        ],
+        "trace": [
+          "20 < 30 → 왼쪽 삽입"
+        ],
+        "description": "작은 키는 왼쪽 서브트리에 넣습니다.",
+        "activeNode": 1
+      },
+      {
+        "operation": "insert_node",
+        "argument": "root, 45",
+        "result": "30 노드 주소",
+        "tree": [
+          30,
+          20,
+          50,
+          10,
+          null,
+          40,
+          60,
+          null,
+          null,
+          null,
+          null,
+          null,
+          45
+        ],
+        "trace": [
+          "root = insert_node(root, 50)",
+          "root = insert_node(root, 10)",
+          "root = insert_node(root, 40)",
+          "root = insert_node(root, 60)",
+          "root = insert_node(root, 45)"
+        ],
+        "description": "50·10·40·60을 차례로 삽입한 뒤 45를 삽입한 상태입니다. 각 호출의 반환값을 root와 자식 연결에 반영합니다.",
+        "activeNode": 12
+      },
+      {
+        "operation": "search",
+        "argument": "root, 45",
+        "result": "45 노드 주소",
+        "tree": [
+          30,
+          20,
+          50,
+          10,
+          null,
+          40,
+          60,
+          null,
+          null,
+          null,
+          null,
+          null,
+          45
+        ],
+        "trace": [
+          "탐색 경로: 30 → 50 → 40 → 45",
+          "결과: 45 노드 주소"
+        ],
+        "description": "키를 비교해 한쪽으로 내려가 실제 노드의 주소를 반환합니다.",
+        "activeNode": 12,
+        "visited": [
+          0,
+          2,
+          5,
+          12
+        ]
+      },
+      {
+        "operation": "delete_node",
+        "argument": "root, 10",
+        "result": "30 노드 주소",
+        "tree": [
+          30,
+          20,
+          50,
+          null,
+          null,
+          40,
+          60,
+          null,
+          null,
+          null,
+          null,
+          null,
+          45
+        ],
+        "trace": [
+          "10 삭제: 단말 노드 해제"
+        ],
+        "description": "자식이 없으면 해제하고 NULL을 반환합니다.",
+        "activeNode": 1
+      },
+      {
+        "operation": "delete_node",
+        "argument": "root, 40",
+        "result": "30 노드 주소",
+        "tree": [
+          30,
+          20,
+          50,
+          null,
+          null,
+          45,
+          60
+        ],
+        "trace": [
+          "40 삭제: 오른쪽 자식 45로 대체"
+        ],
+        "description": "자식이 하나이면 남은 자식을 반환해 부모 연결을 갱신합니다.",
+        "activeNode": 5
+      },
+      {
+        "operation": "delete_node",
+        "argument": "root, 30",
+        "result": "45 노드 주소",
+        "tree": [
+          45,
+          20,
+          50,
+          null,
+          null,
+          null,
+          60
+        ],
+        "trace": [
+          "30 삭제: 오른쪽 서브트리 최솟값 45를 복사",
+          "이전 45 노드를 삭제하고 right 연결 갱신"
+        ],
+        "description": "자식이 둘이면 후계자 키를 복사한 뒤 후계자 노드를 삭제합니다.",
+        "activeNode": 0
+      },
+      {
+        "operation": "insert_node",
+        "argument": "root, 45",
+        "result": "45 노드 주소",
+        "tree": [
+          45,
+          20,
+          50,
+          null,
+          null,
+          null,
+          60
+        ],
+        "trace": [
+          "중복 키: 트리와 할당 수 유지"
+        ],
+        "description": "이미 있는 키는 새 노드를 만들지 않습니다.",
+        "activeNode": 0
+      },
+      {
+        "operation": "search",
+        "argument": "root, 30",
+        "result": "NULL",
+        "tree": [
+          45,
+          20,
+          50,
+          null,
+          null,
+          null,
+          60
+        ],
+        "trace": [
+          "탐색 경로: 45 → 20 → NULL",
+          "결과: NULL"
+        ],
+        "description": "없는 키는 NULL 위치에서 탐색을 종료합니다.",
+        "activeNode": 1,
+        "visited": [
+          0,
+          1
+        ]
+      }
+    ],
+    "notes": [
+      {
+        "title": "반환된 루트를 연결",
+        "description": "root = insert_node(root, key), root = delete_node(root, key)처럼 반환값을 반영합니다. 재귀 호출에서도 left·right를 갱신합니다."
+      },
+      {
+        "title": "두 자식 삭제의 후계자",
+        "description": "오른쪽 서브트리에서 가장 왼쪽 노드의 키를 복사한 뒤 그 노드를 삭제합니다. 후계자의 오른쪽 자식은 보존합니다."
+      },
+      {
+        "title": "중복과 없는 키",
+        "description": "중복 삽입은 할당하지 않고, 없는 키 삭제는 트리를 바꾸지 않습니다. 탐색 실패는 NULL을 반환합니다."
+      }
+    ]
+  },
+  "contract": {
+    "storage": "linked",
+    "scope": "제공된 TreeNode를 사용해 5개 함수의 정의와 본문 전체를 구현합니다. 입력 처리·출력·트리 정리는 호출 코드가 담당합니다.",
+    "functions": [
+      {
+        "name": "search",
+        "signature": "TreeNode *search(TreeNode *node, int key)",
+        "behavior": "키를 비교해 왼쪽 또는 오른쪽으로 탐색합니다. 찾으면 트리에 있는 실제 노드의 주소를, 없으면 NULL을 반환합니다. 값·연결·메모리는 변경하지 않습니다."
+      },
+      {
+        "name": "new_node",
+        "signature": "TreeNode *new_node(int item)",
+        "behavior": "노드 하나를 할당해 key를 item으로, left와 right를 NULL로 초기화합니다. 할당 실패 시 stderr에 오류를 출력하고 종료 코드 1로 끝냅니다."
+      },
+      {
+        "name": "insert_node",
+        "signature": "TreeNode *insert_node(TreeNode *node, int key)",
+        "behavior": "빈 위치에 새 노드를 삽입하고 서브트리의 루트를 반환합니다. 재귀 호출의 반환값을 자식에 연결합니다. 중복 키는 할당 없이 기존 트리를 유지합니다."
+      },
+      {
+        "name": "min_value_node",
+        "signature": "TreeNode *min_value_node(TreeNode *node)",
+        "behavior": "비어 있지 않은 서브트리에서 왼쪽 연결을 따라 최솟값 노드의 실제 주소를 반환합니다. 값·연결·메모리는 변경하지 않습니다. NULL은 전달되지 않습니다."
+      },
+      {
+        "name": "delete_node",
+        "signature": "TreeNode *delete_node(TreeNode *root, int key)",
+        "behavior": "키를 찾아 삭제하고 바뀐 서브트리의 루트를 반환합니다. 자식이 0·1개이면 노드를 해제하고 남은 자식을 반환합니다. 자식이 둘이면 오른쪽 서브트리 최솟값을 복사한 뒤 그 후계자 노드를 삭제합니다. 없는 키는 그대로 둡니다."
+      }
+    ],
+    "requirements": [
+      "왼쪽 서브트리의 모든 키 < 현재 키 < 오른쪽 서브트리의 모든 키를 유지합니다. 중복 키는 삽입하지 않습니다.",
+      "삽입·삭제는 서브트리의 루트를 반환합니다. 삭제된 노드만 해제하며 남은 노드의 연결을 보존합니다.",
+      "자식이 둘이면 오른쪽 서브트리 최솟값을 후계자로 사용합니다.",
+      "search·min_value_node는 실제 노드의 주소를 반환하며 트리를 바꾸거나 메모리를 할당·해제하지 않습니다. min_value_node에는 NULL을 전달하지 않습니다.",
+      "정상 동작 중에는 출력하지 않습니다. 최대 127개 노드인 트리를 두 개까지 독립적으로 다룹니다."
+    ],
+    "valueRange": {
+      "min": -1000000,
+      "max": 1000000
+    }
+  },
+  "prerequisites": [
+    "tree-binary",
+    "tree-inorder"
+  ],
+  "criteria": [
+    {
+      "id": "creation",
+      "order": 1,
+      "title": "노드 생성",
+      "description": "키와 두 NULL 자식을 초기화합니다."
+    },
+    {
+      "id": "search",
+      "order": 2,
+      "title": "탐색",
+      "description": "존재하는 노드 주소와 탐색 실패를 구분합니다."
+    },
+    {
+      "id": "insertion",
+      "order": 3,
+      "title": "삽입과 정렬 규칙",
+      "description": "양쪽 연결과 반환된 루트를 반영합니다."
+    },
+    {
+      "id": "duplicates",
+      "order": 4,
+      "title": "중복 키",
+      "description": "중복 삽입은 할당 없이 유지합니다."
+    },
+    {
+      "id": "minimum",
+      "order": 5,
+      "title": "최솟값 탐색",
+      "description": "가장 왼쪽 노드의 주소를 반환합니다."
+    },
+    {
+      "id": "delete-leaf",
+      "order": 6,
+      "title": "단말 노드 삭제",
+      "description": "단말과 마지막 루트를 삭제합니다."
+    },
+    {
+      "id": "delete-one",
+      "order": 7,
+      "title": "한 자식 노드 삭제",
+      "description": "남은 자식으로 연결을 갱신합니다."
+    },
+    {
+      "id": "delete-two",
+      "order": 8,
+      "title": "두 자식 노드 삭제",
+      "description": "오른쪽 최솟값 후계자와 그 자식을 처리합니다."
+    },
+    {
+      "id": "missing",
+      "order": 9,
+      "title": "없는 키 삭제",
+      "description": "빈 트리와 없는 키를 그대로 유지합니다."
+    },
+    {
+      "id": "memory",
+      "order": 10,
+      "title": "메모리 관리",
+      "description": "노드당 한 번 할당·해제합니다."
+    },
+    {
+      "id": "reuse",
+      "order": 11,
+      "title": "반복 사용",
+      "description": "삭제 후 다시 삽입하고 탐색합니다."
+    },
+    {
+      "id": "independence",
+      "order": 12,
+      "title": "트리 독립성",
+      "description": "서로 다른 두 트리를 독립적으로 처리합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "search",
+          "description": "키를 비교해 왼쪽 또는 오른쪽으로 탐색합니다. 찾으면 트리에 있는 실제 노드의 주소를, 없으면 NULL을 반환합니다. 값·연결·메모리는 변경하지 않습니다."
+        },
+        {
+          "function": "new_node",
+          "description": "노드 하나를 할당해 key를 item으로, left와 right를 NULL로 초기화합니다. 할당 실패 시 stderr에 오류를 출력하고 종료 코드 1로 끝냅니다."
+        },
+        {
+          "function": "insert_node",
+          "description": "빈 위치에 새 노드를 삽입하고 서브트리의 루트를 반환합니다. 재귀 호출의 반환값을 자식에 연결합니다. 중복 키는 할당 없이 기존 트리를 유지합니다."
+        },
+        {
+          "function": "min_value_node",
+          "description": "비어 있지 않은 서브트리에서 왼쪽 연결을 따라 최솟값 노드의 실제 주소를 반환합니다. 값·연결·메모리는 변경하지 않습니다. NULL은 전달되지 않습니다."
+        },
+        {
+          "function": "delete_node",
+          "description": "키를 찾아 삭제하고 바뀐 서브트리의 루트를 반환합니다. 자식이 0·1개이면 노드를 해제하고 남은 자식을 반환합니다. 자식이 둘이면 오른쪽 서브트리 최솟값을 복사한 뒤 그 후계자 노드를 삭제합니다. 없는 키는 그대로 둡니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "각 명령은 명령어와 트리 번호(0 또는 1)로 시작합니다. NEW·INSERT·DELETE·SEARCH는 키를 이어서 받습니다. NEW는 빈 트리에 노드 하나를 만듭니다. MIN은 비어 있지 않은 트리에서만 호출합니다. STATE는 중위 순회 키, SHAPE는 key(left,right) 형태(#은 NULL), ROOT·SIZE는 루트와 노드 수, STATS는 두 트리의 누적 할당·해제 수를 출력합니다. INIT은 지정 트리를 정리합니다. 호출 코드는 연결·정렬 규칙·조회 시 원본 보존을 검사하고 마지막에 모든 메모리를 정리합니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

@@ -1,0 +1,242 @@
+[
+  {
+    "id": "leaf-one",
+    "criterionId": "leaf",
+    "public": false,
+    "description": "양쪽 NULL 단말 노드",
+    "input": "NODE 0 10 -1 -1\nSHAPE 0\nLINKS 0\n",
+    "expected": {
+      "stdout": "SHAPE 10(#,#)\nLINKS -1 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "leaf-zero",
+    "criterionId": "leaf",
+    "public": false,
+    "description": "값 0을 가진 단말",
+    "input": "NODE 0 0 -1 -1\nSHAPE 0\nLINKS 0\n",
+    "expected": {
+      "stdout": "SHAPE 0(#,#)\nLINKS -1 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "leaf-values",
+    "criterionId": "leaf",
+    "public": false,
+    "description": "음수와 입력 범위 경계",
+    "input": "NODE 0 -1000000 -1 -1\nNODE 1 1000000 -1 -1\nSHAPE 0\nSHAPE 1\n",
+    "expected": {
+      "stdout": "SHAPE -1000000(#,#)\nSHAPE 1000000(#,#)\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "left-one",
+    "criterionId": "left",
+    "public": false,
+    "description": "왼쪽 자식만 연결",
+    "input": "NODE 0 20 -1 -1\nNODE 1 10 0 -1\nSHAPE 1\nLINKS 1\n",
+    "expected": {
+      "stdout": "SHAPE 10(20(#,#),#)\nLINKS 0 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "left-chain",
+    "criterionId": "left",
+    "public": false,
+    "description": "왼쪽으로 이어진 서브트리",
+    "input": "NODE 0 3 -1 -1\nNODE 1 2 0 -1\nNODE 2 1 1 -1\nSHAPE 2\nLINKS 2\n",
+    "expected": {
+      "stdout": "SHAPE 1(2(3(#,#),#),#)\nLINKS 1 -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "right-one",
+    "criterionId": "right",
+    "public": false,
+    "description": "오른쪽 자식만 연결",
+    "input": "NODE 0 20 -1 -1\nNODE 1 10 -1 0\nSHAPE 1\nLINKS 1\n",
+    "expected": {
+      "stdout": "SHAPE 10(#,20(#,#))\nLINKS -1 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "right-chain",
+    "criterionId": "right",
+    "public": false,
+    "description": "오른쪽으로 이어진 서브트리",
+    "input": "NODE 0 3 -1 -1\nNODE 1 2 -1 0\nNODE 2 1 -1 1\nSHAPE 2\nLINKS 2\n",
+    "expected": {
+      "stdout": "SHAPE 1(#,2(#,3(#,#)))\nLINKS -1 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "both-example",
+    "criterionId": "both",
+    "public": true,
+    "description": "기존 두 노드를 좌우 자식으로 연결",
+    "input": "NODE 0 20 -1 -1\nNODE 1 30 -1 -1\nNODE 2 10 0 1\nSHAPE 2\nLINKS 2\n",
+    "expected": {
+      "stdout": "SHAPE 10(20(#,#),30(#,#))\nLINKS 0 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "both-subtrees",
+    "criterionId": "both",
+    "public": false,
+    "description": "두 서브트리의 좌우 위치",
+    "input": "NODE 0 4 -1 -1\nNODE 1 2 0 -1\nNODE 2 5 -1 -1\nNODE 3 3 -1 2\nNODE 4 1 1 3\nSHAPE 4\nLINKS 4\n",
+    "expected": {
+      "stdout": "SHAPE 1(2(4(#,#),#),3(#,5(#,#)))\nLINKS 1 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "both-equal-values",
+    "criterionId": "both",
+    "public": false,
+    "description": "같은 값도 다른 자식 주소",
+    "input": "NODE 5 7 -1 -1\nNODE 9 7 -1 -1\nNODE 2 7 9 5\nSHAPE 2\nLINKS 2\n",
+    "expected": {
+      "stdout": "SHAPE 7(7(#,#),7(#,#))\nLINKS 9 5\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "preserves-children",
+    "criterionId": "preservation",
+    "public": false,
+    "description": "부모 생성 후 기존 자식 보존",
+    "input": "NODE 0 20 -1 -1\nNODE 1 30 -1 -1\nNODE 2 10 0 1\nSHAPE 0\nLINKS 0\nSHAPE 1\nLINKS 1\nSHAPE 2\n",
+    "expected": {
+      "stdout": "SHAPE 20(#,#)\nLINKS -1 -1\nSHAPE 30(#,#)\nLINKS -1 -1\nSHAPE 10(20(#,#),30(#,#))\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "preserves-subtree",
+    "criterionId": "preservation",
+    "public": false,
+    "description": "새 루트 연결 후 기존 서브트리 유지",
+    "input": "NODE 0 20 -1 -1\nNODE 1 30 -1 -1\nNODE 2 10 0 1\nNODE 3 40 2 -1\nSHAPE 2\nLINKS 2\nSHAPE 3\n",
+    "expected": {
+      "stdout": "SHAPE 10(20(#,#),30(#,#))\nLINKS 0 1\nSHAPE 40(10(20(#,#),30(#,#)),#)\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "preserves-addresses",
+    "criterionId": "preservation",
+    "public": false,
+    "description": "연속 부모 생성 후 자식 주소 유지",
+    "input": "NODE 0 8 -1 -1\nNODE 1 9 -1 0\nNODE 2 10 1 -1\nNODE 3 11 -1 2\nLINKS 1\nLINKS 2\nLINKS 3\nSHAPE 0\n",
+    "expected": {
+      "stdout": "LINKS -1 0\nLINKS 1 -1\nLINKS -1 2\nSHAPE 8(#,#)\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-one",
+    "criterionId": "memory",
+    "public": false,
+    "description": "한 번 호출에 노드 하나만 할당",
+    "input": "NODE 0 10 -1 -1\nSTATS\nCLEAR\nSTATS\n",
+    "expected": {
+      "stdout": "STATS 1 0\nSTATS 1 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-parent",
+    "criterionId": "memory",
+    "public": false,
+    "description": "자식을 복제하거나 해제하지 않음",
+    "input": "NODE 0 20 -1 -1\nNODE 1 30 -1 -1\nNODE 2 10 0 1\nSTATS\nCLEAR\nSTATS\n",
+    "expected": {
+      "stdout": "STATS 3 0\nSTATS 3 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "memory-many",
+    "criterionId": "memory",
+    "public": false,
+    "description": "63개 노드를 생성하고 정리",
+    "input": "NODE 0 0 -1 -1\nNODE 1 1 0 -1\nNODE 2 2 1 -1\nNODE 3 3 2 -1\nNODE 4 4 3 -1\nNODE 5 5 4 -1\nNODE 6 6 5 -1\nNODE 7 7 6 -1\nNODE 8 8 7 -1\nNODE 9 9 8 -1\nNODE 10 10 9 -1\nNODE 11 11 10 -1\nNODE 12 12 11 -1\nNODE 13 13 12 -1\nNODE 14 14 13 -1\nNODE 15 15 14 -1\nNODE 16 16 15 -1\nNODE 17 17 16 -1\nNODE 18 18 17 -1\nNODE 19 19 18 -1\nNODE 20 20 19 -1\nNODE 21 21 20 -1\nNODE 22 22 21 -1\nNODE 23 23 22 -1\nNODE 24 24 23 -1\nNODE 25 25 24 -1\nNODE 26 26 25 -1\nNODE 27 27 26 -1\nNODE 28 28 27 -1\nNODE 29 29 28 -1\nNODE 30 30 29 -1\nNODE 31 31 30 -1\nNODE 32 32 31 -1\nNODE 33 33 32 -1\nNODE 34 34 33 -1\nNODE 35 35 34 -1\nNODE 36 36 35 -1\nNODE 37 37 36 -1\nNODE 38 38 37 -1\nNODE 39 39 38 -1\nNODE 40 40 39 -1\nNODE 41 41 40 -1\nNODE 42 42 41 -1\nNODE 43 43 42 -1\nNODE 44 44 43 -1\nNODE 45 45 44 -1\nNODE 46 46 45 -1\nNODE 47 47 46 -1\nNODE 48 48 47 -1\nNODE 49 49 48 -1\nNODE 50 50 49 -1\nNODE 51 51 50 -1\nNODE 52 52 51 -1\nNODE 53 53 52 -1\nNODE 54 54 53 -1\nNODE 55 55 54 -1\nNODE 56 56 55 -1\nNODE 57 57 56 -1\nNODE 58 58 57 -1\nNODE 59 59 58 -1\nNODE 60 60 59 -1\nNODE 61 61 60 -1\nNODE 62 62 61 -1\nSTATS\nLINKS 62\nCLEAR\nSTATS\n",
+    "expected": {
+      "stdout": "STATS 63 0\nLINKS 61 -1\nSTATS 63 63\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent",
+    "criterionId": "independence",
+    "public": false,
+    "description": "별개 트리의 독립성",
+    "input": "NODE 0 20 -1 -1\nNODE 1 30 -1 -1\nNODE 2 10 0 1\nNODE 3 100 -1 -1\nNODE 4 200 -1 3\nSHAPE 2\nSHAPE 4\nLINKS 2\nLINKS 4\n",
+    "expected": {
+      "stdout": "SHAPE 10(20(#,#),30(#,#))\nSHAPE 200(#,100(#,#))\nLINKS 0 1\nLINKS -1 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "independent-duplicates",
+    "criterionId": "independence",
+    "public": false,
+    "description": "같은 값의 루트와 자식을 주소로 구분",
+    "input": "NODE 0 0 -1 -1\nNODE 1 0 0 -1\nNODE 2 0 -1 -1\nNODE 3 0 -1 2\nLINKS 1\nLINKS 3\nSTATS\n",
+    "expected": {
+      "stdout": "LINKS 0 -1\nLINKS -1 2\nSTATS 4 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-clear",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "정리한 ID로 새 트리 생성",
+    "input": "NODE 0 20 -1 -1\nNODE 1 30 -1 -1\nNODE 2 10 0 1\nCLEAR\nSTATS\nNODE 0 99 -1 -1\nSHAPE 0\nLINKS 0\nSTATS\n",
+    "expected": {
+      "stdout": "STATS 3 3\nSHAPE 99(#,#)\nLINKS -1 -1\nSTATS 4 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reuse-repeat",
+    "criterionId": "reuse",
+    "public": false,
+    "description": "반복 생성·정리",
+    "input": "NODE 0 0 -1 -1\nCLEAR\nNODE 0 1 -1 -1\nCLEAR\nNODE 0 2 -1 -1\nCLEAR\nNODE 0 3 -1 -1\nCLEAR\nNODE 0 4 -1 -1\nCLEAR\nNODE 0 5 -1 -1\nCLEAR\nNODE 0 6 -1 -1\nCLEAR\nNODE 0 7 -1 -1\nCLEAR\nNODE 0 8 -1 -1\nCLEAR\nNODE 0 9 -1 -1\nCLEAR\nNODE 0 10 -1 -1\nCLEAR\nNODE 0 11 -1 -1\nCLEAR\nSTATS\nNODE 0 50 -1 -1\nSHAPE 0\n",
+    "expected": {
+      "stdout": "STATS 12 12\nSHAPE 50(#,#)\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

@@ -58,12 +58,12 @@
 
 ## 정렬
 
-- [ ] 선택 정렬
-- [ ] 버블 정렬
-- [ ] 삽입 정렬
-- [ ] 병합 정렬
-- [ ] 퀵 정렬
-- [ ] 힙 정렬
+- [x] [선택 정렬](../content/sort-selection/exercise.json)
+- [x] [버블 정렬](../content/sort-bubble/exercise.json)
+- [x] [삽입 정렬](../content/sort-insertion/exercise.json)
+- [x] [병합 정렬](../content/sort-merge/exercise.json)
+- [x] [퀵 정렬](../content/sort-quick/exercise.json)
+- [x] [힙 정렬](../content/sort-heap/exercise.json)
 
 ## 탐색
 
@@ -72,35 +72,35 @@
 
 ## 그래프
 
-- [ ] 인접 행렬
-- [ ] 인접 리스트
-- [ ] 깊이 우선 탐색(DFS)
-- [ ] 너비 우선 탐색(BFS)
-- [ ] 크루스칼 — 최소 신장 트리
-- [ ] 프림 — 최소 신장 트리
-- [ ] 다익스트라 — 최단 경로
-- [ ] 벨만–포드 — 최단 경로
-- [ ] 플로이드–워셜 — 모든 정점 쌍의 최단 경로
-- [ ] 위상 정렬 — 진입 차수 기반
+- [x] [인접 행렬](../content/graph-matrix/exercise.json)
+- [x] [인접 리스트](../content/graph-list/exercise.json)
+- [x] [깊이 우선 탐색(DFS)](../content/graph-dfs/exercise.json)
+- [x] [너비 우선 탐색(BFS)](../content/graph-bfs/exercise.json)
+- [x] [크루스칼 — 최소 신장 트리](../content/graph-kruskal/exercise.json)
+- [x] [프림 — 최소 신장 트리](../content/graph-prim/exercise.json)
+- [x] [다익스트라 — 최단 경로](../content/graph-dijkstra/exercise.json)
+- [x] [벨만–포드 — 최단 경로](../content/graph-bellman-ford/exercise.json)
+- [x] [플로이드–워셜 — 모든 정점 쌍의 최단 경로](../content/graph-floyd-warshall/exercise.json)
+- [x] [위상 정렬 — 진입 차수 기반](../content/graph-topological/exercise.json)
 
 ## 문자열
 
-- [ ] 단순 문자열 검색 (Brute Force)
-- [ ] 문자열 파싱 및 기본 변환 (분리·결합·뒤집기·정렬)
-- [ ] 트라이 — 삽입·검색·삭제
+- [x] [단순 문자열 검색 (Brute Force)](../content/string-brute-force/exercise.json)
+- [x] [문자열 파싱 및 기본 변환 (분리·결합·뒤집기·정렬)](../content/string-transform/exercise.json)
+- [x] [트라이 — 삽입·검색·삭제](../content/trie-basic/exercise.json)
 
 ## 문제 해결 기법
 
-- [ ] 완전 탐색 — 순열 생성
-- [ ] 완전 탐색 — 조합 생성
-- [ ] 완전 탐색 — 부분집합 생성
-- [ ] 백트래킹 — N-Queen
-- [ ] 그리디 — 활동 선택
-- [ ] 동적 계획법 — 피보나치의 메모이제이션·타뷸레이션
-- [ ] 동적 계획법 — 0/1 배낭
-- [ ] 동적 계획법 — 최장 공통 부분 수열(LCS)
-- [ ] 투 포인터 — 정렬된 배열에서 합이 목표값인 두 원소 찾기
-- [ ] 슬라이딩 윈도 — 길이가 K인 연속 구간의 최대 합
+- [x] [완전 탐색 — 순열 생성](../content/exhaustive-permutations/exercise.json)
+- [x] [완전 탐색 — 조합 생성](../content/exhaustive-combinations/exercise.json)
+- [x] [완전 탐색 — 부분집합 생성](../content/exhaustive-subsets/exercise.json)
+- [x] [백트래킹 — N-Queen](../content/backtracking-nqueen/exercise.json)
+- [x] [그리디 — 활동 선택](../content/greedy-activity-selection/exercise.json)
+- [x] [동적 계획법 — 피보나치의 메모이제이션·타뷸레이션](../content/dp-fibonacci/exercise.json)
+- [x] [동적 계획법 — 0/1 배낭](../content/dp-knapsack/exercise.json)
+- [x] [동적 계획법 — 최장 공통 부분 수열(LCS)](../content/dp-lcs/exercise.json)
+- [x] [투 포인터 — 정렬된 배열에서 합이 목표값인 두 원소 찾기](../content/two-pointer-pair/exercise.json)
+- [x] [슬라이딩 윈도 — 길이가 K인 연속 구간의 최대 합](../content/sliding-window-max-sum/exercise.json)
 
 병합·퀵 정렬도 분할 정복에 해당하며 [정렬](#정렬)에서 관리한다. 재귀 피보나치와 동적 계획법 피보나치는 서로 다른 구현으로 비교한다.
 

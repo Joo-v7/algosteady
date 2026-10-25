@@ -1,0 +1,384 @@
+{
+  "id": "graph-matrix",
+  "version": "1.0.0",
+  "title": "인접 행렬",
+  "category": "graph",
+  "kind": "data-structure",
+  "description": "정점 사이의 연결을 0과 1의 행렬로 표현하는 무방향 그래프를 구현합니다.",
+  "learning": {
+    "concept": {
+      "title": "인접 행렬의 정점과 연결",
+      "paragraphs": [
+        "정점은 0부터 n-1까지의 번호를 가집니다. adj_mat[u][v]가 1이면 두 정점 사이에 간선이 있고, 0이면 없습니다. 이 실습은 가중치와 자기 간선이 없는 무방향 단순 그래프입니다.",
+        "간선 하나를 추가할 때 adj_mat[u][v]와 adj_mat[v][u]를 함께 1로 바꿉니다. 같은 간선을 다시 넣어도 중복되지 않습니다. 대각선은 모두 0입니다.",
+        "init_graph는 정점 수를 0으로 하고 전체 행렬을 0으로 초기화합니다. insert_vertex는 다음 번호의 정점을 하나 추가합니다. 정점 수는 최대 50개입니다.",
+        "행렬 공간은 O(V²), 간선 존재 확인과 추가는 O(1)입니다. 한 정점의 이웃을 찾으려면 행의 V개 칸을 확인합니다."
+      ]
+    },
+    "structure": [
+      {
+        "name": "GraphType",
+        "description": "정점 수 n과 인접 행렬를 보관합니다."
+      },
+      {
+        "name": "정점 번호",
+        "description": "유효한 정점 번호는 0부터 n-1까지입니다."
+      }
+    ],
+    "operations": [
+      {
+        "function": "init_graph",
+        "description": "정점 수와 전체 행렬을 0으로 초기화합니다."
+      },
+      {
+        "function": "insert_vertex",
+        "description": "다음 번호의 정점 하나를 추가합니다. 최대 정점 수를 넘으면 stderr 출력 후 exit(1)로 종료합니다."
+      },
+      {
+        "function": "insert_edge",
+        "description": "유효한 두 정점의 양방향 칸을 1로 설정합니다. 중복 간선은 유지하고, 잘못된 정점 또는 자기 간선은 stderr 출력 후 exit(1)로 종료합니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "init_graph",
+        "argument": null,
+        "result": null,
+        "adjacency": [],
+        "visited": [],
+        "trace": [
+          "g->n = 0"
+        ],
+        "description": "모든 연결을 비우고 정점 수를 0으로 초기화합니다."
+      },
+      {
+        "operation": "insert_vertex",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "g->n = 1"
+        ],
+        "description": "0번 정점을 추가했습니다. 아직 이 정점에는 간선이 없습니다.",
+        "activeNode": 0
+      },
+      {
+        "operation": "insert_vertex",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "g->n = 2"
+        ],
+        "description": "1번 정점을 추가했습니다. 아직 이 정점에는 간선이 없습니다.",
+        "activeNode": 1
+      },
+      {
+        "operation": "insert_vertex",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [],
+          [],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "g->n = 3"
+        ],
+        "description": "2번 정점을 추가했습니다. 아직 이 정점에는 간선이 없습니다.",
+        "activeNode": 2
+      },
+      {
+        "operation": "insert_vertex",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [],
+          [],
+          [],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "g->n = 4"
+        ],
+        "description": "3번 정점을 추가했습니다. 아직 이 정점에는 간선이 없습니다.",
+        "activeNode": 3
+      },
+      {
+        "operation": "insert_vertex",
+        "argument": null,
+        "result": null,
+        "adjacency": [
+          [],
+          [],
+          [],
+          [],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "g->n = 5"
+        ],
+        "description": "4번 정점을 추가했습니다. 아직 이 정점에는 간선이 없습니다.",
+        "activeNode": 4
+      },
+      {
+        "operation": "insert_edge",
+        "argument": "0, 1",
+        "result": null,
+        "adjacency": [
+          [
+            1
+          ],
+          [
+            0
+          ],
+          [],
+          [],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "adj_mat[0][1] = adj_mat[1][0] = 1"
+        ],
+        "description": "0과 1를 양쪽으로 연결합니다.",
+        "activeNode": 1
+      },
+      {
+        "operation": "insert_edge",
+        "argument": "0, 2",
+        "result": null,
+        "adjacency": [
+          [
+            1,
+            2
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "adj_mat[0][2] = adj_mat[2][0] = 1"
+        ],
+        "description": "0과 2를 양쪽으로 연결합니다.",
+        "activeNode": 2
+      },
+      {
+        "operation": "insert_edge",
+        "argument": "1, 3",
+        "result": null,
+        "adjacency": [
+          [
+            1,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0
+          ],
+          [
+            1
+          ],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "adj_mat[1][3] = adj_mat[3][1] = 1"
+        ],
+        "description": "1과 3를 양쪽으로 연결합니다.",
+        "activeNode": 3
+      },
+      {
+        "operation": "insert_edge",
+        "argument": "2, 3",
+        "result": null,
+        "adjacency": [
+          [
+            1,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            1,
+            2
+          ],
+          []
+        ],
+        "visited": [],
+        "trace": [
+          "adj_mat[2][3] = adj_mat[3][2] = 1"
+        ],
+        "description": "2과 3를 양쪽으로 연결합니다.",
+        "activeNode": 3
+      },
+      {
+        "operation": "insert_edge",
+        "argument": "3, 4",
+        "result": null,
+        "adjacency": [
+          [
+            1,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            1,
+            2,
+            4
+          ],
+          [
+            3
+          ]
+        ],
+        "visited": [],
+        "trace": [
+          "adj_mat[3][4] = adj_mat[4][3] = 1"
+        ],
+        "description": "3과 4를 양쪽으로 연결합니다.",
+        "activeNode": 4
+      }
+    ],
+    "notes": [
+      {
+        "title": "무방향 간선은 대칭",
+        "description": "u에서 v뿐 아니라 v에서 u로도 연결합니다."
+      },
+      {
+        "title": "정점과 간선은 별도 추가",
+        "description": "정점을 먼저 추가한 뒤 범위 안의 번호로 간선을 연결합니다."
+      }
+    ]
+  },
+  "contract": {
+    "storage": "array",
+    "capacity": 50,
+    "scope": "제공된 GraphType을 사용해 init_graph, insert_vertex, insert_edge 함수의 정의와 본문 전체를 구현합니다.",
+    "functions": [
+      {
+        "name": "init_graph",
+        "signature": "void init_graph(GraphType *g)",
+        "behavior": "정점 수와 전체 행렬을 0으로 초기화합니다."
+      },
+      {
+        "name": "insert_vertex",
+        "signature": "void insert_vertex(GraphType *g)",
+        "behavior": "다음 번호의 정점 하나를 추가합니다. 최대 정점 수를 넘으면 stderr 출력 후 exit(1)로 종료합니다."
+      },
+      {
+        "name": "insert_edge",
+        "signature": "void insert_edge(GraphType *g, int u, int v)",
+        "behavior": "유효한 두 정점의 양방향 칸을 1로 설정합니다. 중복 간선은 유지하고, 잘못된 정점 또는 자기 간선은 stderr 출력 후 exit(1)로 종료합니다."
+      }
+    ],
+    "requirements": [
+      "무방향·비가중치 단순 그래프이며 정점은 0~n-1, 최대 50개입니다. 자기 간선은 허용하지 않습니다.",
+      "중복 간선은 새로 추가하지 않습니다.",
+      "잘못된 간선 정점과 자기 간선, 50개를 넘는 정점 추가는 stderr 출력 후 exit(1)로 종료합니다.",
+      "정상 생성·추가·해제 중 출력하지 않습니다."
+    ]
+  },
+  "prerequisites": [],
+  "criteria": [
+    {
+      "id": "initial",
+      "order": 1,
+      "title": "초기화",
+      "description": "정점 수와 모든 연결 정보를 비웁니다."
+    },
+    {
+      "id": "vertices",
+      "order": 2,
+      "title": "정점 추가",
+      "description": "정점을 순서대로 추가합니다."
+    },
+    {
+      "id": "edges",
+      "order": 3,
+      "title": "양방향 연결",
+      "description": "간선을 양쪽에 저장합니다."
+    },
+    {
+      "id": "duplicates",
+      "order": 4,
+      "title": "중복 간선",
+      "description": "같은 간선을 다시 추가해도 중복되지 않습니다."
+    },
+    {
+      "id": "errors",
+      "order": 5,
+      "title": "범위·포화 처리",
+      "description": "잘못된 정점·자기 간선·정점 수 초과를 오류 종료합니다."
+    },
+    {
+      "id": "boundary",
+      "order": 6,
+      "title": "최대 크기",
+      "description": "50개 정점의 경계와 많은 간선을 처리합니다."
+    },
+    {
+      "id": "reuse",
+      "order": 7,
+      "title": "초기화·독립성",
+      "description": "다시 초기화하거나 두 그래프를 독립적으로 사용합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "init_graph",
+          "description": "정점 수와 전체 행렬을 0으로 초기화합니다."
+        },
+        {
+          "function": "insert_vertex",
+          "description": "다음 번호의 정점 하나를 추가합니다. 최대 정점 수를 넘으면 stderr 출력 후 exit(1)로 종료합니다."
+        },
+        {
+          "function": "insert_edge",
+          "description": "유효한 두 정점의 양방향 칸을 1로 설정합니다. 중복 간선은 유지하고, 잘못된 정점 또는 자기 간선은 stderr 출력 후 exit(1)로 종료합니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "INIT n으로 현재 그래프를 비우고 정점 n개를 만듭니다. VERTEX는 정점 하나, EDGE u v는 간선을 추가합니다. SHOW는 현재 연결 정보를 출력합니다. USE 0 또는 USE 1로 독립된 두 그래프 중 하나를 선택합니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

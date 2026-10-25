@@ -1,0 +1,218 @@
+[
+  {
+    "id": "search-example",
+    "criterionId": "match",
+    "public": true,
+    "description": "일치 위치",
+    "input": "FIND\nABABABC\nABABC\n",
+    "expected": {
+      "stdout": "INDEX 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "not-found",
+    "criterionId": "mismatch",
+    "public": true,
+    "description": "불일치·재시작",
+    "input": "FIND\nhello\nworld\n",
+    "expected": {
+      "stdout": "INDEX -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "at-start",
+    "criterionId": "match",
+    "public": false,
+    "description": "일치 위치",
+    "input": "FIND\nabcdef\nabc\n",
+    "expected": {
+      "stdout": "INDEX 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "at-end",
+    "criterionId": "match",
+    "public": false,
+    "description": "일치 위치",
+    "input": "FIND\nabcdef\ndef\n",
+    "expected": {
+      "stdout": "INDEX 3\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "whole-text",
+    "criterionId": "match",
+    "public": false,
+    "description": "일치 위치",
+    "input": "FIND\nsame\nsame\n",
+    "expected": {
+      "stdout": "INDEX 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "first-occurrence",
+    "criterionId": "match",
+    "public": false,
+    "description": "일치 위치",
+    "input": "FIND\naaaaa\naa\n",
+    "expected": {
+      "stdout": "INDEX 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "overlap-restart",
+    "criterionId": "mismatch",
+    "public": false,
+    "description": "불일치·재시작",
+    "input": "FIND\naaaab\naaab\n",
+    "expected": {
+      "stdout": "INDEX 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "longer-pattern",
+    "criterionId": "mismatch",
+    "public": false,
+    "description": "불일치·재시작",
+    "input": "FIND\nab\nabcd\n",
+    "expected": {
+      "stdout": "INDEX -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "partial-end",
+    "criterionId": "mismatch",
+    "public": false,
+    "description": "불일치·재시작",
+    "input": "FIND\nabcab\nabcabc\n",
+    "expected": {
+      "stdout": "INDEX -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-pattern",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 문자열",
+    "input": "FIND\nabc\n\n",
+    "expected": {
+      "stdout": "INDEX 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-text",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 문자열",
+    "input": "FIND\n\na\n",
+    "expected": {
+      "stdout": "INDEX -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "both-empty",
+    "criterionId": "empty",
+    "public": false,
+    "description": "빈 문자열",
+    "input": "FIND\n\n\n",
+    "expected": {
+      "stdout": "INDEX 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "case-sensitive",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "경계·문자 구분",
+    "input": "FIND\nHello hello\nhello\n",
+    "expected": {
+      "stdout": "INDEX 6\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "spaces",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "경계·문자 구분",
+    "input": "FIND\na b  c\nb  \n",
+    "expected": {
+      "stdout": "INDEX 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "punctuation",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "경계·문자 구분",
+    "input": "FIND\nx.y|z\n.|\n",
+    "expected": {
+      "stdout": "INDEX -1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "max-text",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "경계·문자 구분",
+    "input": "FIND\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab\n",
+    "expected": {
+      "stdout": "INDEX 64\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "max-pattern",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "경계·문자 구분",
+    "input": "FIND\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n",
+    "expected": {
+      "stdout": "INDEX 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "repeat-input",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "동일 입력 재검색",
+    "input": "FIND\nABABABC\nABABC\nFIND\nhello\nworld\nFIND\nABABABC\nABABC\n",
+    "expected": {
+      "stdout": "INDEX 2\nINDEX -1\nINDEX 2\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

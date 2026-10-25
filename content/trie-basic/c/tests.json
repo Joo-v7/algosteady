@@ -1,0 +1,230 @@
+[
+  {
+    "id": "trie-example",
+    "criterionId": "insert",
+    "public": true,
+    "description": "공유 접두사 삽입·검색·삭제",
+    "input": "INSERT\ncar\nINSERT\ncat\nSEARCH\ncar\nSEARCH\nca\nDELETE\ncar\nSEARCH\ncat\n",
+    "expected": {
+      "stdout": "FOUND 1\nFOUND 0\nDELETED 1\nFOUND 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "prefix-example",
+    "criterionId": "search",
+    "public": true,
+    "description": "접두사와 단어 구분",
+    "input": "INSERT\napple\nSEARCH\napp\nINSERT\napp\nSEARCH\napp\nSEARCH\napple\n",
+    "expected": {
+      "stdout": "FOUND 0\nFOUND 1\nFOUND 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-trie",
+    "criterionId": "insert",
+    "public": false,
+    "description": "생성·삽입",
+    "input": "SEARCH\na\nDELETE\na\n",
+    "expected": {
+      "stdout": "FOUND 0\nDELETED 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "duplicate-insert",
+    "criterionId": "insert",
+    "public": false,
+    "description": "생성·삽입",
+    "input": "INSERT\ncat\nINSERT\ncat\nINSERT\ncat\nDELETE\ncat\nSEARCH\ncat\n",
+    "expected": {
+      "stdout": "DELETED 1\nFOUND 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "missing-branch",
+    "criterionId": "search",
+    "public": false,
+    "description": "정확한 단어 검색",
+    "input": "INSERT\ncat\nSEARCH\ncar\nSEARCH\ncats\n",
+    "expected": {
+      "stdout": "FOUND 0\nFOUND 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-prefix",
+    "criterionId": "delete",
+    "public": false,
+    "description": "삭제·접두사 보존",
+    "input": "INSERT\napp\nINSERT\napple\nDELETE\napp\nSEARCH\napp\nSEARCH\napple\n",
+    "expected": {
+      "stdout": "DELETED 1\nFOUND 0\nFOUND 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-longer",
+    "criterionId": "delete",
+    "public": false,
+    "description": "삭제·접두사 보존",
+    "input": "INSERT\napp\nINSERT\napple\nDELETE\napple\nSEARCH\napp\nSEARCH\napple\n",
+    "expected": {
+      "stdout": "DELETED 1\nFOUND 1\nFOUND 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-sibling",
+    "criterionId": "delete",
+    "public": false,
+    "description": "삭제·접두사 보존",
+    "input": "INSERT\ncar\nINSERT\ncat\nDELETE\ncar\nSEARCH\ncat\n",
+    "expected": {
+      "stdout": "DELETED 1\nFOUND 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-missing-prefix",
+    "criterionId": "delete",
+    "public": false,
+    "description": "삭제·접두사 보존",
+    "input": "INSERT\napple\nDELETE\napp\nSEARCH\napple\n",
+    "expected": {
+      "stdout": "DELETED 0\nFOUND 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "delete-missing-branch",
+    "criterionId": "delete",
+    "public": false,
+    "description": "삭제·접두사 보존",
+    "input": "INSERT\ncat\nDELETE\ncar\nSEARCH\ncat\n",
+    "expected": {
+      "stdout": "DELETED 0\nFOUND 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "free-leaf",
+    "criterionId": "memory",
+    "public": false,
+    "description": "메모리 해제",
+    "input": "INSERT\nalone\nDELETE\nalone\n",
+    "expected": {
+      "stdout": "DELETED 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "free-all",
+    "criterionId": "memory",
+    "public": false,
+    "description": "메모리 해제",
+    "input": "INSERT\ncat\nINSERT\ncar\nINSERT\ndog\nCLEAR\nSEARCH\ncat\n",
+    "expected": {
+      "stdout": "CLEARED\nFOUND 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "empty-word",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "빈 단어·길이 경계",
+    "input": "SEARCH\n\nINSERT\n\nSEARCH\n\nINSERT\na\nDELETE\n\nSEARCH\na\nSEARCH\n\n",
+    "expected": {
+      "stdout": "FOUND 0\nFOUND 1\nDELETED 1\nFOUND 1\nFOUND 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "alphabet-ends",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "빈 단어·길이 경계",
+    "input": "INSERT\na\nINSERT\nz\nSEARCH\na\nSEARCH\nz\nDELETE\na\nSEARCH\nz\n",
+    "expected": {
+      "stdout": "FOUND 1\nFOUND 1\nDELETED 1\nFOUND 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "max-length",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "빈 단어·길이 경계",
+    "input": "INSERT\nzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz\nSEARCH\nzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz\nSEARCH\nzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz\nDELETE\nzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz\n",
+    "expected": {
+      "stdout": "FOUND 1\nFOUND 0\nDELETED 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "all-letters",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "빈 단어·길이 경계",
+    "input": "INSERT\na\nINSERT\nb\nINSERT\nc\nINSERT\nd\nINSERT\ne\nINSERT\nf\nINSERT\ng\nINSERT\nh\nINSERT\ni\nINSERT\nj\nINSERT\nk\nINSERT\nl\nINSERT\nm\nINSERT\nn\nINSERT\no\nINSERT\np\nINSERT\nq\nINSERT\nr\nINSERT\ns\nINSERT\nt\nINSERT\nu\nINSERT\nv\nINSERT\nw\nINSERT\nx\nINSERT\ny\nINSERT\nz\nSEARCH\na\nSEARCH\nb\nSEARCH\nc\nSEARCH\nd\nSEARCH\ne\nSEARCH\nf\nSEARCH\ng\nSEARCH\nh\nSEARCH\ni\nSEARCH\nj\nSEARCH\nk\nSEARCH\nl\nSEARCH\nm\nSEARCH\nn\nSEARCH\no\nSEARCH\np\nSEARCH\nq\nSEARCH\nr\nSEARCH\ns\nSEARCH\nt\nSEARCH\nu\nSEARCH\nv\nSEARCH\nw\nSEARCH\nx\nSEARCH\ny\nSEARCH\nz\nDELETE\na\nDELETE\nb\nDELETE\nc\nDELETE\nd\nDELETE\ne\nDELETE\nf\nDELETE\ng\nDELETE\nh\nDELETE\ni\nDELETE\nj\nDELETE\nk\nDELETE\nl\nDELETE\nm\nDELETE\nn\nDELETE\no\nDELETE\np\nDELETE\nq\nDELETE\nr\nDELETE\ns\nDELETE\nt\nDELETE\nu\nDELETE\nv\nDELETE\nw\nDELETE\nx\nDELETE\ny\nDELETE\nz\n",
+    "expected": {
+      "stdout": "FOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nFOUND 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reinsert",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "반복 호출·재사용",
+    "input": "INSERT\ncat\nDELETE\ncat\nINSERT\ncat\nSEARCH\ncat\nDELETE\ncat\nDELETE\ncat\n",
+    "expected": {
+      "stdout": "DELETED 1\nFOUND 1\nDELETED 1\nDELETED 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "clear-reuse",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "반복 호출·재사용",
+    "input": "INSERT\na\nCLEAR\nINSERT\nz\nSEARCH\nz\nCLEAR\nINSERT\n\nSEARCH\n\n",
+    "expected": {
+      "stdout": "CLEARED\nFOUND 1\nCLEARED\nFOUND 1\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "prefix-chain",
+    "criterionId": "delete",
+    "public": false,
+    "description": "삭제·접두사 보존",
+    "input": "INSERT\na\nINSERT\naa\nINSERT\naaa\nINSERT\naaaa\nINSERT\naaaaa\nINSERT\naaaaaa\nINSERT\naaaaaaa\nINSERT\naaaaaaaa\nINSERT\naaaaaaaaa\nINSERT\naaaaaaaaaa\nINSERT\naaaaaaaaaaa\nDELETE\na\nDELETE\naa\nDELETE\naaa\nDELETE\naaaa\nDELETE\naaaaa\nDELETE\naaaaaa\nDELETE\naaaaaaa\nDELETE\naaaaaaaa\nDELETE\naaaaaaaaa\nDELETE\naaaaaaaaaa\nDELETE\naaaaaaaaaaa\nSEARCH\na\n",
+    "expected": {
+      "stdout": "DELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nDELETED 1\nFOUND 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

@@ -1,0 +1,164 @@
+{
+  "id": "string-brute-force",
+  "version": "1.0.0",
+  "title": "단순 문자열 검색 (Brute Force)",
+  "category": "string",
+  "kind": "algorithm",
+  "description": "본문에서 패턴을 처음부터 비교하며 첫 일치 위치를 찾습니다.",
+  "learning": {
+    "concept": {
+      "title": "시작 위치를 한 칸씩 옮기는 문자열 검색",
+      "paragraphs": [
+        "본문의 각 시작 위치에서 패턴을 처음부터 비교합니다. 도중에 다르면 본문의 시작 위치를 한 칸 옮기고 패턴 인덱스를 0으로 되돌립니다.",
+        "처음으로 패턴 전체가 일치한 위치를 반환하고 없으면 -1을 반환합니다. 빈 패턴은 0에서 일치합니다. C 문자열의 끝은 널 문자이며 비교하는 입력 자체는 바꾸지 않습니다.",
+        "본문 길이 N, 패턴 길이 M일 때 최악 시간은 O(NM), 보조 공간은 O(1)입니다. 이 실습의 문자는 1바이트 ASCII이며 대소문자를 구분합니다."
+      ]
+    },
+    "operations": [
+      {
+        "function": "brute_force_search",
+        "description": "첫 일치 인덱스 또는 -1 반환"
+      }
+    ],
+    "steps": [
+      {
+        "operation": "brute_force_search",
+        "argument": "ABABC",
+        "result": null,
+        "text": "ABABABC",
+        "pattern": "ABABC",
+        "offset": 0,
+        "patternIndex": 0,
+        "trace": [
+          "start = 0, matched = 0"
+        ],
+        "description": "0번 위치부터 패턴을 비교합니다."
+      },
+      {
+        "operation": "brute_force_search",
+        "argument": "ABABC",
+        "result": null,
+        "text": "ABABABC",
+        "pattern": "ABABC",
+        "offset": 0,
+        "patternIndex": 4,
+        "trace": [
+          "start = 0, matched = 4"
+        ],
+        "description": "ABAB까지 같지만 다음 문자가 달라 시작 위치를 옮깁니다."
+      },
+      {
+        "operation": "brute_force_search",
+        "argument": "ABABC",
+        "result": null,
+        "text": "ABABABC",
+        "pattern": "ABABC",
+        "offset": 1,
+        "patternIndex": 0,
+        "trace": [
+          "start = 1, matched = 0"
+        ],
+        "description": "1번 위치의 B와 패턴의 A가 달라 다시 시작합니다."
+      },
+      {
+        "operation": "brute_force_search",
+        "argument": "ABABC",
+        "result": null,
+        "text": "ABABABC",
+        "pattern": "ABABC",
+        "offset": 2,
+        "patternIndex": 0,
+        "trace": [
+          "start = 2, matched = 0"
+        ],
+        "description": "2번 위치부터 패턴을 처음부터 비교합니다."
+      },
+      {
+        "operation": "brute_force_search",
+        "argument": "ABABC",
+        "result": 2,
+        "text": "ABABABC",
+        "pattern": "ABABC",
+        "offset": 2,
+        "patternIndex": 4,
+        "trace": [
+          "start = 2, matched = 4"
+        ],
+        "description": "마지막 C까지 모두 일치합니다. 첫 시작 위치인 2를 반환합니다."
+      }
+    ],
+    "notes": [
+      {
+        "title": "패턴이 본문보다 긴 경우",
+        "description": "비교할 시작 위치가 없으므로 -1입니다. start <= n-m 조건은 마지막 가능한 위치도 포함합니다."
+      }
+    ]
+  },
+  "contract": {
+    "capacity": 128,
+    "scope": "제공된 타입과 상수를 사용해 선언된 함수들의 정의와 본문 전체를 구현합니다. 입력 처리·결과 출력은 호출 코드가 담당합니다.",
+    "functions": [
+      {
+        "name": "brute_force_search",
+        "signature": "int brute_force_search(const char *text, const char *pattern)",
+        "behavior": "첫 일치 위치를 반환하고 없으면 -1을 반환합니다. 빈 패턴은 0입니다. 입력 문자열은 보존합니다."
+      }
+    ],
+    "requirements": [
+      "본문은 최대 127자, 패턴은 최대 63자의 출력 가능한 ASCII입니다. 공백도 일반 문자이며 대소문자를 구분합니다.",
+      "문자열은 널 종료되며 인덱스는 0부터 시작합니다. 함수는 입력을 변경하거나 결과를 출력하지 않습니다."
+    ]
+  },
+  "prerequisites": [],
+  "criteria": [
+    {
+      "id": "match",
+      "order": 1,
+      "title": "일치 위치",
+      "description": "처음 일치하는 시작 인덱스를 반환합니다."
+    },
+    {
+      "id": "mismatch",
+      "order": 2,
+      "title": "불일치·재시작",
+      "description": "불일치 후 다음 시작 위치에서 다시 비교합니다."
+    },
+    {
+      "id": "empty",
+      "order": 3,
+      "title": "빈 문자열",
+      "description": "빈 패턴은 0, 빈 본문과 비어 있지 않은 패턴은 -1입니다."
+    },
+    {
+      "id": "boundary",
+      "order": 4,
+      "title": "경계·문자 구분",
+      "description": "끝 위치와 최대 길이, 대소문자·공백을 처리합니다."
+    },
+    {
+      "id": "repeat",
+      "order": 5,
+      "title": "입력 보존·반복 호출",
+      "description": "입력을 변경하지 않고 반복 검색합니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "brute_force_search",
+          "description": "첫 일치 위치를 반환하고 없으면 -1을 반환합니다. 빈 패턴은 0입니다. 입력 문자열은 보존합니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "FIND 다음 두 줄은 본문과 패턴입니다. 빈 줄은 빈 문자열이며 INDEX 위치를 출력합니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

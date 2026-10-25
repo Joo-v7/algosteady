@@ -1,0 +1,302 @@
+[
+  {
+    "id": "split-example",
+    "criterionId": "split",
+    "public": true,
+    "description": "구분자로 분리",
+    "input": "SPLIT ,\n,cat,,dog,bird,\n",
+    "expected": {
+      "stdout": "TOKENS 3\n[0] cat\n[1] dog\n[2] bird\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "join-example",
+    "criterionId": "join",
+    "public": true,
+    "description": "토큰 결합",
+    "input": "JOIN |\n3\ncat\ndog\nbird\n",
+    "expected": {
+      "stdout": "TEXT cat|dog|bird\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "split-empty",
+    "criterionId": "split",
+    "public": false,
+    "description": "구분자로 분리",
+    "input": "SPLIT ,\n\n",
+    "expected": {
+      "stdout": "TOKENS 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "split-all-delimiters",
+    "criterionId": "split",
+    "public": false,
+    "description": "구분자로 분리",
+    "input": "SPLIT ,\n,,,,\n",
+    "expected": {
+      "stdout": "TOKENS 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "split-spaces",
+    "criterionId": "split",
+    "public": false,
+    "description": "구분자로 분리",
+    "input": "SPLIT  \n a  b \n",
+    "expected": {
+      "stdout": "TOKENS 2\n[0] a\n[1] b\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "split-no-delimiter",
+    "criterionId": "split",
+    "public": false,
+    "description": "구분자로 분리",
+    "input": "SPLIT |\nsingle\n",
+    "expected": {
+      "stdout": "TOKENS 1\n[0] single\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "join-empty",
+    "criterionId": "join",
+    "public": false,
+    "description": "토큰 결합",
+    "input": "JOIN ,\n0\n",
+    "expected": {
+      "stdout": "TEXT \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "join-one",
+    "criterionId": "join",
+    "public": false,
+    "description": "토큰 결합",
+    "input": "JOIN ,\n1\none\n",
+    "expected": {
+      "stdout": "TEXT one\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "join-empty-words",
+    "criterionId": "join",
+    "public": false,
+    "description": "토큰 결합",
+    "input": "JOIN :\n3\n\na\n\n",
+    "expected": {
+      "stdout": "TEXT :a:\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reverse-empty",
+    "criterionId": "reverse",
+    "public": false,
+    "description": "문자 순서 뒤집기",
+    "input": "REVERSE\n\n",
+    "expected": {
+      "stdout": "TEXT \n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reverse-one",
+    "criterionId": "reverse",
+    "public": false,
+    "description": "문자 순서 뒤집기",
+    "input": "REVERSE\na\n",
+    "expected": {
+      "stdout": "TEXT a\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reverse-odd",
+    "criterionId": "reverse",
+    "public": false,
+    "description": "문자 순서 뒤집기",
+    "input": "REVERSE\nabcde\n",
+    "expected": {
+      "stdout": "TEXT edcba\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reverse-even",
+    "criterionId": "reverse",
+    "public": false,
+    "description": "문자 순서 뒤집기",
+    "input": "REVERSE\nabcd\n",
+    "expected": {
+      "stdout": "TEXT dcba\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reverse-spaces",
+    "criterionId": "reverse",
+    "public": false,
+    "description": "문자 순서 뒤집기",
+    "input": "REVERSE\na b!\n",
+    "expected": {
+      "stdout": "TEXT !b a\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "sort-example",
+    "criterionId": "sort",
+    "public": false,
+    "description": "문자열 배열 사전순 정렬",
+    "input": "SORT\n6\ndog\nCat\ncat\n\ncar\ncat\n",
+    "expected": {
+      "stdout": "TOKENS 6\n[0] \n[1] Cat\n[2] car\n[3] cat\n[4] cat\n[5] dog\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "sort-empty",
+    "criterionId": "sort",
+    "public": false,
+    "description": "문자열 배열 사전순 정렬",
+    "input": "SORT\n0\n",
+    "expected": {
+      "stdout": "TOKENS 0\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "sort-one",
+    "criterionId": "sort",
+    "public": false,
+    "description": "문자열 배열 사전순 정렬",
+    "input": "SORT\n1\na\n",
+    "expected": {
+      "stdout": "TOKENS 1\n[0] a\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "sort-prefix",
+    "criterionId": "sort",
+    "public": false,
+    "description": "문자열 배열 사전순 정렬",
+    "input": "SORT\n5\naaa\na\naa\nab\n\n",
+    "expected": {
+      "stdout": "TOKENS 5\n[0] \n[1] a\n[2] aa\n[3] aaa\n[4] ab\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "sort-duplicates",
+    "criterionId": "sort",
+    "public": false,
+    "description": "문자열 배열 사전순 정렬",
+    "input": "SORT\n5\nsame\nsame\nsame\nsame\nsame\n",
+    "expected": {
+      "stdout": "TOKENS 5\n[0] same\n[1] same\n[2] same\n[3] same\n[4] same\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "split-max-count",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "구분자로 분리",
+    "input": "SPLIT ,\na,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a\n",
+    "expected": {
+      "stdout": "TOKENS 16\n[0] a\n[1] a\n[2] a\n[3] a\n[4] a\n[5] a\n[6] a\n[7] a\n[8] a\n[9] a\n[10] a\n[11] a\n[12] a\n[13] a\n[14] a\n[15] a\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "split-max-token",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "구분자로 분리",
+    "input": "SPLIT ,\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,end\n",
+    "expected": {
+      "stdout": "TOKENS 2\n[0] xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n[1] end\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "join-max-text",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "토큰 결합",
+    "input": "JOIN |\n4\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n",
+    "expected": {
+      "stdout": "TEXT xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "reverse-max-text",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "문자 순서 뒤집기",
+    "input": "REVERSE\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaz\n",
+    "expected": {
+      "stdout": "TEXT zaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "sort-max-count",
+    "criterionId": "boundary",
+    "public": false,
+    "description": "문자열 배열 사전순 정렬",
+    "input": "SORT\n16\nw15\nw14\nw13\nw12\nw11\nw10\nw09\nw08\nw07\nw06\nw05\nw04\nw03\nw02\nw01\nw00\n",
+    "expected": {
+      "stdout": "TOKENS 16\n[0] w00\n[1] w01\n[2] w02\n[3] w03\n[4] w04\n[5] w05\n[6] w06\n[7] w07\n[8] w08\n[9] w09\n[10] w10\n[11] w11\n[12] w12\n[13] w13\n[14] w14\n[15] w15\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  },
+  {
+    "id": "repeat-mixed",
+    "criterionId": "repeat",
+    "public": false,
+    "description": "서로 다른 함수 연속 호출",
+    "input": "SPLIT ,\n,cat,,dog,bird,\nJOIN |\n3\ncat\ndog\nbird\nREVERSE\nabc\nSORT\n2\nb\na\nSPLIT ,\n,cat,,dog,bird,\n",
+    "expected": {
+      "stdout": "TOKENS 3\n[0] cat\n[1] dog\n[2] bird\nTEXT cat|dog|bird\nTEXT cba\nTOKENS 2\n[0] a\n[1] b\nTOKENS 3\n[0] cat\n[1] dog\n[2] bird\n",
+      "exitCode": 0,
+      "stderrRequired": false
+    }
+  }
+]

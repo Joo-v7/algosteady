@@ -1,0 +1,399 @@
+{
+  "id": "trie-basic",
+  "version": "1.0.0",
+  "title": "트라이 — 삽입·검색·삭제",
+  "category": "trie",
+  "kind": "data-structure",
+  "description": "문자 경로를 공유하며 단어를 삽입·검색·삭제하고 메모리를 해제합니다.",
+  "learning": {
+    "concept": {
+      "title": "문자 경로를 공유하는 트라이",
+      "paragraphs": [
+        "트라이의 각 간선은 한 문자이고 루트에서 내려가는 경로가 접두사를 나타냅니다. 이 실습은 소문자 a~z에 대응하는 자식 포인터 26개를 사용합니다.",
+        "단어 끝 표시는 경로 존재와 별개입니다. apple만 넣었을 때 app은 경로가 있어도 저장된 단어가 아닙니다. 빈 단어는 루트의 단어 끝 표시로 표현합니다.",
+        "삭제는 해당 단어의 끝 표시를 끄고, 단어 끝도 아니고 자식도 없는 노드만 되돌아오며 해제합니다. 공유 접두사와 다른 단어는 보존하며 루트는 전체 해제 전까지 유지합니다.",
+        "길이 L인 단어의 삽입·검색·삭제는 알파벳 크기가 고정되어 O(L)입니다. 전체 해제는 노드 수에 비례하며 노드마다 자식 포인터 26개의 공간을 사용합니다."
+      ]
+    },
+    "operations": [
+      {
+        "function": "create_node",
+        "description": "단어 끝 표시가 0이고 모든 자식이 NULL인 노드를 생성합니다. 할당 실패는 stderr 출력 후 exit(1)로 종료합니다."
+      },
+      {
+        "function": "insert_word",
+        "description": "경로를 만들고 마지막 노드에 단어 끝을 표시합니다. 중복 삽입은 변화가 없습니다."
+      },
+      {
+        "function": "search_word",
+        "description": "완전한 단어가 있으면 1, 없거나 접두사만 있으면 0을 반환합니다."
+      },
+      {
+        "function": "delete_word",
+        "description": "단어가 있으면 삭제 후 1, 없으면 0입니다. 공유 경로·다른 단어를 보존하고 불필요한 노드를 해제하되 루트는 유지합니다."
+      },
+      {
+        "function": "free_trie",
+        "description": "루트를 포함한 모든 노드를 해제합니다. NULL도 허용합니다."
+      }
+    ],
+    "steps": [
+      {
+        "operation": "create_node",
+        "argument": "",
+        "result": null,
+        "word": "",
+        "nodes": [
+          {
+            "prefix": "",
+            "terminal": false
+          }
+        ],
+        "trace": [
+          "자식이 모두 NULL이고 단어 끝 표시가 없는 루트를 만듭니다."
+        ],
+        "description": "자식이 모두 NULL이고 단어 끝 표시가 없는 루트를 만듭니다.",
+        "activePrefix": ""
+      },
+      {
+        "operation": "insert_word",
+        "argument": "car",
+        "result": null,
+        "word": "car",
+        "nodes": [
+          {
+            "prefix": "",
+            "terminal": false
+          },
+          {
+            "prefix": "c",
+            "terminal": false
+          },
+          {
+            "prefix": "ca",
+            "terminal": false
+          },
+          {
+            "prefix": "car",
+            "terminal": true
+          }
+        ],
+        "trace": [
+          "c → a → r 경로를 만들고 r을 단어 끝으로 표시합니다."
+        ],
+        "description": "c → a → r 경로를 만들고 r을 단어 끝으로 표시합니다.",
+        "activePrefix": "car"
+      },
+      {
+        "operation": "insert_word",
+        "argument": "cat",
+        "result": null,
+        "word": "cat",
+        "nodes": [
+          {
+            "prefix": "",
+            "terminal": false
+          },
+          {
+            "prefix": "c",
+            "terminal": false
+          },
+          {
+            "prefix": "ca",
+            "terminal": false
+          },
+          {
+            "prefix": "car",
+            "terminal": true
+          },
+          {
+            "prefix": "cat",
+            "terminal": true
+          }
+        ],
+        "trace": [
+          "c와 a를 공유하고 t 자식만 추가합니다."
+        ],
+        "description": "c와 a를 공유하고 t 자식만 추가합니다.",
+        "activePrefix": "cat"
+      },
+      {
+        "operation": "search_word",
+        "argument": "ca",
+        "result": 0,
+        "word": "ca",
+        "nodes": [
+          {
+            "prefix": "",
+            "terminal": false
+          },
+          {
+            "prefix": "c",
+            "terminal": false
+          },
+          {
+            "prefix": "ca",
+            "terminal": false
+          },
+          {
+            "prefix": "car",
+            "terminal": true
+          },
+          {
+            "prefix": "cat",
+            "terminal": true
+          }
+        ],
+        "trace": [
+          "ca 경로는 있지만 단어 끝 표시가 없으므로 0입니다."
+        ],
+        "description": "ca 경로는 있지만 단어 끝 표시가 없으므로 0입니다.",
+        "activePrefix": "ca"
+      },
+      {
+        "operation": "insert_word",
+        "argument": "ca",
+        "result": null,
+        "word": "ca",
+        "nodes": [
+          {
+            "prefix": "",
+            "terminal": false
+          },
+          {
+            "prefix": "c",
+            "terminal": false
+          },
+          {
+            "prefix": "ca",
+            "terminal": true
+          },
+          {
+            "prefix": "car",
+            "terminal": true
+          },
+          {
+            "prefix": "cat",
+            "terminal": true
+          }
+        ],
+        "trace": [
+          "기존 ca 노드의 단어 끝 표시만 켭니다."
+        ],
+        "description": "기존 ca 노드의 단어 끝 표시만 켭니다.",
+        "activePrefix": "ca"
+      },
+      {
+        "operation": "delete_word",
+        "argument": "car",
+        "result": 1,
+        "word": "car",
+        "nodes": [
+          {
+            "prefix": "",
+            "terminal": false
+          },
+          {
+            "prefix": "c",
+            "terminal": false
+          },
+          {
+            "prefix": "ca",
+            "terminal": true
+          },
+          {
+            "prefix": "cat",
+            "terminal": true
+          }
+        ],
+        "trace": [
+          "r만 해제합니다. ca 단어와 cat 경로는 보존합니다."
+        ],
+        "description": "r만 해제합니다. ca 단어와 cat 경로는 보존합니다.",
+        "activePrefix": "ca"
+      },
+      {
+        "operation": "delete_word",
+        "argument": "ca",
+        "result": 1,
+        "word": "ca",
+        "nodes": [
+          {
+            "prefix": "",
+            "terminal": false
+          },
+          {
+            "prefix": "c",
+            "terminal": false
+          },
+          {
+            "prefix": "ca",
+            "terminal": false
+          },
+          {
+            "prefix": "cat",
+            "terminal": true
+          }
+        ],
+        "trace": [
+          "ca의 단어 끝 표시만 끕니다. cat에 필요한 c·a 노드는 보존합니다."
+        ],
+        "description": "ca의 단어 끝 표시만 끕니다. cat에 필요한 c·a 노드는 보존합니다.",
+        "activePrefix": "ca"
+      },
+      {
+        "operation": "search_word",
+        "argument": "cat",
+        "result": 1,
+        "word": "cat",
+        "nodes": [
+          {
+            "prefix": "",
+            "terminal": false
+          },
+          {
+            "prefix": "c",
+            "terminal": false
+          },
+          {
+            "prefix": "ca",
+            "terminal": false
+          },
+          {
+            "prefix": "cat",
+            "terminal": true
+          }
+        ],
+        "trace": [
+          "마지막 t에 단어 끝 표시가 있으므로 1입니다."
+        ],
+        "description": "마지막 t에 단어 끝 표시가 있으므로 1입니다.",
+        "activePrefix": "cat"
+      }
+    ],
+    "notes": [
+      {
+        "title": "할당 실패",
+        "description": "기준 코드는 할당 실패 시 stderr를 출력하고 exit(1)로 종료합니다. 테스트에서 할당 실패를 강제로 발생시키지는 않습니다."
+      },
+      {
+        "title": "빈 루트와 전체 해제",
+        "description": "마지막 단어를 지워도 루트는 남습니다. free_trie는 루트까지 해제하므로 이후에는 새 루트를 만들어 사용합니다."
+      }
+    ]
+  },
+  "contract": {
+    "capacity": 32,
+    "scope": "제공된 타입과 상수를 사용해 선언된 함수들의 정의와 본문 전체를 구현합니다. 입력 처리·결과 출력은 호출 코드가 담당합니다.",
+    "functions": [
+      {
+        "name": "create_node",
+        "signature": "TrieNode *create_node(void)",
+        "behavior": "단어 끝 표시가 0이고 모든 자식이 NULL인 노드를 생성합니다. 할당 실패는 stderr 출력 후 exit(1)로 종료합니다."
+      },
+      {
+        "name": "insert_word",
+        "signature": "void insert_word(TrieNode *root, const char *word)",
+        "behavior": "경로를 만들고 마지막 노드에 단어 끝을 표시합니다. 중복 삽입은 변화가 없습니다."
+      },
+      {
+        "name": "search_word",
+        "signature": "int search_word(const TrieNode *root, const char *word)",
+        "behavior": "완전한 단어가 있으면 1, 없거나 접두사만 있으면 0을 반환합니다."
+      },
+      {
+        "name": "delete_word",
+        "signature": "int delete_word(TrieNode *root, const char *word)",
+        "behavior": "단어가 있으면 삭제 후 1, 없으면 0입니다. 공유 경로·다른 단어를 보존하고 불필요한 노드를 해제하되 루트는 유지합니다."
+      },
+      {
+        "name": "free_trie",
+        "signature": "void free_trie(TrieNode *root)",
+        "behavior": "루트를 포함한 모든 노드를 해제합니다. NULL도 허용합니다."
+      }
+    ],
+    "requirements": [
+      "단어는 소문자 a~z로 이루어진 0~31자 문자열입니다. 입력은 널 종료되며 유효한 루트와 단어를 제공합니다.",
+      "루트는 호출 코드가 create_node로 만들며 삭제 시에도 유지합니다. 빈 단어는 루트의 is_end로 표현합니다.",
+      "중복 단어는 한 번만 저장합니다. 삭제는 다른 단어를 보존하고 사용하지 않는 노드를 해제해야 합니다.",
+      "노드는 malloc 또는 calloc으로 생성하고 free로 해제합니다. 전체 해제 후 호출 코드는 새 루트를 생성합니다."
+    ]
+  },
+  "prerequisites": [
+    "string-brute-force",
+    "tree-bst"
+  ],
+  "criteria": [
+    {
+      "id": "insert",
+      "order": 1,
+      "title": "생성·삽입",
+      "description": "빈 노드를 만들고 경로를 공유하며 중복 삽입을 무시합니다."
+    },
+    {
+      "id": "search",
+      "order": 2,
+      "title": "정확한 단어 검색",
+      "description": "단어 끝 표시를 확인해 접두사와 단어를 구분합니다."
+    },
+    {
+      "id": "delete",
+      "order": 3,
+      "title": "삭제·접두사 보존",
+      "description": "짧은 단어·긴 단어를 삭제해도 다른 단어를 보존합니다."
+    },
+    {
+      "id": "memory",
+      "order": 4,
+      "title": "메모리 해제",
+      "description": "불필요한 경로와 전체 노드를 해제하고 삭제 후에도 루트를 유지합니다."
+    },
+    {
+      "id": "boundary",
+      "order": 5,
+      "title": "빈 단어·길이 경계",
+      "description": "빈 단어와 길이 31, a·z의 자식 인덱스를 처리합니다."
+    },
+    {
+      "id": "repeat",
+      "order": 6,
+      "title": "반복 호출·재사용",
+      "description": "삭제·재삽입·초기화를 반복해도 상태가 남지 않습니다."
+    }
+  ],
+  "languages": {
+    "c": {
+      "standard": "c17",
+      "starter": "c/starter.c",
+      "reference": "c/reference.c",
+      "harness": "c/harness.c",
+      "tests": "c/tests.json",
+      "codeExplanation": [
+        {
+          "function": "create_node",
+          "description": "단어 끝 표시가 0이고 모든 자식이 NULL인 노드를 생성합니다. 할당 실패는 stderr 출력 후 exit(1)로 종료합니다."
+        },
+        {
+          "function": "insert_word",
+          "description": "경로를 만들고 마지막 노드에 단어 끝을 표시합니다. 중복 삽입은 변화가 없습니다."
+        },
+        {
+          "function": "search_word",
+          "description": "완전한 단어가 있으면 1, 없거나 접두사만 있으면 0을 반환합니다."
+        },
+        {
+          "function": "delete_word",
+          "description": "단어가 있으면 삭제 후 1, 없으면 0입니다. 공유 경로·다른 단어를 보존하고 불필요한 노드를 해제하되 루트는 유지합니다."
+        },
+        {
+          "function": "free_trie",
+          "description": "루트를 포함한 모든 노드를 해제합니다. NULL도 허용합니다."
+        }
+      ],
+      "inputProtocol": {
+        "description": "INSERT·SEARCH·DELETE 다음 줄은 단어입니다. 빈 줄은 빈 단어입니다. SEARCH는 FOUND 0/1, DELETE는 DELETED 0/1을 출력합니다. CLEAR는 전체 해제 후 새 루트를 만들고 CLEARED를 출력합니다. 각 연산 후 구조·공유 접두사·메모리 해제를 검사합니다.",
+        "harnessErrorExitCode": 2
+      }
+    }
+  }
+}

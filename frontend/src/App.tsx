@@ -14,7 +14,7 @@ function App() {
                     algosteady
                 </Link>
                 <span className="header-description">매일 꾸준히 구현하는 자료구조</span>
-                <Link className="header-nav" to="/exercises">과제 목록</Link>
+                <Link className="header-nav" to="/exercises">홈</Link>
             </header>
 
             {/* URL별 화면 연결 */}
@@ -28,8 +28,8 @@ function App() {
                     <main className="workspace">
                         <section className="panel unavailable-page">
                             <h1>페이지를 찾을 수 없습니다.</h1>
-                            <p>주소를 확인하거나 과제 목록으로 돌아가 주세요.</p>
-                            <Link className="primary-button" to="/exercises">과제 목록으로</Link>
+                            <p>주소를 확인하거나 학습 목록으로 돌아가 주세요.</p>
+                            <Link className="primary-button" to="/exercises">학습 목록으로</Link>
                         </section>
                     </main>
                 } />

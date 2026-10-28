@@ -1,5 +1,11 @@
 export type ExerciseCategory = 'stack' | 'queue' | 'deque' | 'linked-list' | 'recursion' | 'tree' | 'heap' | 'hash' | 'set' | 'search' | 'sort' | 'graph' | 'string' | 'trie' | 'exhaustive' | 'backtracking' | 'greedy' | 'dp' | 'two-pointer' | 'sliding-window'
 
+export interface ExerciseGroup {
+    id: string
+    label: string
+    categories: ExerciseCategory[]
+}
+
 export interface ExpectedOutput {
     stdout: string
     exitCode: number
@@ -320,6 +326,10 @@ export async function requestApi<T>(url: string, options?: RequestInit): Promise
 
 export function getExercises(signal: AbortSignal) {
     return requestApi<ExerciseSummary[]>('/api/exercises', { signal })
+}
+
+export function getExerciseGroups(signal: AbortSignal) {
+    return requestApi<ExerciseGroup[]>('/api/exercises/categories', { signal })
 }
 
 export function getExercise(id: string, signal: AbortSignal) {

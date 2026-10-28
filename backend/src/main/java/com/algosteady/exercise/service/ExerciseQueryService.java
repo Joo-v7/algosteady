@@ -1,6 +1,9 @@
 package com.algosteady.exercise.service;
 
 import com.algosteady.exercise.domain.ExerciseContent;
+import com.algosteady.exercise.domain.ExerciseCategory;
+import com.algosteady.exercise.repository.ExerciseCategoryRepository;
+import com.algosteady.exercise.dto.response.ExerciseCategoryResponseDto;
 import com.algosteady.exercise.repository.ExerciseContentRepository;
 import com.algosteady.exercise.dto.response.ExerciseDetailsResponseDto;
 import com.algosteady.exercise.dto.response.ExerciseSummaryResponseDto;
@@ -29,7 +32,27 @@ public class ExerciseQueryService {
 
     private final ExerciseContentRepository exerciseContentRepository;
 
+    private final ExerciseCategoryRepository exerciseCategoryRepository;
+
     private final JsonMapper jsonMapper;
+
+    /**
+     * 표시 순서에 따른 학습 분류와 소속 관계 반환
+     * @return 학습 목록에서 사용하는 분류 목록
+     */
+    public List<ExerciseCategoryResponseDto> findCategories() {
+        List<ExerciseCategoryResponseDto> response = new ArrayList<>();
+
+        for (ExerciseCategory category : exerciseCategoryRepository.findAllByOrderByDisplayOrderAscIdAsc()) {
+            response.add(ExerciseCategoryResponseDto.builder()
+                    .id(category.getId())
+                    .label(category.getLabel())
+                    .categories(category.getContentCategories().stream().sorted().toList())
+                    .build());
+        }
+
+        return response;
+    }
 
     /**
      * 과제별로 가장 최근 등록한 버전과 지원 언어 반환
@@ -47,7 +70,8 @@ public class ExerciseQueryService {
 
             JsonNode exercise = jsonMapper.readTree(content.getSnapshot()).path("exercise");
 
-            response.add(ExerciseSummaryResponseDto.builder()
+            // 최신 버전을 선택한 뒤 등록 ID 오름차순으로 표시
+            response.addFirst(ExerciseSummaryResponseDto.builder()
                     .id(content.getExerciseId())
                     .contentVersion(content.getContentVersion())
                     .title(exercise.path("title").asString())

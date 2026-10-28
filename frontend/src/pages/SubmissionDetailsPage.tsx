@@ -55,7 +55,7 @@ function SubmissionDetailsPage() {
             <main className="workspace">
                 <section className="panel unavailable-page">
                     <h1>{error || '제출 기록을 불러오는 중입니다.'}</h1>
-                    <Link className="primary-button" to="/exercises">과제 목록으로</Link>
+                    <Link className="primary-button" to="/exercises">학습 목록으로</Link>
                 </section>
             </main>
         )
@@ -66,7 +66,7 @@ function SubmissionDetailsPage() {
     return (
         <main className="workspace">
             <div className="breadcrumb">
-                <Link to="/exercises">과제 목록</Link> <span>/</span>
+                <Link to="/exercises">학습 목록</Link> <span>/</span>
                 <Link to={`/exercises/${submission.exerciseId}/submissions?page=${encodeURIComponent(historyPage)}`}>제출 기록</Link> <span>/</span> 상세
             </div>
             <section className="exercise-heading">

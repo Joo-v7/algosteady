@@ -123,7 +123,7 @@ function SubmissionListPage() {
     return (
         <main className="workspace">
             <div className="breadcrumb">
-                <Link to="/exercises">과제 목록</Link> <span>/</span>
+                <Link to="/exercises">학습 목록</Link> <span>/</span>
                 <Link to={`/exercises/${exerciseId}`}>{exercise?.title ?? exerciseId}</Link> <span>/</span> 제출 기록
             </div>
             <section className="exercise-heading">
@@ -132,7 +132,7 @@ function SubmissionListPage() {
                     <h1>{exercise?.title ?? '과제'} · 제출 기록</h1>
                     <p>C · 제출 코드와 채점 결과를 확인합니다.</p>
                 </div>
-                <Link className="primary-button" to={`/exercises/${exerciseId}?tab=training`}>실습하기로</Link>
+                <Link className="primary-button" to={`/exercises/${exerciseId}?tab=training`}><span aria-hidden="true">←</span> 실습하기</Link>
             </section>
             <section className="panel history-panel" aria-busy={loading}>
                 {historyContent}

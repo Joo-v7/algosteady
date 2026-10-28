@@ -4,8 +4,8 @@ import Editor, { loader } from '@monaco-editor/react'
 import * as monaco from 'monaco-editor'
 import EditorWorker from 'monaco-editor/editor/editor.worker?worker'
 import { Link, useParams, useSearchParams } from 'react-router'
-import { ApiError, getExercise, getReference } from '../api/exercises'
-import type { ExerciseDetails } from '../api/exercises'
+import { ApiError, getExercise, getExerciseGroups, getReference } from '../api/exercises'
+import type { ExerciseDetails, ExerciseGroup } from '../api/exercises'
 import { createRun, getJob } from '../api/runs'
 import type { Job } from '../api/runs'
 import ExecutionResultPanel from '../components/ExecutionResultPanel'
@@ -40,6 +40,7 @@ function ExercisePage() {
     const [referenceViewed, setReferenceViewed] = useState(false)
     const [exampleIndex, setExampleIndex] = useState(0)
     const [exercise, setExercise] = useState<ExerciseDetails | null>(null)
+    const [exerciseGroups, setExerciseGroups] = useState<ExerciseGroup[]>([])
     const [contentError, setContentError] = useState('')
     const [referenceCode, setReferenceCode] = useState('')
     const [referenceLoading, setReferenceLoading] = useState(false)
@@ -63,12 +64,13 @@ function ExercisePage() {
         const controller = new AbortController()
         requests.current = controller
 
-        getExercise(exerciseId ?? '', controller.signal)
-            .then(content => {
+        Promise.all([getExercise(exerciseId ?? '', controller.signal), getExerciseGroups(controller.signal)])
+            .then(([content, groups]) => {
                 if (controller.signal.aborted) {
                     return
                 }
                 setExercise(content)
+                setExerciseGroups(groups)
                 setContentError('')
                 setStepIndex(0)
                 setExampleIndex(0)
@@ -303,8 +305,8 @@ function ExercisePage() {
             <main className="workspace">
                 <section className="panel unavailable-page">
                     <h1>{contentError || '과제를 불러오는 중입니다.'}</h1>
-                    <p>과제 목록에서 학습할 항목을 선택해 주세요.</p>
-                    <Link className="primary-button" to="/exercises">과제 목록으로</Link>
+                    <p>학습 목록에서 학습할 항목을 선택해 주세요.</p>
+                    <Link className="primary-button" to="/exercises">학습 목록으로</Link>
                 </section>
             </main>
         )
@@ -321,6 +323,7 @@ function ExercisePage() {
     const isRecursion = exercise.category === 'recursion'
     const presentation = getExercisePresentation(exercise)
     const categoryLabel = presentation.label
+    const categoryGroup = exerciseGroups.find(group => group.categories.includes(exercise.category))
     const restoredKind = jobId && jobId === gradingJobId ? 'GRADING' : 'RUN'
     const resultKind = job?.kind ?? requestKind ?? restoredKind
 
@@ -378,7 +381,7 @@ function ExercisePage() {
             {saveError && <p role="alert">{saveError}</p>}
             {/* 과제 제목 */}
             <div className="breadcrumb">
-                <Link to="/exercises">과제 목록</Link> <span>/</span> {categoryLabel} <span>/</span> <strong>{exercise.title}</strong>
+                <Link to="/exercises">학습 목록</Link> <span>/</span> <Link to={`/exercises?category=${categoryGroup?.id ?? exercise.category}#catalog-heading`}>{categoryGroup?.label ?? categoryLabel}</Link> <span>/</span> <strong>{exercise.title}</strong>
             </div>
             <section className="exercise-heading">
                 <div>
@@ -389,7 +392,7 @@ function ExercisePage() {
                     </h1>
                     <p>{presentation.introduction}</p>
                 </div>
-                <Link className="primary-button" to={`/exercises/${exerciseId}/submissions`}>제출 기록</Link>
+                <Link className="primary-button" to={`/exercises/${exerciseId}/submissions`}>제출 기록 <span aria-hidden="true">→</span></Link>
             </section>
 
             {/* 학습·실습 탭 */}

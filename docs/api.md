@@ -9,6 +9,7 @@
 | 기능 | Method·경로 | Query·본문 | 성공 응답 |
 | --- | --- | --- | --- |
 | 과제 목록 | `GET /exercises` | 없음 | 200, 과제 요약 배열 |
+| 학습 분류 | `GET /exercises/categories` | 없음 | 200, DB 표시 순서의 분류 배열 |
 | 과제 상세 | `GET /exercises/{exerciseId}` | Query: `language` | 200, 과제 상세 |
 | 기준 코드 | `GET /exercises/{exerciseId}/reference` | Query: `language`, `contentVersion` | 200, 기준 코드 |
 | 예제 실행 | `POST /runs` | 본문: 공통 실행 필드 + `exampleId` | 202, `{ "jobId": "UUID" }` |
@@ -35,6 +36,7 @@
 | 응답 | 필드·구조 |
 | --- | --- |
 | 과제 요약 | `id`, `contentVersion`, `title`, `description`, `category`, `languages`, `contract`, `criteria` |
+| 학습 분류 | `id`, `label`, `categories`(소속 콘텐츠 분류 코드 배열). 이름·순서·소속 관계는 DB에서 관리 |
 | 과제 상세 | `id`, `version`, `title`, `description`, `category`, `language`, `standard`, `learning`, `contract`, `criteria`, `starterCode`, `publicExamples` |
 | 기준 코드 | `exerciseId`, `contentVersion`, `language`, `code` |
 | 제출 페이지 | `content`(제출 요약 배열), `page`, `size`, `totalElements`, `totalPages` |

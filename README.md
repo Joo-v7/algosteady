@@ -5,6 +5,9 @@
 ## 주요 기능
 
 - 오전 6시 기준 오늘의 학습 추천, 분류·이름 검색 및 페이지당 9개 학습 목록
+- OAuth 로그인·회원 자동 등록 및 세션 로그아웃 (Google 연결)
+- 비회원 예제 실행, 회원별 제출·제출 기록 조회
+- 오늘의 학습 전체 채점 통과 시 일일 완료 저장 및 홈 완료 표시
 - 과제 목록·학습 내용·구현 규격·기준 코드 조회
 - Monaco 편집기로 코드 작성 및 브라우저 초안 저장
 - 공개 예시 실행과 전체 테스트 채점
@@ -23,7 +26,7 @@
 | 2026-10-21 ~ 10-25 | 과제 확대 | [학습 목록](docs/curriculum.md)의 C17 콘텐츠 56개 구현 (2026-10-25 조기 완료, 기존 목표 11/01~11/15에서 일정 재설정) |
 | 2026-10-25 | 오늘의 학습 | 로그인 없이 오전 6시 기준 공통 학습 추천과 학습·실습 이동 제공 (2026-10-25 구현, 기존 목표 10/31~11/03에서 앞당김) |
 | 2026-10-25 | 홈 개편 | 오늘의 학습 카드, 분류·이름 검색, 페이지당 9개 카드와 페이지네이션 (2026-10-25 구현, 기존 목표 11/04~11/06에서 앞당김) |
-| 2026-10-26 ~ 10-30 | Google 로그인·개인 기록 | 별도 가입 화면 없이 OAuth 로그인, 회원별 제출·실행 기록 연결 (2026-10-25 추가) |
+| 2026-10-26 ~ 10-30 | Google 로그인·개인 기록 | OAuth 로그인, 비회원 예제 실행과 회원별 제출·채점 결과 조회 (2026-10-25 추가, 2026-10-29 구현) |
 | 2026-11-07 ~ 11-12 | 마이페이지 | 학습 현황, 잔디형 완료 기록, 날짜별 제출 기록 연결 (2026-10-25 추가) |
 | 2026-11-13 ~ 11-15 | 회원탈퇴 | 마이페이지 하단 탈퇴 버튼, 데이터 처리 안내·최종 확인 (2026-10-25 추가) |
 | 2026-11-16 ~ 12-06 | 지원 언어 확대 | Python·C++·Java 실행 이미지와 과제 코드·테스트 연결 (2026-10-25 일정 재설정) |
@@ -47,7 +50,15 @@ Node.js 24, JDK 21, Docker를 준비한다. 아래 명령은 저장소 루트에
 
 **1. 환경변수·DB·실행 이미지 준비**
 
-`.env`가 없으면 `.env.example`을 복사하고 `POSTGRES_PASSWORD`를 설정한다. 기존 `.env`는 유지한다.
+`.env`가 없으면 `.env.example`을 복사하고 DB·OAuth 값을 설정한다. 기존 `.env`는 유지하고 누락된 값을 추가한다.
+
+| 환경변수 | 설정 |
+| --- | --- |
+| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | 로컬 PostgreSQL 접속 정보 |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth 웹 애플리케이션 클라이언트 자격 증명 |
+| `FRONTEND_URL` | 웹 화면 주소. 로컬 기본값은 `http://localhost:5173` |
+
+Google Console의 승인된 리디렉션 URI에 `http://localhost:5173/login/oauth2/code/google`을 등록한다([Google 설정 안내](https://developers.google.com/identity/protocols/oauth2/web-server#creatingcred)). 로그인은 프론트 화면에서 시작하며, 주소를 바꾸면 `FRONTEND_URL`과 등록된 리디렉션 URI를 함께 맞춘다. 별도 회원가입·비밀번호 입력 화면은 제공하지 않는다.
 
 ```bash
 cp .env.example .env
@@ -66,7 +77,7 @@ cd backend
 ./mvnw spring-boot:run
 ```
 
-IDE 실행 시에도 JDK 21과 `.env`의 `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`를 실행 설정에 등록한다. 서버는 Flyway로 DB 구조를 적용하고 과제 콘텐츠를 등록한다.
+IDE 실행 시에도 JDK 21과 `.env`의 DB·OAuth 환경변수를 실행 설정에 등록한다. 서버는 Flyway로 DB 구조를 적용하고 과제 콘텐츠를 등록한다.
 
 **3. 프론트엔드 실행 — 별도 터미널**
 
@@ -82,7 +93,7 @@ npm run dev
 | API 서버 | http://localhost:8090 |
 | PostgreSQL | localhost:5432 |
 
-Vite가 `/api` 요청을 API 서버로 전달한다. 종료할 때 각 서버를 중지하고 루트에서 `docker compose stop postgres`를 실행한다.
+Vite가 `/api`, `/oauth2`, `/login/oauth2` 요청을 API 서버로 전달한다. 종료할 때 각 서버를 중지하고 루트에서 `docker compose stop postgres`를 실행한다.
 
 ## 빌드·검증
 
@@ -98,7 +109,7 @@ npm test
 
 ```bash
 ./mvnw test
-./mvnw '-Dtest=JudgingApiPostgresTests,SubmissionQueryPostgresTests' -Dalgosteady.postgres.tests=true test
+./mvnw -Dalgosteady.postgres.tests=true test
 ./mvnw '-Dtest=CodeExecutionDockerTests,ExerciseContentDockerTests' -Dalgosteady.docker.tests=true test
 ./mvnw -DskipTests package
 ```
@@ -119,6 +130,9 @@ npm test
 | 2026-10-25 | 홈 개편: 오전 6시 기준 공통 학습 추천, 분류·이름 검색, 9개 카드 페이지네이션과 URL 상태 복원 구현 |
 | 2026-10-25 | 학습 분류 이름·표시 순서·소속 관계를 DB와 조회 API로 관리하고 상세 페이지의 분류 이동 연결 |
 | 2026-10-28 | 분류·과제 콘텐츠·화면 코드의 관리 기준과 향후 관리자 콘텐츠 편집·버전 발행 방향 정리 |
+| 2026-10-28 | OAuth 로그인·회원 자동 등록, 로그인 상태별 헤더·기본 회원 화면, 세션 로그아웃 및 CSRF 처리 구현 |
+| 2026-10-29 | 비회원 예제 실행 유지, 제출·기록 로그인 제한, 회원별 제출·채점 결과 조회 및 브라우저 결과 복구 구분 |
+| 2026-10-29 | 서버 기준 일일 학습 배정, 제출 접수 시각 기준의 회원별 완료 저장·조회, 홈 완료 표시 구현 |
 
 ## 문서
 

@@ -146,12 +146,45 @@ h1, h2, h3, p {
     color: #92949e;
 }
 
-.header-nav {
+.header-links {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-nav {
     color: #6a61bd;
     font-size: 13px;
     text-decoration: none;
     white-space: nowrap;
+    background: transparent;
+    padding: 0;
+}
+
+.account-workspace {
+    max-width: 560px;
+}
+
+.account-panel {
+    text-align: center;
+    padding: 40px;
+}
+
+.oauth-providers {
+    display: grid;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.oauth-login {
+    display: block;
+    text-align: center;
+}
+
+.account-error {
+    margin: 16px 24px;
+    color: #c85e5e;
 }
 
 .local-label {
@@ -213,6 +246,17 @@ a.primary-button, a.secondary-button {
     padding: 28px 0;
     text-align: center;
     color: #746f84;
+}
+
+.daily-completion {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: #e6f4ed;
+    color: #207453;
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .catalog-filters {

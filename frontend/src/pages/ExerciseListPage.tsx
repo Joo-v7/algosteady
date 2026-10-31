@@ -3,7 +3,9 @@ import { useLocation, useSearchParams } from 'react-router'
 import { getExercises, getExerciseGroups } from '../api/exercises'
 import type { ExerciseSummary, ExerciseGroup } from '../api/exercises'
 import ExerciseCard from '../components/ExerciseCard'
-import { getDailyExercise, getPageNumbers } from '../exerciseCatalog'
+import { getPageNumbers } from '../exerciseCatalog'
+import { getDailyLearning } from '../api/learning'
+import type { DailyLearning } from '../api/learning'
 
 const pageSize = 9
 
@@ -11,7 +13,7 @@ function ExerciseListPage() {
     const [exercises, setExercises] = useState<ExerciseSummary[] | null>(null)
     const [exerciseGroups, setExerciseGroups] = useState<ExerciseGroup[]>([])
     const [error, setError] = useState('')
-    const [openedAt] = useState(() => new Date())
+    const [dailyLearning, setDailyLearning] = useState<DailyLearning | null>(null)
     const [searchParams, setSearchParams] = useSearchParams()
     const location = useLocation()
     const categoryId = searchParams.get('category') ?? 'all'
@@ -25,11 +27,12 @@ function ExerciseListPage() {
     useEffect(() => {
         const controller = new AbortController()
 
-        Promise.all([getExercises(controller.signal), getExerciseGroups(controller.signal)])
-            .then(([result, groups]) => {
+        Promise.all([getExercises(controller.signal), getExerciseGroups(controller.signal), getDailyLearning(controller.signal)])
+            .then(([result, groups, daily]) => {
                 if (!controller.signal.aborted) {
                     setExercises(result)
                     setExerciseGroups(groups)
+                    setDailyLearning(daily)
                 }
             })
             .catch(error => {
@@ -57,7 +60,7 @@ function ExerciseListPage() {
     const validPage = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1
     const page = Math.min(validPage, totalPages)
     const visibleExercises = filtered.slice((page - 1) * pageSize, page * pageSize)
-    const dailyExercise = getDailyExercise(exercises ?? [], openedAt)
+    const dailyExercise = exercises?.find(exercise => exercise.id === dailyLearning?.exerciseId)
     const desktopPages = getPageNumbers(page, totalPages, 5)
     const mobilePages = getPageNumbers(page, totalPages, 3)
 
@@ -113,7 +116,7 @@ function ExerciseListPage() {
                 <h1 id="daily-learning-heading" className="home-section-title">오늘의 학습</h1>
                 {error && <p className="home-message" role="alert">{error}</p>}
                 {!error && exercises === null && <p className="home-message" role="status">학습 목록을 불러오는 중입니다.</p>}
-                {dailyExercise && <ExerciseCard exercise={dailyExercise} featured />}
+                {dailyExercise && <ExerciseCard exercise={dailyExercise} featured dailyCompleted={dailyLearning?.completed} />}
                 {!error && exercises?.length === 0 && <p className="home-message">등록된 학습이 없습니다.</p>}
             </section>
 

@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react'
 import Editor, { loader } from '@monaco-editor/react'
 import * as monaco from 'monaco-editor'
 import EditorWorker from 'monaco-editor/editor/editor.worker?worker'
-import { Link, useParams, useSearchParams } from 'react-router'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
+import type { Member } from '../api/auth'
 import { ApiError, getExercise, getExerciseGroups, getReference } from '../api/exercises'
 import type { ExerciseDetails, ExerciseGroup } from '../api/exercises'
 import { createRun, getJob } from '../api/runs'
@@ -29,7 +30,8 @@ const criterionLabels = {
     UNAVAILABLE: '검사 불가'
 }
 
-function ExercisePage() {
+function ExercisePage({ member }: { member: Member | null }) {
+    const navigate = useNavigate()
     const { exerciseId } = useParams()
     const [searchParams, setSearchParams] = useSearchParams()
     const activeTab = searchParams.get('tab') === 'training' ? 'training' : 'learning'
@@ -55,9 +57,10 @@ function ExercisePage() {
     const [requestKind, setRequestKind] = useState<'RUN' | 'GRADING' | null>(null)
     const requests = useRef<AbortController | null>(null)
     const draftKey = exercise ? `algosteady:${exercise.id}:${exercise.version}:c:draft` : ''
-    const jobKey = exercise ? `algosteady:${exercise.id}:${exercise.version}:c:last-job` : ''
+    const memberSuffix = member ? `:member:${member.id}` : ''
+    const jobKey = exercise ? `algosteady:${exercise.id}:${exercise.version}:c${memberSuffix}:last-job` : ''
 
-    const gradingJobKey = exercise ? `algosteady:${exercise.id}:${exercise.version}:c:last-grading-job` : ''
+    const gradingJobKey = exercise && member ? `algosteady:${exercise.id}:${exercise.version}:c${memberSuffix}:last-grading-job` : ''
 
     // 과제 조회 및 저장된 초안·마지막 작업 복구, URL 변경 시 요청 취소
     useEffect(() => {
@@ -84,14 +87,16 @@ function ExercisePage() {
                 setExecutionError('')
                 setGradingError('')
                 setRequestKind(null)
-                // 과제·버전별 저장된 초안과 마지막 작업 ID 복구
+                // 초안 키는 유지하고 회원별 마지막 실행·제출 결과 복구
                 let draft = content.starterCode
                 let savedJob = null
                 let savedGradingJob = null
                 try {
                     draft = localStorage.getItem(`algosteady:${content.id}:${content.version}:c:draft`) ?? draft
-                    savedJob = localStorage.getItem(`algosteady:${content.id}:${content.version}:c:last-job`)
-                    savedGradingJob = localStorage.getItem(`algosteady:${content.id}:${content.version}:c:last-grading-job`)
+                    savedJob = localStorage.getItem(`algosteady:${content.id}:${content.version}:c${memberSuffix}:last-job`)
+                    if (member) {
+                        savedGradingJob = localStorage.getItem(`algosteady:${content.id}:${content.version}:c${memberSuffix}:last-grading-job`)
+                    }
                 } catch {
                     setSaveError('브라우저 저장소를 사용할 수 없습니다.')
                 }
@@ -107,7 +112,7 @@ function ExercisePage() {
             })
 
         return () => controller.abort()
-    }, [exerciseId])
+    }, [exerciseId, memberSuffix, member])
 
     // 실행·제출별 독립 조회, 한쪽 실패 시 다른 쪽 폴링 유지
     useEffect(() => {
@@ -147,17 +152,21 @@ function ExercisePage() {
                 if (controller.signal.aborted) {
                     return
                 }
+                if (error instanceof ApiError && error.status === 401 && member) {
+                    window.location.assign('/login')
+                    return
+                }
                 const message = error instanceof Error ? error.message : '작업 결과를 조회하지 못했습니다.'
                 if (id === jobId) {
-                    setExecutionError(message)
+                    setExecutionError(error instanceof ApiError && error.status === 401 ? '' : message)
                     setRunBusy(false)
                 }
                 if (id === gradingJobId) {
                     setGradingError(`제출 결과를 조회하지 못했습니다. ${message}`)
                 }
 
-                // 없는 작업의 복구 ID만 제거, 통신·서버 오류의 ID는 보존
-                if (error instanceof ApiError && error.status === 404) {
+                // 없는 작업·비회원의 이전 채점 복구 ID 제거, 통신 장애의 ID는 보존
+                if (error instanceof ApiError && (error.status === 404 || (error.status === 401 && !member))) {
                     if (id === jobId) {
                         setRequestKind(id === gradingJobId ? 'GRADING' : 'RUN')
                         setJobId(null)
@@ -189,10 +198,14 @@ function ExercisePage() {
             controller.abort()
             timers.forEach(timer => clearTimeout(timer))
         }
-    }, [jobId, gradingJobId, exercise, exerciseId, jobKey, gradingJobKey])
+    }, [jobId, gradingJobId, exercise, exerciseId, jobKey, gradingJobKey, member])
 
     // 공개 예제 실행 또는 전체 테스트 채점 제출 등록
     async function handleRun(kind: 'RUN' | 'GRADING') {
+        if (kind === 'GRADING' && !member) {
+            navigate('/login')
+            return
+        }
         if (!exercise || !requests.current || runBusy) {
             return
         }
@@ -241,6 +254,10 @@ function ExercisePage() {
             }
         } catch (error) {
             if (!signal.aborted) {
+                if (error instanceof ApiError && error.status === 401) {
+                    window.location.assign('/login')
+                    return
+                }
                 setExecutionError(error instanceof Error ? error.message : '실행 요청을 보내지 못했습니다.')
                 setRunBusy(false)
             }

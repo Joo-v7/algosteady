@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
-import { getExercise } from '../api/exercises'
+import { ApiError, getExercise } from '../api/exercises'
 import type { ExerciseDetails } from '../api/exercises'
 import { getSubmissions } from '../api/submissions'
 import type { SubmissionPage } from '../api/submissions'
@@ -46,6 +46,10 @@ function SubmissionListPage() {
                 }
             } catch (error) {
                 if (!controller.signal.aborted) {
+                    if (error instanceof ApiError && error.status === 401) {
+                        window.location.assign('/login')
+                        return
+                    }
                     setPageState({
                         key,
                         error: error instanceof Error ? error.message : '제출 기록을 조회하지 못했습니다.'

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { getSubmission } from '../api/submissions'
+import { ApiError } from '../api/exercises'
 import type { SubmissionDetails } from '../api/submissions'
 import ExecutionResultPanel from '../components/ExecutionResultPanel'
 
@@ -37,6 +38,10 @@ function SubmissionDetailsPage() {
                 }
             } catch (error) {
                 if (!controller.signal.aborted) {
+                    if (error instanceof ApiError && error.status === 401) {
+                        window.location.assign('/login')
+                        return
+                    }
                     setError(error instanceof Error ? error.message : '제출 상세를 조회하지 못했습니다.')
                 }
             }

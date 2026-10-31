@@ -31,13 +31,18 @@ public class SubmissionQueryService {
 
     /**
      * 과제와 언어별 제출을 최신순으로 조회
+     * @param memberId 인증된 세션의 회원 ID
      * @param exerciseId 조회 또는 실행할 과제 ID
      * @param language 구현 언어 코드
      * @param page 0부터 시작하는 페이지 번호
      * @param size 한 페이지에 조회할 제출 수
      * @return 제출별 작업 요약과 페이지 정보
      */
-    public SubmissionPageResponseDto findAll(String exerciseId, String language, int page, int size) {
+    public SubmissionPageResponseDto findAll(UUID memberId, String exerciseId, String language, int page, int size) {
+        if (memberId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+        }
+
         if (exerciseId.isBlank() || !"c".equals(language)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "과제 ID와 지원 언어를 확인해 주세요.");
         }
@@ -46,8 +51,8 @@ public class SubmissionQueryService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "페이지는 0 이상, 한 페이지의 건수는 1 이상이어야 합니다.");
         }
 
-        // 과제·언어별 제출을 최신순으로 페이지 조회
-        Page<Submission> submissionPage = submissionRepository.findByExerciseIdAndLanguageOrderBySubmittedAtDescIdDesc(exerciseId, language, PageRequest.of(page, size));
+        // 본인 제출만 과제·언어별 최신순으로 페이지 조회
+        Page<Submission> submissionPage = submissionRepository.findByMemberIdAndExerciseIdAndLanguageOrderBySubmittedAtDescIdDesc(memberId, exerciseId, language, PageRequest.of(page, size));
         List<UUID> jobIds = submissionPage.getContent().stream()
                 .map(submission -> submission.getJobId())
                 .toList();
@@ -68,13 +73,18 @@ public class SubmissionQueryService {
 
     /**
      * 제출 원본과 해당 작업의 상세 결과 조회
+     * @param memberId 인증된 세션의 회원 ID
      * @param submissionId 조회할 제출 ID
      * @return 제출 원본과 연결된 채점 결과
      */
-    public SubmissionDetailsResponseDto findById(UUID submissionId) {
-        Submission submission = submissionRepository.findById(submissionId)
+    public SubmissionDetailsResponseDto findById(UUID memberId, UUID submissionId) {
+        if (memberId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+        }
+
+        Submission submission = submissionRepository.findByIdAndMemberId(submissionId, memberId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "제출 기록을 찾을 수 없습니다."));
 
-        return SubmissionDetailsResponseDto.from(submission, judgingQueryService.findById(submission.getJobId()));
+        return SubmissionDetailsResponseDto.from(submission, judgingQueryService.findById(submission.getJobId(), memberId));
     }
 }

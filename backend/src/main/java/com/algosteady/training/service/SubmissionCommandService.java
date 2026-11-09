@@ -7,6 +7,7 @@ import com.algosteady.training.dto.response.SubmissionResponseDto;
 import com.algosteady.training.repository.SubmissionRepository;
 import com.algosteady.learning.domain.DailyLearning;
 import com.algosteady.learning.service.DailyLearningCommandService;
+import com.algosteady.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,8 @@ public class SubmissionCommandService {
 
     private final DailyLearningCommandService dailyLearningCommandService;
 
+    private final MemberRepository memberRepository;
+
     /**
      * 매 요청마다 새 제출과 채점 작업 생성
      * @param memberId 인증된 세션의 회원 ID
@@ -39,6 +42,9 @@ public class SubmissionCommandService {
         if (memberId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
         }
+
+        memberRepository.findByIdForUpdate(memberId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "다시 로그인해 주세요."));
 
         // 같은 접수 시각으로 일일 배정·제출·채점 작업을 원자적으로 등록
         Instant acceptedAt = Instant.now().truncatedTo(ChronoUnit.MICROS);

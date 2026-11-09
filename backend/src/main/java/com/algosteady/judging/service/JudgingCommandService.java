@@ -12,6 +12,7 @@ import com.algosteady.judging.dto.response.RunResponseDto;
 import com.algosteady.judging.runner.model.ExecutionResult;
 import com.algosteady.judging.runner.model.PreparationResult;
 import com.algosteady.judging.runner.model.TestExecutionResult;
+import com.algosteady.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.context.ApplicationEventPublisher;
@@ -40,6 +41,8 @@ public class JudgingCommandService {
     private final JsonMapper jsonMapper;
 
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    private final MemberRepository memberRepository;
 
     /**
      * 서버 콘텐츠에서 공개 예시를 검증한 뒤 작업 저장
@@ -99,6 +102,10 @@ public class JudgingCommandService {
      * @param expected 콘텐츠에 정의된 기대 출력과 종료 조건
      */
     public void saveTest(UUID jobId, TestExecutionResult result, JsonNode expected) {
+        if (findExistingJob(jobId) == null) {
+            return;
+        }
+
         // 줄바꿈 형식 통일 및 마지막 줄바꿈 한 개 제외
         String actualStdout = result.stdout().replace("\r\n", "\n").replace('\r', '\n').replaceFirst("\n$", "");
         String expectedStdout = expected.path("stdout").asString().replace("\r\n", "\n").replace('\r', '\n').replaceFirst("\n$", "");
@@ -117,11 +124,15 @@ public class JudgingCommandService {
      * @param result 컴파일 결과와 테스트별 실행 결과
      */
     public void complete(UUID jobId, ExecutionResult result) {
+        ExecutionJob job = findExistingJob(jobId);
+        if (job == null) {
+            return;
+        }
+
         // 컴파일·프로그램 오류와 실행 환경 장애 구분
         boolean environmentError = result.preparation().status() == PreparationResult.Status.ENVIRONMENT_ERROR
                 || result.tests().stream()
                         .anyMatch(test -> test.status() == TestExecutionResult.Status.ENVIRONMENT_ERROR);
-        ExecutionJob job = executionJobRepository.findById(jobId).orElseThrow();
         job.complete(jsonMapper.writeValueAsString(result.preparation()), environmentError);
 
         if (job.getKind() != ExecutionJob.Kind.GRADING || job.getMemberId() == null || environmentError
@@ -156,7 +167,23 @@ public class JudgingCommandService {
      * @param message 작업 실패 사유
      */
     public void fail(UUID jobId, String message) {
-        executionJobRepository.findById(jobId).orElseThrow().markFailed(message);
+        ExecutionJob job = findExistingJob(jobId);
+        if (job != null) {
+            job.markFailed(message);
+        }
+    }
+
+    /** 탈퇴 삭제와 결과 저장 사이의 회원 잠금 및 삭제된 작업 제외 */
+    private ExecutionJob findExistingJob(UUID jobId) {
+        Optional<ExecutionJob> job = executionJobRepository.findById(jobId);
+        if (job.isEmpty()) {
+            return null;
+        }
+        UUID memberId = job.get().getMemberId();
+        if (memberId != null && memberRepository.findByIdForUpdate(memberId).isEmpty()) {
+            return null;
+        }
+        return job.get();
     }
 
     /**

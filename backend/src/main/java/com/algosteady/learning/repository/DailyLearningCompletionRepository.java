@@ -9,10 +9,19 @@ import org.springframework.data.repository.query.Param;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 /** 회원별 하루 한 번의 학습 완료 저장 및 조회 */
 public interface DailyLearningCompletionRepository extends JpaRepository<DailyLearningCompletion, Long> {
+
+    /**
+     * 회원의 완료 날짜와 증빙 작업을 최신순으로 조회
+     * @param memberId 로그인한 회원 ID
+     * @param learningDate 조회 가능한 마지막 학습 날짜
+     * @return 해당 날짜까지의 완료 기록
+     */
+    List<DailyLearningCompletion> findByMemberIdAndLearningDateLessThanEqualOrderByLearningDateDesc(UUID memberId, LocalDate learningDate);
 
     /**
      * 회원의 학습 날짜별 완료 여부 조회

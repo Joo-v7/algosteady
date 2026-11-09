@@ -3,6 +3,8 @@ package com.algosteady.member.repository;
 import com.algosteady.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Lock;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -11,6 +13,15 @@ import java.util.UUID;
 
 /** OAuth 회원 등록 및 조회 */
 public interface MemberRepository extends JpaRepository<Member, UUID> {
+
+    /**
+     * 제출·채점 저장과 탈퇴 삭제를 회원 단위로 직렬화
+     * @param id 인증된 회원 ID
+     * @return 잠금한 회원, 탈퇴 후에는 빈 값
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT m FROM Member m WHERE m.id = :id")
+    Optional<Member> findByIdForUpdate(@Param("id") UUID id);
 
     /**
      * OAuth 제공자와 제공자 사용자 ID로 회원 조회

@@ -18,4 +18,6 @@ public class DailyLearningResponseDto {
     private String exerciseId;
 
     private boolean completed;
+
+    private boolean attempted;
 }

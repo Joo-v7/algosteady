@@ -5,6 +5,8 @@ import com.algosteady.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -14,6 +16,20 @@ import java.util.UUID;
 public class MemberCommandService {
 
     private final MemberRepository memberRepository;
+
+    /**
+     * 회원과 해당 회원의 제출·채점·학습 기록 삭제
+     * @param memberId 인증된 회원 ID
+     */
+    @Transactional
+    public void withdraw(UUID memberId) {
+        Member member = memberRepository.findByIdForUpdate(memberId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "다시 로그인해 주세요."));
+
+        // 외래 키의 삭제 연쇄로 본인 기록만 원자적으로 삭제
+        memberRepository.delete(member);
+        memberRepository.flush();
+    }
 
     /**
      * 제공자 계정으로 회원을 연결하고 최신 프로필 반영

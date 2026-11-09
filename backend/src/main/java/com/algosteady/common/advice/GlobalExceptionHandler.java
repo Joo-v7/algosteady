@@ -2,6 +2,7 @@ package com.algosteady.common.advice;
 
 import com.algosteady.common.dto.ErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.DisconnectedClientHelper;
 
 /** API 공통 오류 응답 처리 */
 @Slf4j
@@ -56,12 +58,18 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 내부 오류 원인의 서버 로그 보존
+     * 연결 종료의 중복 응답 제외 및 내부 오류 로그 보존
      * @param exception 처리하지 못한 내부 예외
-     * @return 내부 오류를 안내하는 500 응답
+     * @return 내부 오류의 500 응답, 연결 종료 시 응답 작성 없이 null
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDto> handleUnexpected(Exception exception) {
+    public @Nullable ResponseEntity<ErrorResponseDto> handleUnexpected(Exception exception) {
+        // 끊어진 연결에는 오류 응답을 다시 작성하지 않고 DEBUG 한 줄 기록
+        if (DisconnectedClientHelper.isClientDisconnectedException(exception)) {
+            log.debug("클라이언트 연결 종료로 응답 전송 중단: {}", exception.getClass().getSimpleName());
+            return null;
+        }
+
         log.error("API 처리 중 오류가 발생했습니다.", exception);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponseDto.builder()

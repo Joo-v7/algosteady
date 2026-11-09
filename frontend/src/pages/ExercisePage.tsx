@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from 'react'
 import Editor, { loader } from '@monaco-editor/react'
 import * as monaco from 'monaco-editor'
 import EditorWorker from 'monaco-editor/editor/editor.worker?worker'
-import { Link, useParams, useSearchParams } from 'react-router'
-import { ApiError, getExercise, getReference } from '../api/exercises'
-import type { ExerciseDetails } from '../api/exercises'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
+import type { Member } from '../api/auth'
+import { ApiError, getExercise, getExerciseGroups, getReference } from '../api/exercises'
+import type { ExerciseDetails, ExerciseGroup } from '../api/exercises'
 import { createRun, getJob } from '../api/runs'
 import type { Job } from '../api/runs'
 import ExecutionResultPanel from '../components/ExecutionResultPanel'
@@ -29,7 +30,8 @@ const criterionLabels = {
     UNAVAILABLE: '검사 불가'
 }
 
-function ExercisePage() {
+function ExercisePage({ member }: { member: Member | null }) {
+    const navigate = useNavigate()
     const { exerciseId } = useParams()
     const [searchParams, setSearchParams] = useSearchParams()
     const activeTab = searchParams.get('tab') === 'training' ? 'training' : 'learning'
@@ -40,6 +42,7 @@ function ExercisePage() {
     const [referenceViewed, setReferenceViewed] = useState(false)
     const [exampleIndex, setExampleIndex] = useState(0)
     const [exercise, setExercise] = useState<ExerciseDetails | null>(null)
+    const [exerciseGroups, setExerciseGroups] = useState<ExerciseGroup[]>([])
     const [contentError, setContentError] = useState('')
     const [referenceCode, setReferenceCode] = useState('')
     const [referenceLoading, setReferenceLoading] = useState(false)
@@ -54,21 +57,23 @@ function ExercisePage() {
     const [requestKind, setRequestKind] = useState<'RUN' | 'GRADING' | null>(null)
     const requests = useRef<AbortController | null>(null)
     const draftKey = exercise ? `algosteady:${exercise.id}:${exercise.version}:c:draft` : ''
-    const jobKey = exercise ? `algosteady:${exercise.id}:${exercise.version}:c:last-job` : ''
+    const memberSuffix = member ? `:member:${member.id}` : ''
+    const jobKey = exercise ? `algosteady:${exercise.id}:${exercise.version}:c${memberSuffix}:last-job` : ''
 
-    const gradingJobKey = exercise ? `algosteady:${exercise.id}:${exercise.version}:c:last-grading-job` : ''
+    const gradingJobKey = exercise && member ? `algosteady:${exercise.id}:${exercise.version}:c${memberSuffix}:last-grading-job` : ''
 
     // 과제 조회 및 저장된 초안·마지막 작업 복구, URL 변경 시 요청 취소
     useEffect(() => {
         const controller = new AbortController()
         requests.current = controller
 
-        getExercise(exerciseId ?? '', controller.signal)
-            .then(content => {
+        Promise.all([getExercise(exerciseId ?? '', controller.signal), getExerciseGroups(controller.signal)])
+            .then(([content, groups]) => {
                 if (controller.signal.aborted) {
                     return
                 }
                 setExercise(content)
+                setExerciseGroups(groups)
                 setContentError('')
                 setStepIndex(0)
                 setExampleIndex(0)
@@ -82,14 +87,16 @@ function ExercisePage() {
                 setExecutionError('')
                 setGradingError('')
                 setRequestKind(null)
-                // 과제·버전별 저장된 초안과 마지막 작업 ID 복구
+                // 초안 키는 유지하고 회원별 마지막 실행·제출 결과 복구
                 let draft = content.starterCode
                 let savedJob = null
                 let savedGradingJob = null
                 try {
                     draft = localStorage.getItem(`algosteady:${content.id}:${content.version}:c:draft`) ?? draft
-                    savedJob = localStorage.getItem(`algosteady:${content.id}:${content.version}:c:last-job`)
-                    savedGradingJob = localStorage.getItem(`algosteady:${content.id}:${content.version}:c:last-grading-job`)
+                    savedJob = localStorage.getItem(`algosteady:${content.id}:${content.version}:c${memberSuffix}:last-job`)
+                    if (member) {
+                        savedGradingJob = localStorage.getItem(`algosteady:${content.id}:${content.version}:c${memberSuffix}:last-grading-job`)
+                    }
                 } catch {
                     setSaveError('브라우저 저장소를 사용할 수 없습니다.')
                 }
@@ -105,7 +112,7 @@ function ExercisePage() {
             })
 
         return () => controller.abort()
-    }, [exerciseId])
+    }, [exerciseId, memberSuffix, member])
 
     // 실행·제출별 독립 조회, 한쪽 실패 시 다른 쪽 폴링 유지
     useEffect(() => {
@@ -124,7 +131,7 @@ function ExercisePage() {
                 }
                 // 현재 과제의 작업만 해당 결과 영역에 반영
                 if (result.exerciseId !== exercise!.id || result.contentVersion !== exercise!.version || result.language !== 'c') {
-                    throw new Error('현재 과제와 실행 작업의 정보가 다릅니다.')
+                    throw new Error('현재 실습과 실행 작업의 정보가 다릅니다.')
                 }
                 if (id === jobId) {
                     setJob(result)
@@ -145,17 +152,21 @@ function ExercisePage() {
                 if (controller.signal.aborted) {
                     return
                 }
+                if (error instanceof ApiError && error.status === 401 && member) {
+                    window.location.assign('/login')
+                    return
+                }
                 const message = error instanceof Error ? error.message : '작업 결과를 조회하지 못했습니다.'
                 if (id === jobId) {
-                    setExecutionError(message)
+                    setExecutionError(error instanceof ApiError && error.status === 401 ? '' : message)
                     setRunBusy(false)
                 }
                 if (id === gradingJobId) {
                     setGradingError(`제출 결과를 조회하지 못했습니다. ${message}`)
                 }
 
-                // 없는 작업의 복구 ID만 제거, 통신·서버 오류의 ID는 보존
-                if (error instanceof ApiError && error.status === 404) {
+                // 없는 작업·비회원의 이전 채점 복구 ID 제거, 통신 장애의 ID는 보존
+                if (error instanceof ApiError && (error.status === 404 || (error.status === 401 && !member))) {
                     if (id === jobId) {
                         setRequestKind(id === gradingJobId ? 'GRADING' : 'RUN')
                         setJobId(null)
@@ -187,10 +198,14 @@ function ExercisePage() {
             controller.abort()
             timers.forEach(timer => clearTimeout(timer))
         }
-    }, [jobId, gradingJobId, exercise, exerciseId, jobKey, gradingJobKey])
+    }, [jobId, gradingJobId, exercise, exerciseId, jobKey, gradingJobKey, member])
 
     // 공개 예제 실행 또는 전체 테스트 채점 제출 등록
     async function handleRun(kind: 'RUN' | 'GRADING') {
+        if (kind === 'GRADING' && !member) {
+            navigate('/login')
+            return
+        }
         if (!exercise || !requests.current || runBusy) {
             return
         }
@@ -239,6 +254,10 @@ function ExercisePage() {
             }
         } catch (error) {
             if (!signal.aborted) {
+                if (error instanceof ApiError && error.status === 401) {
+                    window.location.assign('/login')
+                    return
+                }
                 setExecutionError(error instanceof Error ? error.message : '실행 요청을 보내지 못했습니다.')
                 setRunBusy(false)
             }
@@ -302,9 +321,9 @@ function ExercisePage() {
         return (
             <main className="workspace">
                 <section className="panel unavailable-page">
-                    <h1>{contentError || '과제를 불러오는 중입니다.'}</h1>
-                    <p>과제 목록에서 학습할 항목을 선택해 주세요.</p>
-                    <Link className="primary-button" to="/exercises">과제 목록으로</Link>
+                    <h1>{contentError || '학습 내용을 불러오는 중입니다.'}</h1>
+                    <p>학습 목록에서 학습할 항목을 선택해 주세요.</p>
+                    <Link className="primary-button" to="/exercises">학습 목록으로</Link>
                 </section>
             </main>
         )
@@ -321,6 +340,7 @@ function ExercisePage() {
     const isRecursion = exercise.category === 'recursion'
     const presentation = getExercisePresentation(exercise)
     const categoryLabel = presentation.label
+    const categoryGroup = exerciseGroups.find(group => group.categories.includes(exercise.category))
     const restoredKind = jobId && jobId === gradingJobId ? 'GRADING' : 'RUN'
     const resultKind = job?.kind ?? requestKind ?? restoredKind
 
@@ -378,7 +398,7 @@ function ExercisePage() {
             {saveError && <p role="alert">{saveError}</p>}
             {/* 과제 제목 */}
             <div className="breadcrumb">
-                <Link to="/exercises">과제 목록</Link> <span>/</span> {categoryLabel} <span>/</span> <strong>{exercise.title}</strong>
+                <Link to="/exercises">학습 목록</Link> <span>/</span> <Link to={`/exercises?category=${categoryGroup?.id ?? exercise.category}#catalog-heading`}>{categoryGroup?.label ?? categoryLabel}</Link> <span>/</span> <strong>{exercise.title}</strong>
             </div>
             <section className="exercise-heading">
                 <div>
@@ -389,11 +409,11 @@ function ExercisePage() {
                     </h1>
                     <p>{presentation.introduction}</p>
                 </div>
-                <Link className="primary-button" to={`/exercises/${exerciseId}/submissions`}>제출 기록</Link>
+                <Link className="primary-button" to={`/exercises/${exerciseId}/submissions`}>제출 기록 <span aria-hidden="true">→</span></Link>
             </section>
 
             {/* 학습·실습 탭 */}
-            <div className="tabs" role="tablist" aria-label="과제 화면">
+            <div className="tabs" role="tablist" aria-label="학습·실습 화면">
                 <button
                     id="learning-tab"
                     role="tab"
@@ -600,7 +620,7 @@ function ExercisePage() {
                     <aside className="side-column">
                         {/* 채점 기준 */}
                         <section className="panel criteria-panel">
-                            <div className="section-label">실습 체크포인트</div>
+                            <div className="section-label">제출 체크포인트</div>
                             <h2>채점 기준 <span>{exercise.criteria.length}</span></h2>
                             {gradingError && <p role="alert">{gradingError}</p>}
                             <p>각 기준에 연결된 테스트로<br />구현을 확인합니다.</p>

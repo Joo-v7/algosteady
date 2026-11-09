@@ -37,7 +37,7 @@ export function getJobPresentation(job: Job | null, kind: Job['kind'], pending =
                 } else if (resultError) {
                     resultLabel = '채점 오류'
                 } else {
-                    resultLabel = '모든 기준 통과'
+                    resultLabel = '통과'
                 }
                 break
             case 'RUN':

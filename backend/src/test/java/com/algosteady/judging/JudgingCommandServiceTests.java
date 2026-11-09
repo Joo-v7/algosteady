@@ -50,7 +50,9 @@ class JudgingCommandServiceTests {
     void saveTest_normalizesOnlyLineEndings() {
         // given
         JsonNode expected = jsonMapper.readTree("{\"stdout\":\"OK\\n\",\"exitCode\":1,\"stderrRequired\":true}");
-        UUID jobId = UUID.randomUUID();
+        ExecutionJob job = ExecutionJob.create("stack-array", "1.0.0", "c", "code", "example");
+        UUID jobId = job.getId();
+        Mockito.when(executionJobRepository.findById(jobId)).thenReturn(Optional.of(job));
 
         // when
         judgingCommandService.saveTest(jobId, new TestExecutionResult("example", TestExecutionResult.Status.COMPLETED, "OK\r\n", "error", 1, 10L, null), expected);

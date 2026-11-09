@@ -1,5 +1,11 @@
 export type ExerciseCategory = 'stack' | 'queue' | 'deque' | 'linked-list' | 'recursion' | 'tree' | 'heap' | 'hash' | 'set' | 'search' | 'sort' | 'graph' | 'string' | 'trie' | 'exhaustive' | 'backtracking' | 'greedy' | 'dp' | 'two-pointer' | 'sliding-window'
 
+export interface ExerciseGroup {
+    id: string
+    label: string
+    categories: ExerciseCategory[]
+}
+
 export interface ExpectedOutput {
     stdout: string
     exitCode: number
@@ -308,11 +314,24 @@ export class ApiError extends Error {
 
 // API 요청 및 공통 오류 응답 처리
 export async function requestApi<T>(url: string, options?: RequestInit): Promise<T> {
-    const response = await fetch(url, options)
+    const method = options?.method?.toUpperCase() ?? 'GET'
+    const headers = new Headers(options?.headers)
+
+    // 로그인·로그아웃으로 바뀐 세션에 맞춰 변경 요청 직전 CSRF 토큰 조회
+    if (method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS') {
+        const csrf = await requestApi<{ headerName: string; token: string }>('/api/auth/csrf', { signal: options?.signal })
+        headers.set(csrf.headerName, csrf.token)
+    }
+
+    const response = await fetch(url, { ...options, headers })
 
     if (!response.ok) {
         const error = await response.json().catch(() => null)
         throw new ApiError(error?.message ?? '서버에 연결하지 못했습니다.', response.status)
+    }
+
+    if (response.status === 204) {
+        return undefined as T
     }
 
     return response.json()
@@ -320,6 +339,10 @@ export async function requestApi<T>(url: string, options?: RequestInit): Promise
 
 export function getExercises(signal: AbortSignal) {
     return requestApi<ExerciseSummary[]>('/api/exercises', { signal })
+}
+
+export function getExerciseGroups(signal: AbortSignal) {
+    return requestApi<ExerciseGroup[]>('/api/exercises/categories', { signal })
 }
 
 export function getExercise(id: string, signal: AbortSignal) {

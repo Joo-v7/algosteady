@@ -37,6 +37,8 @@ public class ExecutionJob {
     @Id
     private UUID id;
 
+    private UUID memberId;
+
     @Column(nullable = false)
     private String exerciseId;
 
@@ -100,14 +102,19 @@ public class ExecutionJob {
 
     /**
      * 전체 테스트를 실행할 채점 작업 생성
+     * @param memberId 제출한 회원 ID
      * @param exerciseId 조회 또는 실행할 과제 ID
      * @param contentVersion 조회 또는 실행할 콘텐츠 버전
      * @param language 구현 언어 코드
      * @param code 사용자가 작성한 코드 원본
+     * @param acceptedAt 서버에서 제출을 접수한 시각
      * @return 새로 생성한 대기 작업
      */
-    public static ExecutionJob createGrading(String exerciseId, String contentVersion, String language, String code) {
-        return new ExecutionJob(exerciseId, contentVersion, language, code, null);
+    public static ExecutionJob createGrading(UUID memberId, String exerciseId, String contentVersion, String language, String code, Instant acceptedAt) {
+        ExecutionJob job = new ExecutionJob(exerciseId, contentVersion, language, code, null);
+        job.memberId = memberId;
+        job.queuedAt = acceptedAt;
+        return job;
     }
 
     /**

@@ -10,6 +10,12 @@ export default defineConfig({
             '/api': {
                 target: 'http://localhost:8090',
             },
+            '/oauth2': {
+                target: 'http://localhost:8090',
+            },
+            '/login/oauth2': {
+                target: 'http://localhost:8090',
+            },
         },
     },
 })

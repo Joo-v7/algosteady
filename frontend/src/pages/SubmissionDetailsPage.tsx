@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { getSubmission } from '../api/submissions'
+import { ApiError } from '../api/exercises'
 import type { SubmissionDetails } from '../api/submissions'
 import ExecutionResultPanel from '../components/ExecutionResultPanel'
 
@@ -37,6 +38,10 @@ function SubmissionDetailsPage() {
                 }
             } catch (error) {
                 if (!controller.signal.aborted) {
+                    if (error instanceof ApiError && error.status === 401) {
+                        window.location.assign('/login')
+                        return
+                    }
                     setError(error instanceof Error ? error.message : '제출 상세를 조회하지 못했습니다.')
                 }
             }
@@ -55,7 +60,7 @@ function SubmissionDetailsPage() {
             <main className="workspace">
                 <section className="panel unavailable-page">
                     <h1>{error || '제출 기록을 불러오는 중입니다.'}</h1>
-                    <Link className="primary-button" to="/exercises">과제 목록으로</Link>
+                    <Link className="primary-button" to="/exercises">학습 목록으로</Link>
                 </section>
             </main>
         )
@@ -66,7 +71,7 @@ function SubmissionDetailsPage() {
     return (
         <main className="workspace">
             <div className="breadcrumb">
-                <Link to="/exercises">과제 목록</Link> <span>/</span>
+                <Link to="/exercises">학습 목록</Link> <span>/</span>
                 <Link to={`/exercises/${submission.exerciseId}/submissions?page=${encodeURIComponent(historyPage)}`}>제출 기록</Link> <span>/</span> 상세
             </div>
             <section className="exercise-heading">

@@ -146,12 +146,90 @@ h1, h2, h3, p {
     color: #92949e;
 }
 
-.header-nav {
+.header-links {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-nav {
     color: #6a61bd;
     font-size: 13px;
     text-decoration: none;
     white-space: nowrap;
+    background: transparent;
+    padding: 0;
+}
+
+.workspace.account-workspace {
+    max-width: 560px;
+    min-height: calc(100dvh - 82px);
+    display: flex;
+    align-items: flex-start;
+    padding-block: clamp(48px, 18dvh, 160px) 24px;
+}
+
+.login-panel {
+    width: 100%;
+}
+
+.account-panel {
+    text-align: center;
+    padding: 40px;
+}
+
+.oauth-providers {
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 50px;
+}
+
+.oauth-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.login-panel h1 {
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+/* Google 공식 밝은 테마: 로고 원본·여백·테두리 유지 */
+.google-login {
+    box-sizing: border-box;
+    min-height: 40px;
+    max-width: 100%;
+    padding: 0 12px;
+    gap: 10px;
+    border: 1px solid #747775;
+    border-radius: 4px;
+    background: #fff;
+    color: #1f1f1f;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    text-decoration: none;
+}
+
+.google-login img {
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.google-login:hover {
+    background: #f8faff;
+    box-shadow: 0 1px 2px #3c404326;
+}
+
+.account-error {
+    margin: 16px 24px;
+    color: #c85e5e;
 }
 
 .local-label {
@@ -197,17 +275,158 @@ a.primary-button, a.secondary-button {
     text-decoration: none;
 }
 
+.home-section-title {
+    display: block;
+    margin: 12px 0 28px;
+    text-align: center;
+    font-size: 26px;
+    scroll-margin-top: 24px;
+}
+
+.catalog-section {
+    margin-top: 56px;
+}
+
+.home-message {
+    padding: 28px 0;
+    text-align: center;
+    color: #746f84;
+}
+
+.daily-completion {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: #e6f4ed;
+    color: #207453;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.daily-completion[data-status="in-progress"] {
+    background: #fbecec;
+    color: #b94040;
+}
+
+
+.catalog-filters {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.catalog-category {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: #656174;
+}
+
+.catalog-category select,
+.catalog-search input {
+    height: 44px;
+    border: 1px solid #dedbe8;
+    border-radius: 7px;
+    background: #fff;
+    font: inherit;
+    color: #514d61;
+}
+
+.catalog-select {
+    position: relative;
+    width: 160px;
+}
+
+.catalog-category select {
+    width: 100%;
+    padding: 0 38px 0 12px;
+    appearance: none;
+}
+
+.catalog-select svg {
+    position: absolute;
+    top: 13px;
+    right: 12px;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: #82778e;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+.catalog-search {
+    position: relative;
+    width: 320px;
+    min-width: 0;
+}
+
+.catalog-search input {
+    width: 100%;
+    padding: 0 14px;
+}
+
+.catalog-search input::-webkit-search-cancel-button {
+    cursor: pointer;
+}
+
+.catalog-query {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 44px;
+    flex-shrink: 0;
+}
+
+.catalog-query svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+}
+
+.catalog-filters :focus-visible,
+.catalog-pagination button:focus-visible {
+    outline: 2px solid #6a61cb;
+    outline-offset: 3px;
+}
+
 .exercise-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 24px;
 }
 
 .exercise-card {
-    max-width: 580px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
-.exercise-card > p {
+.exercise-card-content {
+    min-width: 0;
+}
+
+.exercise-card h2,
+.exercise-card h3 {
+    margin-top: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.exercise-card h3 {
+    font-size: 19px;
+}
+
+.exercise-card-description {
     margin-top: 16px;
     color: #746f84;
     font-size: 14px;
@@ -216,9 +435,68 @@ a.primary-button, a.secondary-button {
 
 .exercise-card-actions {
     display: flex;
+    justify-content: flex-end;
     gap: 12px;
     flex-wrap: wrap;
-    margin-top: 28px;
+    margin-top: auto;
+    padding-top: 28px;
+}
+
+.featured-exercise-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+}
+
+.featured-exercise-card .exercise-card-content {
+    flex: 1;
+}
+
+.featured-exercise-card h2 {
+    font-size: 24px;
+}
+
+.featured-exercise-card .exercise-card-actions {
+    flex-shrink: 0;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.catalog-pagination,
+.pagination-pages {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.catalog-pagination {
+    margin-top: 32px;
+}
+
+.catalog-pagination button {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: transparent;
+    color: #716982;
+    font-size: 14px;
+}
+
+.catalog-pagination button:hover:not(:disabled) {
+    background: #eeebf8;
+}
+
+.catalog-pagination button[aria-current="page"] {
+    background: #6a61cb;
+    color: #fff;
+}
+
+.pagination-pages-mobile {
+    display: none;
 }
 
 .unavailable-page {
@@ -1810,6 +2088,10 @@ h1 {
 }
 
 @media (max-width: 1000px) {
+    .exercise-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .workspace {
         padding: 28px 24px 0;
     }
@@ -1836,9 +2118,62 @@ h1 {
 }
 
 @media (max-width: 760px) {
+    .exercise-list {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .featured-exercise-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 24px;
+    }
+
+    .catalog-filters {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+    }
+
+    .catalog-category {
+        grid-column: 1 / -1;
+    }
+
+    .catalog-category,
+    .catalog-search {
+        width: 100%;
+    }
+
+    .catalog-select {
+        flex: 1;
+        width: auto;
+        min-width: 0;
+    }
+
+    .pagination-pages-desktop {
+        display: none;
+    }
+
+    .pagination-pages-mobile {
+        display: flex;
+    }
+
+    .catalog-pagination,
+    .pagination-pages {
+        gap: 6px;
+    }
+
+    .catalog-pagination button {
+        width: 34px;
+        height: 34px;
+    }
+
     .site-header {
         height: 66px;
         padding: 0 20px;
+    }
+
+    .workspace.account-workspace {
+        min-height: calc(100dvh - 66px);
     }
 
     .brand {
@@ -2162,4 +2497,175 @@ h1 {
 
 .window-summary strong {
     margin-left: 6px;
+}
+
+/* 마이페이지 학습 현황과 연도별 완료 기록 */
+.mypage-workspace {
+    max-width: 1120px;
+}
+
+.mypage-workspace h1 {
+    justify-content: center;
+}
+
+.learning-summary,
+.learning-history {
+    padding: 32px;
+    margin-top: 24px;
+}
+
+.learning-summary h2,
+.learning-history h2 {
+    text-align: center;
+}
+
+.learning-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    text-align: center;
+    margin: 28px 0;
+}
+
+.learning-stats dt {
+    color: #777a85;
+    font-size: 14px;
+}
+
+.learning-stats dd {
+    margin: 12px 0 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #6a61bd;
+}
+
+.learning-stats small {
+    margin-left: 4px;
+    font-size: 14px;
+}
+
+.learning-note {
+    color: #777a85;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.7;
+}
+
+.learning-year {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 24px 0;
+}
+
+.learning-calendar-scroll {
+    overflow-x: auto;
+    padding: 4px;
+}
+
+.learning-calendar {
+    display: grid;
+    gap: 4px;
+    width: max-content;
+    margin: 0 auto;
+}
+
+.learning-months {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    font-size: 10px;
+    color: #777a85;
+    height: 20px;
+}
+
+.learning-months span {
+    white-space: nowrap;
+}
+
+.learning-days {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    grid-template-rows: repeat(7, 14px);
+    grid-auto-flow: column;
+    gap: 4px;
+}
+
+.learning-day {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: #e7e8ec;
+}
+
+.learning-day.is-completed {
+    background: #47976a;
+}
+
+.learning-day.is-future {
+    background: #f3f3f6;
+}
+
+.learning-day.is-padding {
+    visibility: hidden;
+}
+
+a.learning-day:hover,
+a.learning-day:focus-visible {
+    outline: 2px solid #6a61bd;
+    outline-offset: 2px;
+}
+
+.learning-legend {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    font-size: 12px;
+    color: #777a85;
+}
+
+@media (max-width: 600px) {
+    .learning-summary,
+    .learning-history {
+        padding: 20px 16px;
+    }
+
+    .learning-stats {
+        gap: 8px;
+    }
+
+    .learning-stats dd {
+        font-size: 20px;
+    }
+
+    .learning-calendar {
+        margin-left: 0;
+    }
+}
+
+/* 학습 기록 아래의 회원탈퇴 */
+.withdrawal-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    margin: 24px 0;
+    color: #b94040;
+    font-size: 13px;
+}
+
+.withdrawal-button {
+    background: transparent;
+    color: #777a85;
+    padding: 8px 0;
+    font-size: 12px;
+    text-decoration: underline;
+}
+
+.withdrawal-button:hover {
+    color: #b94040;
 }

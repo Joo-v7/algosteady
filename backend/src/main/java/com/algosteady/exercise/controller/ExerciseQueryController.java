@@ -1,6 +1,7 @@
 package com.algosteady.exercise.controller;
 
 import com.algosteady.exercise.dto.response.ExerciseDetailsResponseDto;
+import com.algosteady.exercise.dto.response.ExerciseCategoryResponseDto;
 import com.algosteady.exercise.dto.response.ExerciseSummaryResponseDto;
 import com.algosteady.exercise.dto.response.ReferenceResponseDto;
 import com.algosteady.exercise.service.ExerciseQueryService;
@@ -28,6 +29,15 @@ public class ExerciseQueryController {
     @GetMapping
     public List<ExerciseSummaryResponseDto> findAll() {
         return exerciseQueryService.findAll();
+    }
+
+    /**
+     * 표시 순서에 따른 학습 분류 조회
+     * @return 분류 이름과 소속 콘텐츠 분류 목록
+     */
+    @GetMapping("/categories")
+    public List<ExerciseCategoryResponseDto> findCategories() {
+        return exerciseQueryService.findCategories();
     }
 
     /**

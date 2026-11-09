@@ -29,6 +29,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.time.Instant;
 
 /** 채점 기준별 상태 및 원본 테스트 연결 검증 */
 @ExtendWith(MockitoExtension.class)
@@ -49,6 +51,7 @@ class JudgingQueryServiceTests {
     @Spy
     private JsonMapper jsonMapper = JsonMapper.builder().build();
 
+    private final UUID memberId = UUID.randomUUID();
     private ExecutionJob executionJob;
     private final List<ExecutionTestResult> storedResults = new ArrayList<>();
     private JsonNode testContents;
@@ -58,7 +61,7 @@ class JudgingQueryServiceTests {
     void setUp() throws Exception {
         ObjectNode snapshot = jsonMapper.createObjectNode();
         exerciseMetadata = jsonMapper.readTree(new ClassPathResource("content/stack-array/exercise.json").getContentAsString(StandardCharsets.UTF_8));
-        executionJob = ExecutionJob.createGrading(exerciseMetadata.path("id").asString(), exerciseMetadata.path("version").asString(), "c", "code");
+        executionJob = ExecutionJob.createGrading(memberId, exerciseMetadata.path("id").asString(), exerciseMetadata.path("version").asString(), "c", "code", Instant.now());
         snapshot.set("exercise", exerciseMetadata);
         testContents = jsonMapper.readTree(new ClassPathResource("content/stack-array/c/tests.json").getContentAsString(StandardCharsets.UTF_8));
         snapshot.putObject("sources").putObject("c").set("tests", testContents);
@@ -77,7 +80,7 @@ class JudgingQueryServiceTests {
         executionJob.complete("{}", false);
 
         // when
-        JobResponseDto response = judgingQueryService.findById(executionJob.getId());
+        JobResponseDto response = judgingQueryService.findById(executionJob.getId(), memberId);
 
         // then
         Assertions.assertEquals(testContents.size(), response.getTests().size());
@@ -97,7 +100,7 @@ class JudgingQueryServiceTests {
         executionJob.markRunning();
 
         // when
-        JobResponseDto beforeTests = judgingQueryService.findById(executionJob.getId());
+        JobResponseDto beforeTests = judgingQueryService.findById(executionJob.getId(), memberId);
 
         // then
         Assertions.assertEquals("RUNNING", beforeTests.getCriteria().getFirst().getStatus());
@@ -106,7 +109,7 @@ class JudgingQueryServiceTests {
         storedResults.add(createStoredResult(testContents.get(0), TestExecutionResult.Status.COMPLETED, true));
 
         // when
-        JobResponseDto afterFirstTest = judgingQueryService.findById(executionJob.getId());
+        JobResponseDto afterFirstTest = judgingQueryService.findById(executionJob.getId(), memberId);
 
         // then
         Assertions.assertEquals("RUNNING", afterFirstTest.getCriteria().getFirst().getStatus());
@@ -115,7 +118,7 @@ class JudgingQueryServiceTests {
         storedResults.add(createStoredResult(testContents.get(1), TestExecutionResult.Status.COMPLETED, true));
 
         // when
-        JobResponseDto afterCriterionCompleted = judgingQueryService.findById(executionJob.getId());
+        JobResponseDto afterCriterionCompleted = judgingQueryService.findById(executionJob.getId(), memberId);
 
         // then
         Assertions.assertEquals("PASSED", afterCriterionCompleted.getCriteria().get(0).getStatus());
@@ -131,7 +134,7 @@ class JudgingQueryServiceTests {
         executionJob.markFailed("서버 중단");
 
         // when
-        JobResponseDto response = judgingQueryService.findById(executionJob.getId());
+        JobResponseDto response = judgingQueryService.findById(executionJob.getId(), memberId);
 
         // then
         Assertions.assertEquals("FAILED", response.getCriteria().getFirst().getStatus());
@@ -150,7 +153,7 @@ class JudgingQueryServiceTests {
         executionJob.complete("{}", false);
 
         // when
-        JobResponseDto response = judgingQueryService.findById(executionJob.getId());
+        JobResponseDto response = judgingQueryService.findById(executionJob.getId(), memberId);
 
         // then
         Assertions.assertTrue(response.getCriteria().stream()
@@ -167,7 +170,7 @@ class JudgingQueryServiceTests {
         executionJob.complete("{}", true);
 
         // when
-        JobResponseDto response = judgingQueryService.findById(executionJob.getId());
+        JobResponseDto response = judgingQueryService.findById(executionJob.getId(), memberId);
 
         // then
         Assertions.assertEquals("PASSED", response.getCriteria().getFirst().getStatus());
@@ -199,7 +202,7 @@ class JudgingQueryServiceTests {
         Mockito.when(executionTestResultRepository.findSummariesByJobIds(List.of(executionJob.getId()))).thenReturn(testSummaries);
 
         // when
-        JobResponseDto details = judgingQueryService.findById(executionJob.getId());
+        JobResponseDto details = judgingQueryService.findById(executionJob.getId(), memberId);
         JobSummaryResponseDto summary = judgingQueryService.findSummariesByIds(List.of(executionJob.getId())).get(executionJob.getId());
 
         // then

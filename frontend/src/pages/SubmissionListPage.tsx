@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
-import { getExercise } from '../api/exercises'
+import { ApiError, getExercise } from '../api/exercises'
 import type { ExerciseDetails } from '../api/exercises'
 import { getSubmissions } from '../api/submissions'
 import type { SubmissionPage } from '../api/submissions'
@@ -46,6 +46,10 @@ function SubmissionListPage() {
                 }
             } catch (error) {
                 if (!controller.signal.aborted) {
+                    if (error instanceof ApiError && error.status === 401) {
+                        window.location.assign('/login')
+                        return
+                    }
                     setPageState({
                         key,
                         error: error instanceof Error ? error.message : '제출 기록을 조회하지 못했습니다.'
@@ -123,16 +127,16 @@ function SubmissionListPage() {
     return (
         <main className="workspace">
             <div className="breadcrumb">
-                <Link to="/exercises">과제 목록</Link> <span>/</span>
+                <Link to="/exercises">학습 목록</Link> <span>/</span>
                 <Link to={`/exercises/${exerciseId}`}>{exercise?.title ?? exerciseId}</Link> <span>/</span> 제출 기록
             </div>
             <section className="exercise-heading">
                 <div>
                     <div className="eyebrow">SUBMISSION HISTORY</div>
-                    <h1>{exercise?.title ?? '과제'} · 제출 기록</h1>
+                    <h1>{exercise?.title ?? '실습'} · 제출 기록</h1>
                     <p>C · 제출 코드와 채점 결과를 확인합니다.</p>
                 </div>
-                <Link className="primary-button" to={`/exercises/${exerciseId}?tab=training`}>실습하기로</Link>
+                <Link className="primary-button" to={`/exercises/${exerciseId}?tab=training`}><span aria-hidden="true">←</span> 실습하기</Link>
             </section>
             <section className="panel history-panel" aria-busy={loading}>
                 {historyContent}

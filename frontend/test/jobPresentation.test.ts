@@ -48,7 +48,7 @@ function completedJob(kind: Job['kind'] = 'GRADING'): Job {
 
 test('실행과 제출은 같은 결과를 서로 다른 문구로 표시한다', () => {
     assert.equal(getJobPresentation(completedJob('RUN'), 'RUN').resultLabel, '정상')
-    assert.equal(getJobPresentation(completedJob(), 'GRADING').resultLabel, '모든 기준 통과')
+    assert.equal(getJobPresentation(completedJob(), 'GRADING').resultLabel, '통과')
     const job = completedJob()
     job.tests[0].passed = false
     assert.equal(getJobPresentation(job, 'GRADING').resultLabel, '일부 기준 실패')

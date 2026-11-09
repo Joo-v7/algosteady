@@ -3,6 +3,8 @@ package com.algosteady.judging.service;
 import com.algosteady.exercise.service.ExerciseQueryService;
 import com.algosteady.judging.domain.ExecutionJob;
 import com.algosteady.judging.domain.ExecutionTestResult;
+import com.algosteady.judging.domain.CriterionProgress;
+import com.algosteady.judging.domain.GradingPassedEvent;
 import com.algosteady.judging.repository.ExecutionJobRepository;
 import com.algosteady.judging.repository.ExecutionTestResultRepository;
 import com.algosteady.judging.dto.request.RunRequestDto;
@@ -10,14 +12,19 @@ import com.algosteady.judging.dto.response.RunResponseDto;
 import com.algosteady.judging.runner.model.ExecutionResult;
 import com.algosteady.judging.runner.model.PreparationResult;
 import com.algosteady.judging.runner.model.TestExecutionResult;
+import com.algosteady.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.time.Instant;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /** 실행 요청 등록 및 작업 상태 변경 */
 @Service
@@ -32,6 +39,10 @@ public class JudgingCommandService {
     private final ExerciseQueryService exerciseQueryService;
 
     private final JsonMapper jsonMapper;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    private final MemberRepository memberRepository;
 
     /**
      * 서버 콘텐츠에서 공개 예시를 검증한 뒤 작업 저장
@@ -51,15 +62,17 @@ public class JudgingCommandService {
 
     /**
      * 지정 버전의 전체 테스트를 실행할 채점 작업 저장
+     * @param memberId 제출한 회원 ID
      * @param exerciseId 조회 또는 실행할 과제 ID
      * @param contentVersion 조회 또는 실행할 콘텐츠 버전
      * @param language 구현 언어 코드
      * @param code 사용자가 작성한 코드 원본
+     * @param acceptedAt 서버에서 제출을 접수한 시각
      * @return 생성한 채점 작업 ID
      */
-    public UUID registerGrading(String exerciseId, String contentVersion, String language, String code) {
+    public UUID registerGrading(UUID memberId, String exerciseId, String contentVersion, String language, String code, Instant acceptedAt) {
         exerciseQueryService.findSnapshot(exerciseId, contentVersion, language);
-        ExecutionJob job = ExecutionJob.createGrading(exerciseId, contentVersion, language, code);
+        ExecutionJob job = ExecutionJob.createGrading(memberId, exerciseId, contentVersion, language, code, acceptedAt);
         executionJobRepository.save(job);
 
         return job.getId();
@@ -89,6 +102,10 @@ public class JudgingCommandService {
      * @param expected 콘텐츠에 정의된 기대 출력과 종료 조건
      */
     public void saveTest(UUID jobId, TestExecutionResult result, JsonNode expected) {
+        if (findExistingJob(jobId) == null) {
+            return;
+        }
+
         // 줄바꿈 형식 통일 및 마지막 줄바꿈 한 개 제외
         String actualStdout = result.stdout().replace("\r\n", "\n").replace('\r', '\n').replaceFirst("\n$", "");
         String expectedStdout = expected.path("stdout").asString().replace("\r\n", "\n").replace('\r', '\n').replaceFirst("\n$", "");
@@ -107,11 +124,41 @@ public class JudgingCommandService {
      * @param result 컴파일 결과와 테스트별 실행 결과
      */
     public void complete(UUID jobId, ExecutionResult result) {
+        ExecutionJob job = findExistingJob(jobId);
+        if (job == null) {
+            return;
+        }
+
         // 컴파일·프로그램 오류와 실행 환경 장애 구분
         boolean environmentError = result.preparation().status() == PreparationResult.Status.ENVIRONMENT_ERROR
                 || result.tests().stream()
                         .anyMatch(test -> test.status() == TestExecutionResult.Status.ENVIRONMENT_ERROR);
-        executionJobRepository.findById(jobId).orElseThrow().complete(jsonMapper.writeValueAsString(result.preparation()), environmentError);
+        job.complete(jsonMapper.writeValueAsString(result.preparation()), environmentError);
+
+        if (job.getKind() != ExecutionJob.Kind.GRADING || job.getMemberId() == null || environmentError
+                || result.preparation().status() != PreparationResult.Status.SUCCEEDED) {
+            return;
+        }
+
+        // 상세·기록 조회와 같은 필수 테스트 집계로 전체 기준 통과 확인
+        JsonNode snapshot = exerciseQueryService.findSnapshot(job.getExerciseId(), job.getContentVersion(), job.getLanguage());
+        JsonNode tests = snapshot.path("sources").path(job.getLanguage()).path("tests");
+        JsonNode criteria = snapshot.path("exercise").path("criteria");
+        Set<String> passedTestIds = executionTestResultRepository.findAllByJobId(jobId).stream()
+                .filter(ExecutionTestResult::isPassed)
+                .map(ExecutionTestResult::getTestId)
+                .collect(Collectors.toSet());
+        if (criteria.isEmpty()) {
+            return;
+        }
+        for (JsonNode criterion : criteria) {
+            CriterionProgress progress = CriterionProgress.calculate(criterion.path("id").asString(), tests, passedTestIds);
+            if (progress.testIds().isEmpty() || !progress.isPassed()) {
+                return;
+            }
+        }
+
+        applicationEventPublisher.publishEvent(new GradingPassedEvent(jobId, job.getMemberId(), job.getExerciseId(), job.getQueuedAt(), job.getCompletedAt()));
     }
 
     /**
@@ -120,7 +167,23 @@ public class JudgingCommandService {
      * @param message 작업 실패 사유
      */
     public void fail(UUID jobId, String message) {
-        executionJobRepository.findById(jobId).orElseThrow().markFailed(message);
+        ExecutionJob job = findExistingJob(jobId);
+        if (job != null) {
+            job.markFailed(message);
+        }
+    }
+
+    /** 탈퇴 삭제와 결과 저장 사이의 회원 잠금 및 삭제된 작업 제외 */
+    private ExecutionJob findExistingJob(UUID jobId) {
+        Optional<ExecutionJob> job = executionJobRepository.findById(jobId);
+        if (job.isEmpty()) {
+            return null;
+        }
+        UUID memberId = job.get().getMemberId();
+        if (memberId != null && memberRepository.findByIdForUpdate(memberId).isEmpty()) {
+            return null;
+        }
+        return job.get();
     }
 
     /**

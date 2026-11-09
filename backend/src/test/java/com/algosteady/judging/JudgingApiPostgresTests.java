@@ -16,6 +16,9 @@ import com.algosteady.training.dto.response.SubmissionResponseDto;
 import com.algosteady.training.repository.SubmissionRepository;
 import com.algosteady.training.service.SubmissionCommandService;
 import jakarta.persistence.EntityManager;
+import com.algosteady.member.service.MemberCommandService;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,9 +44,14 @@ import tools.jackson.databind.json.JsonMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.time.Instant;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -87,12 +95,22 @@ class JudgingApiPostgresTests {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
+    @Autowired
+    private MemberCommandService memberCommandService;
+
+    private UUID memberId;
+
     private MockMvc mockMvc;
     private String stackContentVersion;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        memberId = memberCommandService.login("test", UUID.randomUUID().toString(), "test@example.com", "기록 검증 회원").getId();
+        DefaultOAuth2User principal = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority("OIDC_USER")), Map.of("member_id", memberId.toString()), "member_id");
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .defaultRequest(get("/").with(oauth2Login().oauth2User(principal)).with(csrf()))
+                .apply(springSecurity())
+                .build();
         stackContentVersion = exerciseQueryService.findDetails("stack-array", "c").getVersion();
     }
 
@@ -177,10 +195,10 @@ class JudgingApiPostgresTests {
     @DisplayName("재시작 복구는 실행 중인 작업만 실패로 바꾸고 대기 작업을 보존합니다.")
     void recover_success_onlyRunningJobs() {
         // given
-        ExecutionJob running = ExecutionJob.createGrading("stack-array", stackContentVersion, "c", "code");
+        ExecutionJob running = ExecutionJob.createGrading(memberId, "stack-array", stackContentVersion, "c", "code", Instant.now());
         running.markRunning();
         executionJobRepository.save(running);
-        ExecutionJob queued = executionJobRepository.save(ExecutionJob.createGrading("stack-array", stackContentVersion, "c", "code"));
+        ExecutionJob queued = executionJobRepository.save(ExecutionJob.createGrading(memberId, "stack-array", stackContentVersion, "c", "code", Instant.now()));
         entityManager.flush();
         entityManager.clear();
 
@@ -284,7 +302,7 @@ class JudgingApiPostgresTests {
 
         // when / then
         Assertions.assertThrows(IllegalStateException.class, () -> new TransactionTemplate(transactionManager).execute(status -> {
-            SubmissionResponseDto response = submissionCommandService.register(request);
+            SubmissionResponseDto response = submissionCommandService.register(memberId, request);
             submissionId.set(response.getSubmissionId());
             jobId.set(response.getJobId());
             entityManager.flush();

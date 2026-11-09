@@ -46,12 +46,24 @@ public class JudgingQueryService {
     /**
      * 작업 상태와 해당 콘텐츠 버전의 기대값 반환
      * @param jobId 실행 또는 채점 작업 ID
+     * @param memberId 인증된 회원 ID, 비로그인은 null
      * @return 작업 상태와 테스트·기준별 판정 결과
      */
-    public JobResponseDto findById(UUID jobId) {
+    public JobResponseDto findById(UUID jobId, UUID memberId) {
         // 작업 원본과 실행 당시 콘텐츠 조회
         ExecutionJob job = executionJobRepository.findById(jobId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "실행 작업을 찾을 수 없습니다."));
+
+        // 공개 예제 실행은 허용하고 채점 작업은 제출한 회원만 조회
+        if (job.getKind() == ExecutionJob.Kind.GRADING) {
+            if (memberId == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+            }
+            if (!memberId.equals(job.getMemberId())) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "실행 작업을 찾을 수 없습니다.");
+            }
+        }
+
         JsonNode snapshot = exerciseQueryService.findSnapshot(job.getExerciseId(), job.getContentVersion(), job.getLanguage());
         boolean grading = job.getKind() == ExecutionJob.Kind.GRADING;
         List<JsonNode> selectedTests = new ArrayList<>();

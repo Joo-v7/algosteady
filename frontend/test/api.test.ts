@@ -46,12 +46,14 @@ test('변경 요청마다 현재 세션의 CSRF 토큰을 받고 기존 헤더·
     const body = JSON.stringify({ code: 'int main() {}' })
     await requestApi('/api/runs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body })
     await requestApi('/api/auth/logout', { method: 'POST' })
+    await requestApi('/api/auth/me', { method: 'DELETE' })
 
-    assert.equal(token, 2)
+    assert.equal(token, 3)
     assert.equal(requests[0].headers.get('X-CSRF-TOKEN'), 'token-1')
     assert.equal(requests[0].headers.get('Content-Type'), 'application/json')
     assert.equal(requests[0].body, body)
     assert.equal(requests[1].headers.get('X-CSRF-TOKEN'), 'token-2')
+    assert.equal(requests[2].headers.get('X-CSRF-TOKEN'), 'token-3')
 })
 
 test('CSRF 토큰 조회 실패 시 변경 요청을 보내지 않는다', async context => {

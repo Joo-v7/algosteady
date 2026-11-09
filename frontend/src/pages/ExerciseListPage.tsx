@@ -116,7 +116,7 @@ function ExerciseListPage() {
                 <h1 id="daily-learning-heading" className="home-section-title">오늘의 학습</h1>
                 {error && <p className="home-message" role="alert">{error}</p>}
                 {!error && exercises === null && <p className="home-message" role="status">학습 목록을 불러오는 중입니다.</p>}
-                {dailyExercise && <ExerciseCard exercise={dailyExercise} featured dailyCompleted={dailyLearning?.completed} />}
+                {dailyExercise && <ExerciseCard exercise={dailyExercise} featured dailyCompleted={dailyLearning?.completed} dailyAttempted={dailyLearning?.attempted} />}
                 {!error && exercises?.length === 0 && <p className="home-message">등록된 학습이 없습니다.</p>}
             </section>
 

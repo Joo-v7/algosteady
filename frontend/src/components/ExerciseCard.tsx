@@ -3,17 +3,18 @@ import type { ExerciseSummary } from '../api/exercises'
 import { getExercisePresentation } from '../exercisePresentation'
 
 // 오늘의 추천과 학습 목록에서 같은 콘텐츠 정보·이동 버튼 사용
-export default function ExerciseCard({ exercise, featured = false, dailyCompleted = false }: {
+export default function ExerciseCard({ exercise, featured = false, dailyCompleted = false, dailyAttempted = false }: {
     exercise: ExerciseSummary
     featured?: boolean
     dailyCompleted?: boolean
+    dailyAttempted?: boolean
 }) {
     const presentation = getExercisePresentation(exercise)
     const Heading = featured ? 'h2' : 'h3'
     return (
         <article className={`panel exercise-card${featured ? ' featured-exercise-card' : ''}`}>
             <div className="exercise-card-content">
-                {featured && dailyCompleted && <span className="daily-completion">오늘 완료 ✓</span>}
+                {featured && (dailyCompleted || dailyAttempted) && <span className="daily-completion" data-status={dailyCompleted ? 'completed' : 'in-progress'}>{dailyCompleted ? '완료' : '진행 중'}</span>}
                 <div className="section-label">{presentation.label} · 기본 구현</div>
                 <Heading>{exercise.title}</Heading>
                 <p className="exercise-card-description">{exercise.description}</p>

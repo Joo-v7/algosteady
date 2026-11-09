@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, Navigate, Outlet, Route, Routes, useNavigate } from 'react-router'
+import { Link, Navigate, Outlet, Route, Routes } from 'react-router'
 import { getCurrentMember, logout } from './api/auth'
 import type { Member } from './api/auth'
 import ExerciseListPage from './pages/ExerciseListPage'
@@ -10,7 +10,6 @@ import LoginPage from './pages/LoginPage'
 import MyPage from './pages/MyPage'
 
 function App() {
-    const navigate = useNavigate()
     const [member, setMember] = useState<Member | null>(null)
     const [authLoading, setAuthLoading] = useState(true)
     const [authError, setAuthError] = useState('')
@@ -41,11 +40,9 @@ function App() {
         setAuthError('')
         try {
             await logout()
-            setMember(null)
-            navigate('/exercises')
+            window.location.replace('/exercises')
         } catch (error) {
             setAuthError(error instanceof Error ? error.message : '로그아웃하지 못했습니다.')
-        } finally {
             setLogoutBusy(false)
         }
     }
@@ -72,7 +69,7 @@ function App() {
                     <span className="brand-mark">AS</span>
                     algosteady
                 </Link>
-                <span className="header-description">매일 꾸준히 구현하는 자료구조</span>
+                <span className="header-description">매일 꾸준히 구현하는 알고리즘</span>
                 <nav className="header-links" aria-label="주 메뉴">
                     <Link className="header-nav" to="/exercises">홈</Link>
                     {authLoading && <span className="header-nav" role="status">로그인 확인 중</span>}
@@ -88,7 +85,7 @@ function App() {
             {authError && <p className="account-error" role="alert">{authError}</p>}
 
             {/* URL별 화면 연결 */}
-            <Routes>
+            {logoutBusy ? loadingPage : <Routes>
                 <Route path="/" element={<Navigate to="/exercises" replace />} />
                 <Route path="/exercises" element={<ExerciseListPage key={member?.id ?? 'anonymous'} />} />
                 <Route path="/login" element={member ? <Navigate to="/exercises" replace /> : <LoginPage />} />
@@ -107,7 +104,7 @@ function App() {
                         </section>
                     </main>
                 } />
-            </Routes>
+            </Routes>}
         </div>
     )
 }

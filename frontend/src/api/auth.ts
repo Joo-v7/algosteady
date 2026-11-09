@@ -30,3 +30,7 @@ export function getOAuthProviders(signal: AbortSignal) {
 export function logout() {
     return requestApi<void>('/api/auth/logout', { method: 'POST' })
 }
+
+export function withdrawMember() {
+    return requestApi<void>('/api/auth/me', { method: 'DELETE' })
+}

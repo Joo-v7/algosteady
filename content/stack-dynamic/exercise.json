@@ -1,6 +1,6 @@
 {
   "id": "stack-dynamic",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "title": "동적 배열 스택",
   "category": "stack",
   "kind": "data-structure",
@@ -310,7 +310,7 @@
           }
         ],
         "harnessErrorExitCode": 2,
-        "harnessErrors": "잘못된 명령, 스택 번호, 누락된 인자 또는 배열 위치는 호출 코드 입력 오류입니다. 과제 테스트 입력의 오류로 구분합니다."
+        "harnessErrors": "잘못된 명령, 스택 번호, 누락된 인자 또는 배열 위치는 호출 코드 입력 오류입니다. 실습 테스트 입력의 오류로 구분합니다."
       }
     }
   }

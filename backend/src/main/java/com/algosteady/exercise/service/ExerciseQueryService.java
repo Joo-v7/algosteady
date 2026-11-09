@@ -163,11 +163,11 @@ public class ExerciseQueryService {
         } else {
             selectedContent = exerciseContentRepository.findByExerciseIdAndContentVersion(exerciseId, contentVersion);
         }
-        ExerciseContent content = selectedContent.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "과제 또는 콘텐츠 버전을 찾을 수 없습니다."));
+        ExerciseContent content = selectedContent.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "실습 또는 콘텐츠 버전을 찾을 수 없습니다."));
         JsonNode snapshot = jsonMapper.readTree(content.getSnapshot());
 
         if (!snapshot.path("sources").has(language)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "과제에서 지원하지 않는 언어입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이 실습에서 지원하지 않는 언어입니다.");
         }
 
         return snapshot;

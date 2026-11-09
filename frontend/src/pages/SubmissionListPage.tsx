@@ -133,7 +133,7 @@ function SubmissionListPage() {
             <section className="exercise-heading">
                 <div>
                     <div className="eyebrow">SUBMISSION HISTORY</div>
-                    <h1>{exercise?.title ?? '과제'} · 제출 기록</h1>
+                    <h1>{exercise?.title ?? '실습'} · 제출 기록</h1>
                     <p>C · 제출 코드와 채점 결과를 확인합니다.</p>
                 </div>
                 <Link className="primary-button" to={`/exercises/${exerciseId}?tab=training`}><span aria-hidden="true">←</span> 실습하기</Link>

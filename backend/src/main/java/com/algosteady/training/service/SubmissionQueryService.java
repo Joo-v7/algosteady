@@ -44,7 +44,7 @@ public class SubmissionQueryService {
         }
 
         if (exerciseId.isBlank() || !"c".equals(language)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "과제 ID와 지원 언어를 확인해 주세요.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "실습 ID와 지원 언어를 확인해 주세요.");
         }
 
         if (page < 0 || size < 1) {

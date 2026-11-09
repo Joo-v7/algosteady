@@ -131,7 +131,7 @@ function ExercisePage({ member }: { member: Member | null }) {
                 }
                 // 현재 과제의 작업만 해당 결과 영역에 반영
                 if (result.exerciseId !== exercise!.id || result.contentVersion !== exercise!.version || result.language !== 'c') {
-                    throw new Error('현재 과제와 실행 작업의 정보가 다릅니다.')
+                    throw new Error('현재 실습과 실행 작업의 정보가 다릅니다.')
                 }
                 if (id === jobId) {
                     setJob(result)
@@ -321,7 +321,7 @@ function ExercisePage({ member }: { member: Member | null }) {
         return (
             <main className="workspace">
                 <section className="panel unavailable-page">
-                    <h1>{contentError || '과제를 불러오는 중입니다.'}</h1>
+                    <h1>{contentError || '학습 내용을 불러오는 중입니다.'}</h1>
                     <p>학습 목록에서 학습할 항목을 선택해 주세요.</p>
                     <Link className="primary-button" to="/exercises">학습 목록으로</Link>
                 </section>
@@ -413,7 +413,7 @@ function ExercisePage({ member }: { member: Member | null }) {
             </section>
 
             {/* 학습·실습 탭 */}
-            <div className="tabs" role="tablist" aria-label="과제 화면">
+            <div className="tabs" role="tablist" aria-label="학습·실습 화면">
                 <button
                     id="learning-tab"
                     role="tab"
@@ -620,7 +620,7 @@ function ExercisePage({ member }: { member: Member | null }) {
                     <aside className="side-column">
                         {/* 채점 기준 */}
                         <section className="panel criteria-panel">
-                            <div className="section-label">실습 체크포인트</div>
+                            <div className="section-label">제출 체크포인트</div>
                             <h2>채점 기준 <span>{exercise.criteria.length}</span></h2>
                             {gradingError && <p role="alert">{gradingError}</p>}
                             <p>각 기준에 연결된 테스트로<br />구현을 확인합니다.</p>

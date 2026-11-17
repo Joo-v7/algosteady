@@ -1,6 +1,6 @@
 {
   "id": "stack-dynamic",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "title": "동적 배열 스택",
   "category": "stack",
   "kind": "data-structure",

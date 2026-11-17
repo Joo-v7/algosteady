@@ -1,6 +1,6 @@
 {
   "id": "two-pointer-pair",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "title": "투 포인터 — 정렬된 배열에서 합이 목표값인 두 원소 찾기",
   "category": "two-pointer",
   "kind": "algorithm",

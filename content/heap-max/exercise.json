@@ -1,6 +1,6 @@
 {
   "id": "heap-max",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "title": "최대 힙",
   "category": "heap",
   "kind": "data-structure",

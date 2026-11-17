@@ -1,6 +1,6 @@
 {
   "id": "sort-heap",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "title": "힙 정렬",
   "category": "sort",
   "kind": "algorithm",

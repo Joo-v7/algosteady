@@ -1,6 +1,6 @@
 {
   "id": "heap-min",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "title": "최소 힙",
   "category": "heap",
   "kind": "data-structure",

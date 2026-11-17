@@ -4,7 +4,12 @@ import lombok.Getter;
 
 import java.util.List;
 
-/** 언어별 파일명 및 컴파일·실행 명령 */
+/**
+ * 언어별 파일명 및 컴파일·실행 명령
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 public enum LanguageSpec {
 

@@ -1,6 +1,6 @@
 {
   "id": "tree-bst",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "title": "이진 탐색 트리",
   "category": "tree",
   "kind": "data-structure",

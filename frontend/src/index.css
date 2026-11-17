@@ -122,6 +122,8 @@ h1, h2, h3, p {
 .brand {
     display: flex;
     align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
     color: #292831;
     text-decoration: none;
     font-size: 24px;
@@ -130,15 +132,10 @@ h1, h2, h3, p {
 }
 
 .brand-mark {
-    background: #6a61cb;
-    color: #fff;
-    width: 34px;
-    height: 34px;
-    display: grid;
-    place-items: center;
-    border-radius: 9px;
-    margin-right: 12px;
-    font-size: 23px;
+    width: 40px;
+    height: 40px;
+    display: block;
+    object-fit: contain;
 }
 
 .header-description {
@@ -2169,7 +2166,8 @@ h1 {
 
     .site-header {
         height: 66px;
-        padding: 0 20px;
+        padding: 0 16px;
+        gap: 16px;
     }
 
     .workspace.account-workspace {
@@ -2177,7 +2175,16 @@ h1 {
     }
 
     .brand {
-        font-size: 20px;
+        font-size: 18px;
+    }
+
+    .brand-mark {
+        width: 32px;
+        height: 32px;
+    }
+
+    .header-links {
+        gap: 12px;
     }
 
     .local-label {

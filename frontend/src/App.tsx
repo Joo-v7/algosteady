@@ -66,8 +66,8 @@ function App() {
             {/* 모든 화면에서 사용하는 헤더 */}
             <header className="site-header">
                 <Link className="brand" to="/exercises" aria-label="Algosteady 홈">
-                    <span className="brand-mark">AS</span>
-                    algosteady
+                    <img className="brand-mark" src="/algosteady-mark.png" alt="" width="40" height="40" />
+                    Algosteady
                 </Link>
                 <span className="header-description">매일 꾸준히 구현하는 알고리즘</span>
                 <nav className="header-links" aria-label="주 메뉴">

@@ -1,124 +1,127 @@
 # API
 
-기본 주소는 `http://localhost:8090/api`이며 요청·응답은 JSON이다. 모든 실습은 아래 API를 공유한다. 경로 또는 본문의 `exerciseId`로 실습을 선택하며, 실습 추가 시 API를 따로 만들거나 이 문서에 실습별 항목을 추가하지 않는다.
+로컬 기본 주소는 `http://localhost:9090/api`다. 아래 표의 경로를 기본 주소 뒤에 붙이며, 본문은 JSON이다. 204 응답은 본문이 없다. 실습마다 API를 추가하지 않고 `exerciseId`로 콘텐츠를 선택한다.
 
-## 경로와 요청
+## 엔드포인트
 
-경로의 `{exerciseId}`는 콘텐츠 ID, `{jobId}`·`{submissionId}`는 UUID다. `language`는 언어 코드이며 지원 값은 `c`다. 아래 Query는 별도 표시가 없으면 필수다.
+| 기능 | Method·경로 | 접근 | 입력 | 성공 응답 |
+| --- | --- | --- | --- | --- |
+| 로그인 수단 | `GET /auth/providers` | 공개 | 없음 | 200, 제공자 배열 |
+| 현재 회원 | `GET /auth/me` | 로그인 | 없음 | 200, `id`, `name`, `email` |
+| CSRF 토큰 | `GET /auth/csrf` | 공개 | 없음 | 200, `headerName`, `token` |
+| 로그아웃 | `POST /auth/logout` | 현재 세션 | CSRF 헤더 | 204 |
+| 회원탈퇴 | `DELETE /auth/me` | 로그인 | CSRF 헤더 | 204 |
+| 학습 분류 | `GET /exercises/categories` | 공개 | 없음 | 200, 분류 배열 |
+| 학습 목록 | `GET /exercises` | 공개 | 없음 | 200, 학습 항목 요약 배열 |
+| 학습 상세 | `GET /exercises/{exerciseId}` | 공개 | Query: `language` | 200, 상세 정보 |
+| 기준 코드 | `GET /exercises/{exerciseId}/reference` | 공개 | Query: `language`, `contentVersion` | 200, 기준 코드 |
+| 오늘의 학습 | `GET /learning/today` | 공개 | 없음 | 200, 배정·본인 상태 |
+| 학습 현황·기록 | `GET /learning/history` | 로그인 | 선택 Query: `year` | 200, 현황·연도별 완료 기록 |
+| 예제 실행 | `POST /runs` | 공개 | 실행 본문·CSRF 헤더 | 202, `jobId` |
+| 제출 | `POST /submissions` | 로그인 | 제출 본문·CSRF 헤더 | 202, `submissionId`, `jobId` |
+| 작업 조회 | `GET /jobs/{jobId}` | 작업 유형별 | 없음 | 200, 작업 결과 |
+| 제출 목록 | `GET /submissions` | 로그인 | Query: `exerciseId`, `language`, 선택 `page`·`size` | 200, 본인 제출 페이지 |
+| 제출 상세 | `GET /submissions/{submissionId}` | 로그인 | 없음 | 200, 본인 제출·채점 결과 |
 
-| 기능 | Method·경로 | Query·본문 | 성공 응답 |
-| --- | --- | --- | --- |
-| 로그인 수단 | `GET /auth/providers` | 없음 | 200, OAuth 제공자 배열: `id`, `name`, `authorizationUrl` |
-| 현재 회원 | `GET /auth/me` | 로그인 세션 | 200, `id`, `name`, `email`. 비로그인은 401 |
-| CSRF 토큰 | `GET /auth/csrf` | 없음 | 200, `headerName`, `token` |
-| 회원탈퇴 | `DELETE /auth/me` | 로그인 세션·CSRF 헤더 | 204, 계정·본인 제출·채점·학습 기록 삭제 및 세션 만료 |
-| 로그아웃 | `POST /auth/logout` | CSRF 헤더 | 204, 응답 본문 없음 |
-| 학습 목록 | `GET /exercises` | 없음 | 200, 학습 항목 요약 배열 |
-| 학습 분류 | `GET /exercises/categories` | 없음 | 200, DB 표시 순서의 분류 배열 |
-| 오늘의 학습 | `GET /learning/today` | 없음, 로그인 선택 | 200, `learningDate`, `exerciseId`, `completed`, `attempted` |
-| 학습 현황·기록 | `GET /learning/history` | 로그인 세션, 선택 Query: `year` | 200, 현황과 연도별 완료 날짜·제출 ID |
-| 학습·실습 상세 | `GET /exercises/{exerciseId}` | Query: `language` | 200, 학습·실습 상세 |
-| 기준 코드 | `GET /exercises/{exerciseId}/reference` | Query: `language`, `contentVersion` | 200, 기준 코드 |
-| 예제 실행 | `POST /runs` | 본문: 공통 실행 필드 + `exampleId` | 202, `{ "jobId": "UUID" }` |
-| 전체 채점 제출 | `POST /submissions` | 본문: 공통 실행 필드 + `referenceViewed` | 202, `{ "submissionId": "UUID", "jobId": "UUID" }` |
-| 작업 조회 | `GET /jobs/{jobId}` | 없음 | 200, 작업 결과 |
-| 제출 목록 | `GET /submissions` | Query: `exerciseId`, `language`, 선택 `page`·`size` | 200, 제출 페이지 |
-| 제출 상세 | `GET /submissions/{submissionId}` | 없음 | 200, 제출 상세 |
+`jobId`·`submissionId`는 UUID다. 현재 `language` 지원 값은 `c`이며, 선택으로 표시하지 않은 Query는 필수다.
 
-### 로그인·변경 요청
+## 인증과 변경 요청
 
-로그인 화면은 서버에 등록된 OAuth 제공자 목록을 사용한다. `authorizationUrl`은 API 기본 경로가 아닌 `/oauth2/authorization/{registrationId}`이며, 브라우저 전체 이동으로 로그인을 시작한다. 콜백은 `/login/oauth2/code/{registrationId}`다. 성공 시 홈, 실패·취소 시 `/login?error=oauth`로 이동한다.
+Google OAuth 로그인과 `ALGOSTEADY_SESSION` 쿠키로 인증을 유지한다. 쿠키는 HttpOnly·SameSite=Lax다. 로그인 수단 응답은 `id`, `name`, `authorizationUrl`을 가진다.
 
-인증은 HttpOnly·SameSite=Lax의 `ALGOSTEADY_SESSION` 쿠키로 유지한다. 변경 요청은 `/auth/csrf`에서 받은 `headerName`과 `token`을 요청 헤더에 넣는다. 프론트 공통 API 함수가 변경 요청 직전에 토큰을 조회하며, 로그인·로그아웃 이전 토큰은 재사용하지 않는다.
+`authorizationUrl`은 `/oauth2/authorization/{registrationId}`이며 API 기본 주소에 붙이지 않는다. 브라우저 전체 이동으로 로그인을 시작하고 `/login/oauth2/code/{registrationId}`로 콜백을 받는다. 성공 시 홈, 실패·취소 시 `/login?error=oauth`로 이동한다.
 
-회원은 제공자 등록 ID와 제공자 사용자 ID로 구분한다. 학습·기준 코드 조회와 예제 실행은 비로그인도 허용한다. 제출·제출 기록 조회는 로그인한 본인에게만 허용하며, 회원 ID는 요청 본문·헤더·Query가 아닌 인증 세션에서 결정한다.
+POST·DELETE 요청은 먼저 `GET /auth/csrf`로 받은 `headerName`과 `token`을 요청 헤더에 넣는다. 비로그인 예제 실행도 CSRF 토큰이 필요하다.
 
-`GET /jobs/{jobId}`는 공개 예제 실행 결과를 비로그인도 조회할 수 있다. 전체 채점 결과는 제출한 회원만 조회할 수 있으며, 비로그인은 401, 다른 회원이나 소유자가 없는 기존 채점 작업은 로그인한 사용자에게 404를 반환한다. 기존 비회원 제출은 보존하되 개인 기록에 연결하지 않는다.
+회원 ID는 인증 세션에서 결정한다. 요청 본문이나 Query로 다른 회원을 지정할 수 없다. 예제 실행 작업은 공개 조회하며, 전체 채점 작업은 본인만 조회한다. 채점 작업에 비로그인으로 접근하면 401, 다른 회원 또는 소유자가 없는 기존 작업에 접근하면 404다.
 
-### 회원탈퇴
+로그아웃은 현재 세션을 종료한다. 탈퇴는 계정·본인 제출 코드·채점 결과·학습 기록을 삭제하고 로그인 세션을 만료한다. 같은 제공자 계정으로 다시 로그인하면 기록이 없는 새 회원으로 등록한다.
 
-`DELETE /api/auth/me`는 로그인한 본인만 CSRF 토큰과 함께 호출한다. 계정 정보·제출 코드·채점 작업과 테스트 결과·일일 완료 기록을 한 트랜잭션으로 삭제한다. 다른 회원과 공통 콘텐츠·일일 배정·비회원 예제 실행은 유지한다. 본인의 모든 로그인 세션을 만료하고 현재 세션과 쿠키를 정리한다. 같은 Google 계정으로 다시 로그인하면 기록이 없는 새 회원으로 등록한다.
+## 실행·제출 본문
 
-### 오늘의 학습
-
-오늘의 학습은 서버의 한국 시간 오전 6시 기준 날짜로 배정하고, 최초 배정을 DB에 보존한다. `learningDate`는 `YYYY-MM-DD`이며 `completed`는 현재 로그인 회원의 완료 여부다. `attempted`는 해당 학습 날짜의 배정 실습에 제출한 기록이 있는지 나타낸다. 비로그인의 두 상태값은 항상 `false`이며, 등록된 실습이 없으면 404를 반환한다.
-
-일일 완료는 해당 날짜에 배정된 실습의 전체 채점 기준을 통과하면 서버가 저장한다. 학습 날짜는 **제출 접수 시각**으로 결정하므로 6시 전에 접수하고 이후 채점이 끝나도 이전 학습 날짜로 인정한다. 회원·날짜별 최초 완료만 유지하며, 예제 실행·기준 코드 열람·오답·컴파일 실패·환경 장애는 완료로 인정하지 않는다.
-
-### 회원 학습 현황·기록
-
-`GET /api/learning/history?year=2026` — 로그인한 본인의 현황과 연도별 완료 날짜를 조회한다. 연도 생략 시 서버 학습 날짜의 연도를 사용한다. 유효하지 않거나 미래인 연도는 400, 비로그인은 401이다.
-
-| 응답 필드 | 의미 |
-| --- | --- |
-| `learningDate` | 한국 시간 오전 6시 기준 오늘의 학습 날짜 |
-| `completedToday` | 오늘의 학습 완료 여부 |
-| `currentStreak` | 오늘 또는 어제부터 끊기지 않은 연속 완료 일수 |
-| `totalCompletedDays` | 선택 연도와 관계없는 누적 완료 일수 |
-| `year` | 조회한 연도 |
-| `days` | 해당 연도의 완료 날짜 `learningDate`와 최초 통과 제출 `submissionId` |
-
-완료하지 않은 날짜는 `days`에 포함하지 않는다. 날짜별 제출 링크도 본인 소유만 조회하며, 선택 연도 변경은 누적·연속 일수에 영향을 주지 않는다.
-
-### 실행·제출 본문
-
-| 공통 필드 | 타입 | 값의 출처 |
+| 공통 필드 | 타입 | 의미 |
 | --- | --- | --- |
-| `exerciseId` | string | 선택한 실습의 ID |
-| `contentVersion` | string | 조회한 학습·실습 상세의 `version` |
-| `language` | string | 선택한 언어 코드 |
+| `exerciseId` | string | 선택한 실습 ID |
+| `contentVersion` | string | 학습 상세에서 받은 `version` |
+| `language` | string | 구현 언어 코드 |
 | `code` | string | 사용자가 작성한 코드 |
 
-실행은 `exampleId`(string)를 추가한다. 값은 학습·실습 상세의 `publicExamples[].id`에서 선택한다. 제출은 대신 `referenceViewed`(boolean)를 추가한다. 기준 코드를 열람했으면 `true`, 아니면 `false`다. 모든 본문 필드는 필수이며 문자열은 공백일 수 없다.
+- 실행은 `exampleId`(string)를 추가한다. 상세의 `publicExamples[].id`에서 선택한다.
+- 제출은 `referenceViewed`(boolean)를 추가한다. 기준 코드 열람 여부이며, 열람하지 않은 경우 `false`다.
 
-호출 코드·입력·기대값은 서버가 해당 콘텐츠에서 선택한다. 제출할 때마다 새 제출과 전체 테스트 채점 작업을 생성한다.
+모든 본문 필드는 필수이며 문자열은 공백일 수 없다. 입력·기대값·호출 코드는 서버가 등록된 콘텐츠에서 선택한다. 제출할 때마다 새 제출 원본과 전체 채점 작업을 저장한다.
 
-## 조회 응답 구조
+## 오늘의 학습·완료 기록
 
-| 응답 | 필드·구조 |
+오늘의 학습 응답은 `learningDate`, `exerciseId`, `completed`, `attempted`다. 날짜는 한국 시간 오전 6시 기준이며 `YYYY-MM-DD` 형식이다. 날짜별 최초 배정을 DB에 보존한다.
+
+| 상태 | 의미 |
 | --- | --- |
+| `attempted` | 해당 학습 날짜에 배정된 실습의 제출 기록이 있음 |
+| `completed` | 해당 날짜의 배정 실습 전체 채점을 통과함 |
+
+비로그인은 두 값 모두 `false`다. 화면은 `completed`를 우선해 `완료`, 미완료 제출이 있으면 `진행 중`으로 표시한다.
+
+완료 날짜는 **제출 접수 시각**으로 결정한다. 오전 6시 전에 접수하고 이후 채점이 끝나도 이전 학습 날짜로 인정한다. 회원·날짜별 최초 완료만 유지하며, 예제 실행·기준 코드 열람·다른 실습 통과는 일일 완료로 인정하지 않는다.
+
+`GET /learning/history?year=2026`은 본인의 학습 현황과 해당 연도의 완료 날짜를 반환한다. `year` 생략 시 현재 학습 연도이며, 1부터 현재 학습 연도까지 허용한다.
+
+| 필드 | 의미 |
+| --- | --- |
+| `learningDate`, `completedToday` | 서버 학습 날짜·오늘 완료 여부 |
+| `currentStreak` | 오늘 완료 시 오늘부터, 미완료 시 어제부터 이어지는 연속 완료 일수 |
+| `totalCompletedDays` | 선택 연도와 관계없는 오늘까지의 누적 완료 일수 |
+| `year` | 조회 연도 |
+| `days` | 완료 날짜 `learningDate`와 최초 통과 제출 `submissionId` 배열 |
+
+미완료 날짜는 `days`에 포함하지 않는다. 연결된 제출이 없으면 `submissionId`는 null이다. 연도 변경은 누적·연속 일수에 영향을 주지 않는다.
+
+## 콘텐츠·제출 응답
+
+| 응답 | 필드 |
+| --- | --- |
+| 학습 분류 | `id`, `label`, `categories`(소속 콘텐츠 분류 코드 배열) |
 | 학습 항목 요약 | `id`, `contentVersion`, `title`, `description`, `category`, `languages`, `contract`, `criteria` |
-| 학습 분류 | `id`, `label`, `categories`(소속 콘텐츠 분류 코드 배열). 이름·순서·소속 관계는 DB에서 관리 |
-| 학습·실습 상세 | `id`, `version`, `title`, `description`, `category`, `language`, `standard`, `learning`, `contract`, `criteria`, `starterCode`, `publicExamples` |
+| 학습 상세 | `id`, `version`, `title`, `description`, `category`, `language`, `standard`, `learning`, `contract`, `criteria`, `starterCode`, `publicExamples` |
 | 기준 코드 | `exerciseId`, `contentVersion`, `language`, `code` |
 | 제출 페이지 | `content`(제출 요약 배열), `page`, `size`, `totalElements`, `totalPages` |
-| 제출 요약 | `submissionId`, `exerciseId`, `contentVersion`, `language`, `referenceViewed`, `submittedAt`, `job`(작업 요약) |
+| 제출 요약 | `submissionId`, `exerciseId`, `contentVersion`, `language`, `referenceViewed`, `submittedAt`, `job` |
 | 작업 요약 | `jobId`, `status`, `passedCriteria`, `totalCriteria` |
-| 제출 상세 | 제출 요약과 같은 제출 메타데이터에 `code` 추가. `job`은 아래의 전체 작업 결과 |
+| 제출 상세 | 제출 메타데이터와 `code`, 전체 작업 결과 `job` |
 
-학습 목록·상세는 최신 등록 버전을 반환하고, 기준 코드는 지정한 버전을 반환한다. 상세에는 기준 코드·호출 코드·비공개 테스트를 포함하지 않는다. `publicExamples`는 `id`, `description`, `input`, `expected`를 가진다. 콘텐츠 내부 구조와 기대값 규격은 [콘텐츠 규격](content.md)을 따른다.
+목록·상세는 실습별 최신 등록 버전을 반환하고 기준 코드는 지정한 버전을 반환한다. 상세에는 기준 코드·호출 코드·비공개 테스트가 없으며, `publicExamples`는 `id`, `description`, `input`, `expected`를 가진다.
 
-제출 목록은 최신순이며 `page`는 0부터 시작한다. 기본값은 `page=0`, `size=20`이고 `size`는 1 이상이다. 기록이 없거나 페이지 범위를 벗어나면 `content`는 빈 배열이다.
+학습 목록 API는 전체 배열을 반환하며 홈 검색·페이지 분할은 프론트에서 처리한다. 제출 목록은 DB에서 최신순 페이지 조회한다. 제출의 `page`는 0부터 시작하고 기본값은 `page=0`, `size=20`이다. `size`는 1~20만 허용하며 범위를 벗어나면 400을 반환한다. 결과가 없거나 페이지 범위를 벗어나면 `content`는 빈 배열이다.
 
-## 작업 결과 구조
+## 작업 결과
 
-예제 실행·전체 채점·제출 상세는 같은 작업 결과 구조를 사용한다.
+예제 실행·전체 채점은 같은 작업 결과 구조를 사용한다.
 
 | 필드 | 내용 |
 | --- | --- |
 | `jobId`, `exerciseId`, `exerciseTitle`, `contentVersion`, `language` | 작업·실습 정보 |
-| `code`, `exampleId`, `kind` | 실행 원본, 예제 ID, `RUN` 또는 `GRADING` |
+| `code`, `exampleId`, `kind` | 실행 원본·예제 ID·`RUN` 또는 `GRADING`. 제출의 `exampleId`는 null |
 | `status`, `message` | 작업 상태와 장애·중단 사유 |
-| `queuedAt`, `startedAt`, `completedAt` | 등록·시작·종료 시각. 시작·종료 전에는 해당 값이 null |
+| `queuedAt`, `startedAt`, `completedAt` | 등록·시작·종료 시각. 시작·종료 전에는 null |
 | `preparation` | 컴파일 상태·stdout·stderr·종료 코드·메시지. 준비 전 null |
-| `tests` | 테스트 결과 배열: `testId`, `criterionId`, `description`, `input`, `expected`, `actual`, `passed` |
-| `criteria` | 기준별 결과 배열: `criterionId`, `title`, `description`, `status`, `totalTests`, `completedTests`, `passedTests`. 예제 실행은 빈 배열 |
+| `tests` | 저장된 테스트 결과 배열: `testId`, `criterionId`, `description`, `input`, `expected`, `actual`, `passed` |
+| `criteria` | 기준별 배열: `criterionId`, `title`, `description`, `status`, `totalTests`, `completedTests`, `passedTests`. 예제 실행은 빈 배열 |
 
-`expected`는 `stdout`, `exitCode`, `stderrRequired`다. `actual`은 `testId`, `status`, `stdout`, `stderr`, `exitCode`, `executionTimeNanos`, `message`다. 미실행 테스트의 종료 코드·시간은 null이며, 실행 시간은 나노초로 반환한다. 화면에서는 초로 표시하고 제출 결과의 실행 시간은 테스트 실행 시간의 합계로 표시한다.
+`expected`는 `stdout`, `exitCode`, `stderrRequired`다. `actual`은 `testId`, `status`, `stdout`, `stderr`, `exitCode`, `executionTimeNanos`, `message`다. 실행 시간은 나노초이며 미실행 테스트의 종료 코드·시간은 null이다.
 
 - 작업 상태: `QUEUED` → `RUNNING` → `COMPLETED` 또는 `FAILED`.
-- `COMPLETED`는 처리 완료를 뜻한다. 컴파일 실패·오답·시간 초과도 결과로 반환하며, 서버·실행 환경 장애는 `FAILED`다.
-- 기준 상태: `PENDING`(대기), `RUNNING`(검사 중), `PASSED`(통과), `FAILED`(실패), `UNAVAILABLE`(검사 불가).
-- 화면은 진행 중인 작업을 500ms 간격으로 조회하고 완료·실패·통신 오류·화면 이탈 시 중단한다.
+- `COMPLETED`는 처리 완료를 뜻한다. 컴파일 실패·오답·시간 초과도 포함하며 서버·실행 환경 장애는 `FAILED`다.
+- 기준 상태: `PENDING`, `RUNNING`, `PASSED`, `FAILED`, `UNAVAILABLE`.
+- 프론트는 500ms 간격으로 조회하고 완료·실패·통신 오류·화면 이탈 시 중단한다.
 
 ## 오류 응답
 
-공통 본문은 `{ "message": "오류 설명" }`이다.
+본문은 `{ "message": "오류 설명" }`이다.
 
-| HTTP 상태 | 원인 |
+| 상태 | 원인 |
 | --- | --- |
-| 400 | 필수값·JSON·UUID·페이지 오류, 지원하지 않는 언어, 잘못된 공개 예제 |
-| 401 | 인증되지 않은 회원 정보·제출·기록·채점 결과 요청 또는 만료된 로그인 |
-| 403 | 접근 거부 또는 CSRF 검증 실패 |
+| 400 | 필수값·JSON·UUID·페이지·연도 오류, 지원하지 않는 언어, 잘못된 공개 예제 |
+| 401 | 인증 필요 또는 만료·탈퇴한 회원의 인증 |
+| 403 | 접근 거부·CSRF 검증 실패 |
 | 404 | 없는 실습·콘텐츠 버전·작업·제출 또는 본인 소유가 아닌 제출·채점 작업 |
 | 500 | 예상하지 못한 서버 처리 오류 |

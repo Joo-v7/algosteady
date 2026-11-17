@@ -23,3 +23,4 @@ out/
 
 # 로그
 *.log
+logs/

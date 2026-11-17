@@ -20,7 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Docker 기반 C 실행·제한·자원 정리 검증 */
+/**
+ * Docker 기반 C 실행·제한·자원 정리 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @EnabledIfSystemProperty(named = "algosteady.docker.tests", matches = "true")
 class CodeExecutionDockerTests {
 

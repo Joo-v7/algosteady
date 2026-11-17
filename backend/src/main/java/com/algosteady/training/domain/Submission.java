@@ -11,7 +11,12 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.util.UUID;
 
-/** 제출 원본 및 채점 작업 ID */
+/**
+ * 제출 원본 및 채점 작업 ID
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity

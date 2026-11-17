@@ -2,7 +2,12 @@ package com.algosteady.judging.repository;
 
 import java.util.UUID;
 
-/** 작업별 테스트 통과 여부 요약 */
+/**
+ * 작업별 테스트 통과 여부 요약
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public interface ExecutionTestSummary {
 
     /**

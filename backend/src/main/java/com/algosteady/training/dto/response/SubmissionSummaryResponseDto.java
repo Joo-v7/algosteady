@@ -10,24 +10,30 @@ import lombok.Getter;
 import java.time.Instant;
 import java.util.UUID;
 
-/** 제출 메타데이터 및 작업 요약 */
+/**
+ * 제출 메타데이터 및 작업 요약
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SubmissionSummaryResponseDto {
 
+    /** 제출 ID */
     private UUID submissionId;
-
+    /** 실습 ID */
     private String exerciseId;
-
+    /** 콘텐츠 버전 */
     private String contentVersion;
-
+    /** 구현 언어 코드 */
     private String language;
-
+    /** 기준 코드 열람 여부 */
     private boolean referenceViewed;
-
+    /** 서버의 제출 접수 시각 */
     private Instant submittedAt;
-
+    /** 제출에 연결된 채점 작업 요약 */
     private JobSummaryResponseDto job;
 
     /**

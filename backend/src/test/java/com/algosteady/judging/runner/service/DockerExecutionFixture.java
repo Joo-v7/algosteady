@@ -16,7 +16,12 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** Docker 테스트의 공통 실행 환경과 자원 정리 확인 */
+/**
+ * Docker 테스트의 공통 실행 환경과 자원 정리 확인
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 class DockerExecutionFixture {
 
     final RunnerProperties runnerProperties = new RunnerProperties(Map.of("c", "algosteady-runner-c:14.4.0"),
@@ -26,6 +31,9 @@ class DockerExecutionFixture {
     private final Set<Path> initialWorkspaces = workspaces();
     private final String containerPrefix = "algosteady-runner-";
 
+    /**
+     * 실행용 컨테이너와 임시 작업 공간의 정리 검증
+     */
     void assertCleanedUp() throws Exception {
         // given
         ProcessExecutor.Result containers = processExecutor.execute(List.of("docker", "ps", "-a", "--filter", "name=" + containerPrefix,
@@ -35,6 +43,10 @@ class DockerExecutionFixture {
         assertEquals(initialWorkspaces, workspaces());
     }
 
+    /**
+     * 현재 남아 있는 실행용 임시 작업 공간 조회
+     * @return 실행용 임시 작업 공간 경로 집합
+     */
     private Set<Path> workspaces() {
         try (Stream<Path> files = Files.list(Path.of(System.getProperty("java.io.tmpdir")))) {
             return files

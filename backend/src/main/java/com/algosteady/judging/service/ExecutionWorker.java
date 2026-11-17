@@ -1,6 +1,6 @@
 package com.algosteady.judging.service;
 
-import com.algosteady.exercise.service.ExerciseQueryService;
+import com.algosteady.exercise.service.ExerciseService;
 import com.algosteady.judging.domain.ExecutionJob;
 import com.algosteady.judging.runner.service.CodeExecutionService;
 import com.algosteady.judging.runner.language.LanguageSpec;
@@ -25,16 +25,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-/** DB 대기 작업의 순차 실행 */
+/**
+ * DB 대기 작업의 순차 실행
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class ExecutionWorker {
 
-    private final JudgingCommandService judgingCommandService;
-
-    private final ExerciseQueryService exerciseQueryService;
-
+    private final JudgingService judgingService;
+    private final ExerciseService exerciseService;
     private final CodeExecutionService codeExecutionService;
 
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -44,28 +47,31 @@ public class ExecutionWorker {
      */
     @EventListener(ApplicationReadyEvent.class)
     public void start() {
-        judgingCommandService.recoverInterrupted();
+        judgingService.recoverInterrupted();
         scheduledExecutorService.scheduleWithFixedDelay(this::processNext, 0, 500, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * 대기 작업 하나를 가져와 실행하고 결과 저장
+     */
     private void processNext() {
         ExecutionJob job = null;
 
         try {
             // 커밋된 대기 작업을 등록 순서대로 실행 상태로 변경
-            job = judgingCommandService.claimNext();
+            job = judgingService.claimNext();
 
             if (job == null) {
                 return;
             }
 
             // 실행 당시 콘텐츠에서 공개 예제 또는 전체 테스트 선택
-            JsonNode snapshot = exerciseQueryService.findSnapshot(job.getExerciseId(), job.getContentVersion(), job.getLanguage());
+            JsonNode snapshot = exerciseService.findSnapshot(job.getExerciseId(), job.getContentVersion(), job.getLanguage());
             JsonNode source = snapshot.path("sources").path(job.getLanguage());
             Map<String, JsonNode> selectedTests = new LinkedHashMap<>();
 
             if (job.getKind() == ExecutionJob.Kind.RUN) {
-                JsonNode example = exerciseQueryService.findPublicExample(snapshot, job.getLanguage(), job.getExampleId());
+                JsonNode example = exerciseService.findPublicExample(snapshot, job.getLanguage(), job.getExampleId());
                 selectedTests.put(job.getExampleId(), example);
             } else {
                 for (JsonNode test : source.path("tests")) {
@@ -78,8 +84,8 @@ public class ExecutionWorker {
             ExecutionRequest request = new ExecutionRequest(LanguageSpec.C, job.getCode(), source.path("harness").asString(), inputs);
             UUID jobId = job.getId();
             // DB 트랜잭션 없이 실행, 테스트 완료마다 결과 비교·저장
-            ExecutionResult result = codeExecutionService.execute(request, test -> judgingCommandService.saveTest(jobId, test, selectedTests.get(test.testId()).path("expected")));
-            judgingCommandService.complete(jobId, result);
+            ExecutionResult result = codeExecutionService.execute(request, test -> judgingService.saveTest(jobId, test, selectedTests.get(test.testId()).path("expected")));
+            judgingService.complete(jobId, result);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
 
@@ -95,9 +101,14 @@ public class ExecutionWorker {
         }
     }
 
+    /**
+     * 작업 실패 저장 및 저장 중 발생한 예외 기록
+     * @param job 실패 처리할 작업
+     * @param message 작업 실패 사유
+     */
     private void recordFailure(ExecutionJob job, String message) {
         try {
-            judgingCommandService.fail(job.getId(), message);
+            judgingService.fail(job.getId(), message);
         } catch (RuntimeException exception) {
             log.error("작업 중단 상태를 저장하지 못했습니다: {}", job.getId(), exception);
         }

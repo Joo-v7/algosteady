@@ -8,7 +8,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-/** 작업별 테스트 결과 조회 */
+/**
+ * 작업별 테스트 결과 조회
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public interface ExecutionTestResultRepository extends JpaRepository<ExecutionTestResult, UUID> {
 
     /**

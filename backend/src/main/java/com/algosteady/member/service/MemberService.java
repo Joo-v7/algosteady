@@ -10,10 +10,16 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
-/** OAuth 회원 등록 및 로그인 정보 갱신 */
+/**
+ * OAuth 회원 등록 및 로그인 정보 갱신
+ *
+ * @author Joo
+ * @since 2026.11
+ */
 @Service
 @RequiredArgsConstructor
-public class MemberCommandService {
+@Transactional(readOnly = true)
+public class MemberService {
 
     private final MemberRepository memberRepository;
 

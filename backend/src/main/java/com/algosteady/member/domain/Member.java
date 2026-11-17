@@ -11,7 +11,12 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.util.UUID;
 
-/** OAuth 제공자 계정과 연결된 회원 */
+/**
+ * OAuth 제공자 계정과 연결된 회원
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity

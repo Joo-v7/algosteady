@@ -15,18 +15,29 @@ import org.hibernate.type.SqlTypes;
 import java.time.Instant;
 import java.util.UUID;
 
-/** 실행 원본 및 작업 상태 */
+/**
+ * 실행 원본 및 작업 상태
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "execution_job")
 public class ExecutionJob {
 
+    /**
+     * 실행·채점 작업 종류
+     */
     public enum Kind {
         RUN,
         GRADING
     }
 
+    /**
+     * 작업 진행 상태
+     */
     public enum Status {
         QUEUED,
         RUNNING,

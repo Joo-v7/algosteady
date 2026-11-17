@@ -14,7 +14,12 @@ import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 
-/** 버전별 콘텐츠 원본 */
+/**
+ * 버전별 콘텐츠 원본
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity

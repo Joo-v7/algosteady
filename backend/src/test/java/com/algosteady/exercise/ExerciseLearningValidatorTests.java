@@ -16,7 +16,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.stream.Stream;
 
-/** 학습 데이터 형식과 노드 연결 검증 */
+/**
+ * 학습 데이터 형식과 노드 연결 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 class ExerciseLearningValidatorTests {
 
     private final ExerciseLearningValidator exerciseLearningValidator = new ExerciseLearningValidator();
@@ -158,6 +163,10 @@ class ExerciseLearningValidatorTests {
         Assertions.assertThrows(IllegalStateException.class, () -> exerciseLearningValidator.validate(exercise));
     }
 
+    /**
+     * LCS 계산 규칙을 어긴 학습 표 구성
+     * @return 잘못된 단계와 LCS 표 테스트 입력
+     */
     static Stream<Arguments> invalidLcsTables() {
         return Stream.of(
                 Arguments.of(1, "[[1,0,0,0],[0,null,null,null],[0,null,null,null],[0,null,null,null]]"),
@@ -192,6 +201,10 @@ class ExerciseLearningValidatorTests {
         Assertions.assertThrows(IllegalStateException.class, () -> exerciseLearningValidator.validate(exercise));
     }
 
+    /**
+     * 슬라이딩 윈도 갱신 규칙을 어긴 단계 구성
+     * @return 단계·필드·잘못된 값 테스트 입력
+     */
     static Stream<Arguments> invalidWindowUpdates() {
         return Stream.of(
                 Arguments.of(3, "previousSum", "0"),
@@ -218,6 +231,10 @@ class ExerciseLearningValidatorTests {
         Assertions.assertTrue(failure.getMessage().contains("슬라이딩 윈도 최대 합"));
     }
 
+    /**
+     * 분류별 학습 단계의 잘못된 시각화 데이터 구성
+     * @return 실습·필드·잘못된 값 테스트 입력
+     */
     static Stream<Arguments> invalidSteps() {
         return Stream.of(
                 Arguments.of("set-union-find", "parents", "[1,0]"),

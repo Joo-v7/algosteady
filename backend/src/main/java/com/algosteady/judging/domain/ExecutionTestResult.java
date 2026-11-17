@@ -12,7 +12,12 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.UUID;
 
-/** 테스트 실행 결과 및 기대값 비교 결과 */
+/**
+ * 테스트 실행 결과 및 기대값 비교 결과
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity

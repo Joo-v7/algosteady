@@ -11,7 +11,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 import java.util.UUID;
 
-/** OAuth 회원 등록 및 조회 */
+/**
+ * OAuth 회원 등록 및 조회
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public interface MemberRepository extends JpaRepository<Member, UUID> {
 
     /**

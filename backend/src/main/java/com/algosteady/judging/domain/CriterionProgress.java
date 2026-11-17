@@ -5,7 +5,12 @@ import tools.jackson.databind.JsonNode;
 import java.util.HashSet;
 import java.util.Set;
 
-/** 채점 기준의 필수 테스트와 통과 수 */
+/**
+ * 채점 기준의 필수 테스트와 통과 수
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public record CriterionProgress(Set<String> testIds, int passedTests) {
 
     /**

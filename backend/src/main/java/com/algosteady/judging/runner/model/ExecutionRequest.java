@@ -7,7 +7,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-/** 실행 언어·제출 코드·호출 코드·테스트 입력 */
+/**
+ * 실행 언어·제출 코드·호출 코드·테스트 입력
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public record ExecutionRequest(
         LanguageSpec language,
         String code,

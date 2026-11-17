@@ -1,10 +1,10 @@
 package com.algosteady.training;
 
 import com.algosteady.exercise.dto.response.ExerciseDetailsResponseDto;
-import com.algosteady.exercise.service.ExerciseQueryService;
+import com.algosteady.exercise.service.ExerciseService;
 import com.algosteady.judging.repository.ExecutionJobRepository;
 import com.algosteady.judging.service.ExecutionWorker;
-import com.algosteady.member.service.MemberCommandService;
+import com.algosteady.member.service.MemberService;
 import com.algosteady.training.dto.request.SubmissionRequestDto;
 import com.algosteady.training.repository.SubmissionRepository;
 import jakarta.persistence.EntityManager;
@@ -38,7 +38,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** 비회원 실행 허용 및 제출·채점 결과의 회원별 접근 검증 */
+/**
+ * 비회원 실행 허용 및 제출·채점 결과의 회원별 접근 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @SpringBootTest
 @Transactional
 @EnabledIfSystemProperty(named = "algosteady.postgres.tests", matches = "true")
@@ -51,10 +56,10 @@ class SubmissionAccessPostgresTests {
     private WebApplicationContext context;
 
     @Autowired
-    private MemberCommandService memberCommandService;
+    private MemberService memberService;
 
     @Autowired
-    private ExerciseQueryService exerciseQueryService;
+    private ExerciseService exerciseService;
 
     @Autowired
     private SubmissionRepository submissionRepository;
@@ -76,9 +81,9 @@ class SubmissionAccessPostgresTests {
 
     @BeforeEach
     void setUp() {
-        memberId = memberCommandService.login("test", UUID.randomUUID().toString(), "owner@example.com", "제출 회원").getId();
-        otherMemberId = memberCommandService.login("test", UUID.randomUUID().toString(), "other@example.com", "다른 회원").getId();
-        exercise = exerciseQueryService.findDetails("stack-array", "c");
+        memberId = memberService.login("test", UUID.randomUUID().toString(), "owner@example.com", "제출 회원").getId();
+        otherMemberId = memberService.login("test", UUID.randomUUID().toString(), "other@example.com", "다른 회원").getId();
+        exercise = exerciseService.findDetails("stack-array", "c");
         submissionBody = jsonMapper.writeValueAsString(SubmissionRequestDto.builder()
                 .exerciseId(exercise.getId())
                 .contentVersion(exercise.getVersion())
@@ -197,6 +202,11 @@ class SubmissionAccessPostgresTests {
         Assertions.assertTrue(executionJobRepository.existsById(jobId));
     }
 
+    /**
+     * 지정한 회원 ID의 OAuth 인증 구성
+     * @param id 인증할 회원 ID
+     * @return HTTP 테스트 요청에 적용할 OAuth 인증
+     */
     private OAuth2LoginRequestPostProcessor loginAs(UUID id) {
         DefaultOAuth2User principal = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority("OIDC_USER")), Map.of("member_id", id.toString()), "member_id");
         return oauth2Login().oauth2User(principal);

@@ -2,7 +2,12 @@ package com.algosteady.judging.runner.model;
 
 import java.util.Objects;
 
-/** 테스트 ID 및 실행 입력 */
+/**
+ * 테스트 ID 및 실행 입력
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public record TestInput(
         String id,
         String input

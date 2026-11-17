@@ -13,7 +13,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** 학습 날짜 경계 및 기존 일일 추천 호환 검증 */
+/**
+ * 학습 날짜 경계 및 기존 일일 추천 호환 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 class DailyLearningTests {
 
     @ParameterizedTest

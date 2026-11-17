@@ -14,7 +14,12 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.DisconnectedClientHelper;
 
-/** API 공통 오류 응답 처리 */
+/**
+ * API 공통 오류 응답 처리
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {

@@ -6,7 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-/** 과제별 콘텐츠 버전 조회 */
+/**
+ * 과제별 콘텐츠 버전 조회
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public interface ExerciseContentRepository extends JpaRepository<ExerciseContent, Long> {
 
     /**

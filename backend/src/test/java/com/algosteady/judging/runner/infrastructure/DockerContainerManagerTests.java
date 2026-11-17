@@ -27,7 +27,12 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/** 컨테이너 생성 옵션 및 작업 공간 정리 검증 */
+/**
+ * 컨테이너 생성 옵션 및 작업 공간 정리 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 class DockerContainerManagerTests {
 
     private final ProcessExecutor processExecutor = mock(ProcessExecutor.class);
@@ -104,6 +109,11 @@ class DockerContainerManagerTests {
         }
     }
 
+    /**
+     * Docker 생성 명령에서 호스트 작업 공간 경로 추출
+     * @param command Docker 생성 명령과 인자
+     * @return 호스트 작업 공간 경로
+     */
     private Path workspace(List<String> command) {
         String mount = command.get(command.indexOf("--mount") + 1);
         return Path.of(mount.substring("type=bind,source=".length(), mount.indexOf(",target=")));

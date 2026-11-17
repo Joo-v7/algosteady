@@ -5,13 +5,19 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-/** 변경 요청에 사용할 CSRF 토큰과 헤더 이름 */
+/**
+ * 변경 요청에 사용할 CSRF 토큰과 헤더 이름
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CsrfTokenResponseDto {
 
+    /** CSRF 토큰을 전달할 요청 헤더 이름 */
     private String headerName;
-
+    /** CSRF 토큰 */
     private String token;
 }

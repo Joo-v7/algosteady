@@ -13,7 +13,12 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 
-/** 인증·접근 거부를 공통 API 오류 응답으로 변환 */
+/**
+ * 인증·접근 거부를 공통 API 오류 응답으로 변환
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Component
 @RequiredArgsConstructor
 public class SecurityExceptionHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
@@ -44,6 +49,12 @@ public class SecurityExceptionHandler implements AuthenticationEntryPoint, Acces
         writeError(response, HttpServletResponse.SC_FORBIDDEN, "요청 권한 또는 보안 토큰을 확인해 주세요.");
     }
 
+    /**
+     * 보안 오류의 HTTP 상태와 JSON 응답 작성
+     * @param response 오류를 기록할 HTTP 응답
+     * @param status HTTP 오류 상태 코드
+     * @param message 사용자에게 전달할 오류 사유
+     */
     private void writeError(HttpServletResponse response, int status, String message) throws IOException {
         response.setStatus(status);
         response.setContentType("application/json;charset=UTF-8");

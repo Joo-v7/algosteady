@@ -6,7 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-/** 백엔드 애플리케이션 시작 검증 */
+/**
+ * 백엔드 애플리케이션 시작 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @SpringBootTest
 class BackendApplicationTests {
 

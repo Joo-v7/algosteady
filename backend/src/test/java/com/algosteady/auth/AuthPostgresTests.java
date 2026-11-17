@@ -1,10 +1,10 @@
 package com.algosteady.auth;
 
-import com.algosteady.auth.service.OAuthLoginService;
+import com.algosteady.auth.service.AuthService;
 import com.algosteady.judging.service.ExecutionWorker;
 import com.algosteady.member.domain.Member;
 import com.algosteady.member.repository.MemberRepository;
-import com.algosteady.member.service.MemberCommandService;
+import com.algosteady.member.service.MemberService;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +55,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** PostgreSQL 기반 OAuth 회원·세션·CSRF 검증 */
+/**
+ * PostgreSQL 기반 OAuth 회원·세션·CSRF 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @SpringBootTest
 @Transactional
 @EnabledIfSystemProperty(named = "algosteady.postgres.tests", matches = "true")
@@ -68,13 +73,13 @@ class AuthPostgresTests {
     private WebApplicationContext context;
 
     @Autowired
-    private MemberCommandService memberCommandService;
+    private MemberService memberService;
 
     @Autowired
     private MemberRepository memberRepository;
 
     @Autowired
-    private OAuthLoginService oauthLoginService;
+    private AuthService oauthLoginService;
 
     @Autowired
     private JsonMapper jsonMapper;
@@ -92,12 +97,12 @@ class AuthPostgresTests {
     @DisplayName("최초 로그인은 회원을 생성하고 재로그인은 같은 회원의 프로필을 갱신합니다.")
     void login_success_reusesProviderIdentity() {
         // given
-        Member first = memberCommandService.login("google", "subject-one", "same@example.com", "처음 이름");
+        Member first = memberService.login("google", "subject-one", "same@example.com", "처음 이름");
 
         // when
-        Member repeated = memberCommandService.login("google", "subject-one", "changed@example.com", "변경 이름");
-        Member anotherProvider = memberCommandService.login("another-provider", "subject-one", "changed@example.com", "다른 제공자");
-        Member anotherSubject = memberCommandService.login("google", "subject-two", "changed@example.com", "다른 사용자");
+        Member repeated = memberService.login("google", "subject-one", "changed@example.com", "변경 이름");
+        Member anotherProvider = memberService.login("another-provider", "subject-one", "changed@example.com", "다른 제공자");
+        Member anotherSubject = memberService.login("google", "subject-two", "changed@example.com", "다른 사용자");
 
         // then
         Assertions.assertEquals(first.getId(), repeated.getId());
@@ -183,11 +188,11 @@ class AuthPostgresTests {
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             Future<UUID> first = executor.submit(() -> {
                 start.await();
-                return memberCommandService.login("google", subject, "concurrent@example.com", "동시 로그인").getId();
+                return memberService.login("google", subject, "concurrent@example.com", "동시 로그인").getId();
             });
             Future<UUID> second = executor.submit(() -> {
                 start.await();
-                return memberCommandService.login("google", subject, "concurrent@example.com", "동시 로그인").getId();
+                return memberService.login("google", subject, "concurrent@example.com", "동시 로그인").getId();
             });
 
             // when
@@ -219,7 +224,7 @@ class AuthPostgresTests {
     @DisplayName("세션의 회원을 조회하고 CSRF 검증 후 로그아웃하면 세션을 폐기합니다.")
     void logout_success_invalidatesSession() throws Exception {
         // given
-        Member member = memberCommandService.login("google", "session-subject", "session@example.com", "세션 회원");
+        Member member = memberService.login("google", "session-subject", "session@example.com", "세션 회원");
         DefaultOAuth2User principal = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority("OIDC_USER")), Map.of("member_id", member.getId().toString()), "member_id");
         MockHttpSession session = new MockHttpSession();
         mockMvc.perform(get("/api/auth/me").session(session).with(oauth2Login().oauth2User(principal)))

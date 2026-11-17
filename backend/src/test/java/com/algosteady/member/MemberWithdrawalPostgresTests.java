@@ -8,12 +8,12 @@ import com.algosteady.judging.runner.model.ExecutionResult;
 import com.algosteady.judging.runner.model.PreparationResult;
 import com.algosteady.judging.runner.model.TestExecutionResult;
 import com.algosteady.judging.service.ExecutionWorker;
-import com.algosteady.judging.service.JudgingCommandService;
+import com.algosteady.judging.service.JudgingService;
 import com.algosteady.learning.repository.DailyLearningCompletionRepository;
 import com.algosteady.learning.repository.DailyLearningRepository;
 import com.algosteady.member.repository.MemberRepository;
 import com.algosteady.member.domain.Member;
-import com.algosteady.member.service.MemberCommandService;
+import com.algosteady.member.service.MemberService;
 import com.algosteady.training.domain.Submission;
 import com.algosteady.training.dto.request.SubmissionRequestDto;
 import com.algosteady.training.repository.SubmissionRepository;
@@ -61,7 +61,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** 회원탈퇴의 본인 데이터 삭제·세션 만료·후속 저장 차단 검증 */
+/**
+ * 회원탈퇴의 본인 데이터 삭제·세션 만료·후속 저장 차단 검증
+ *
+ * @author Joo
+ * @since 2026.11
+ */
 @SpringBootTest
 @Transactional
 @EnabledIfSystemProperty(named = "algosteady.postgres.tests", matches = "true")
@@ -74,7 +79,7 @@ class MemberWithdrawalPostgresTests {
     private WebApplicationContext context;
 
     @Autowired
-    private MemberCommandService memberCommandService;
+    private MemberService memberService;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -95,7 +100,7 @@ class MemberWithdrawalPostgresTests {
     private DailyLearningCompletionRepository dailyLearningCompletionRepository;
 
     @Autowired
-    private JudgingCommandService judgingCommandService;
+    private JudgingService judgingService;
 
     @Autowired
     private SessionRegistry sessionRegistry;
@@ -117,8 +122,8 @@ class MemberWithdrawalPostgresTests {
 
     @BeforeEach
     void setUp() {
-        memberId = memberCommandService.login("test", UUID.randomUUID().toString(), "withdraw@example.com", "탈퇴 회원").getId();
-        otherMemberId = memberCommandService.login("test", UUID.randomUUID().toString(), "other@example.com", "다른 회원").getId();
+        memberId = memberService.login("test", UUID.randomUUID().toString(), "withdraw@example.com", "탈퇴 회원").getId();
+        otherMemberId = memberService.login("test", UUID.randomUUID().toString(), "other@example.com", "다른 회원").getId();
         user = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority("ROLE_USER")), Map.of("member_id", memberId.toString()), "member_id");
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(springSecurity())
@@ -177,14 +182,14 @@ class MemberWithdrawalPostgresTests {
         // given
         ExecutionJob job = saveGrading(memberId, ExecutionJob.Status.RUNNING);
         entityManager.flush();
-        memberCommandService.withdraw(memberId);
+        memberService.withdraw(memberId);
         entityManager.clear();
         TestExecutionResult test = new TestExecutionResult("test", TestExecutionResult.Status.COMPLETED, "OK", "", 0, 1L, null);
 
         // when
-        judgingCommandService.saveTest(job.getId(), test, jsonMapper.readTree("{\"stdout\":\"OK\",\"exitCode\":0,\"stderrRequired\":false}"));
-        judgingCommandService.complete(job.getId(), new ExecutionResult(new PreparationResult(PreparationResult.Status.SUCCEEDED, "", "", 0, null), List.of(test)));
-        judgingCommandService.fail(job.getId(), "late failure");
+        judgingService.saveTest(job.getId(), test, jsonMapper.readTree("{\"stdout\":\"OK\",\"exitCode\":0,\"stderrRequired\":false}"));
+        judgingService.complete(job.getId(), new ExecutionResult(new PreparationResult(PreparationResult.Status.SUCCEEDED, "", "", 0, null), List.of(test)));
+        judgingService.fail(job.getId(), "late failure");
         entityManager.flush();
         entityManager.clear();
 
@@ -197,7 +202,7 @@ class MemberWithdrawalPostgresTests {
     @DisplayName("탈퇴한 회원의 남은 인증으로 새 제출을 등록할 수 없습니다.")
     void register_fail_afterWithdrawal() throws Exception {
         // given
-        memberCommandService.withdraw(memberId);
+        memberService.withdraw(memberId);
         entityManager.clear();
         SubmissionRequestDto request = SubmissionRequestDto.builder()
                 .exerciseId("recursion-factorial")
@@ -225,14 +230,14 @@ class MemberWithdrawalPostgresTests {
     @DisplayName("같은 제공자 계정으로 다시 로그인해도 이전 회원과 기록은 복구되지 않습니다.")
     void login_success_createsNewIdentityAfterWithdrawal() {
         // given
-        Member before = memberCommandService.login("google", "withdraw-rejoin", "rejoin@example.com", "재로그인 회원");
+        Member before = memberService.login("google", "withdraw-rejoin", "rejoin@example.com", "재로그인 회원");
         saveGrading(before.getId(), ExecutionJob.Status.COMPLETED);
         entityManager.flush();
-        memberCommandService.withdraw(before.getId());
+        memberService.withdraw(before.getId());
         entityManager.clear();
 
         // when
-        Member after = memberCommandService.login("google", "withdraw-rejoin", "rejoin@example.com", "재로그인 회원");
+        Member after = memberService.login("google", "withdraw-rejoin", "rejoin@example.com", "재로그인 회원");
 
         // then
         Assertions.assertNotEquals(before.getId(), after.getId());
@@ -253,7 +258,7 @@ class MemberWithdrawalPostgresTests {
         try {
             // 삭제 후 예외 발생 시 계정·제출·채점 결과 전체 롤백
             Assertions.assertThrows(IllegalStateException.class, () -> transaction.executeWithoutResult(status -> {
-                memberCommandService.withdraw(memberId);
+                memberService.withdraw(memberId);
                 throw new IllegalStateException("rollback");
             }));
             Assertions.assertTrue(memberRepository.existsById(memberId));
@@ -272,12 +277,12 @@ class MemberWithdrawalPostgresTests {
                     throw new IllegalStateException(exception);
                 }
                 TestExecutionResult result = new TestExecutionResult("concurrent", TestExecutionResult.Status.COMPLETED, "OK", "", 0, 1L, null);
-                judgingCommandService.saveTest(job.getId(), result, jsonMapper.readTree("{\"stdout\":\"OK\",\"exitCode\":0,\"stderrRequired\":false}"));
+                judgingService.saveTest(job.getId(), result, jsonMapper.readTree("{\"stdout\":\"OK\",\"exitCode\":0,\"stderrRequired\":false}"));
             }));
             Assertions.assertTrue(locked.await(5, TimeUnit.SECONDS));
 
             // when
-            Future<?> withdrawal = executor.submit(() -> memberCommandService.withdraw(memberId));
+            Future<?> withdrawal = executor.submit(() -> memberService.withdraw(memberId));
             Assertions.assertThrows(TimeoutException.class, () -> withdrawal.get(200, TimeUnit.MILLISECONDS));
             release.countDown();
             writer.get(5, TimeUnit.SECONDS);
@@ -293,12 +298,18 @@ class MemberWithdrawalPostgresTests {
             executor.awaitTermination(5, TimeUnit.SECONDS);
             for (UUID id : List.of(memberId, otherMemberId)) {
                 if (memberRepository.existsById(id)) {
-                    memberCommandService.withdraw(id);
+                    memberService.withdraw(id);
                 }
             }
         }
     }
 
+    /**
+     * 지정한 상태의 회원 채점 작업과 제출 저장
+     * @param owner 제출한 회원 ID
+     * @param status 저장할 작업 상태
+     * @return 저장된 채점 작업
+     */
     private ExecutionJob saveGrading(UUID owner, ExecutionJob.Status status) {
         ExecutionJob job = ExecutionJob.createGrading(owner, "recursion-factorial", "1.0.0", "c", "code", Instant.now());
         if (status == ExecutionJob.Status.RUNNING) {

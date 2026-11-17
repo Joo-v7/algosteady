@@ -9,7 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/** 학습 단계와 시각화 데이터 검증 */
+/**
+ * 학습 단계와 시각화 데이터 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Component
 public class ExerciseLearningValidator {
 
@@ -339,7 +344,12 @@ public class ExerciseLearningValidator {
         }
     }
 
-    /** 고정 구간의 합·누적 최대 합·교체 원소 확인 */
+    /**
+     * 고정 구간의 합·누적 최대 합·교체 원소 확인
+     * @param step 검증할 학습 단계
+     * @param contract 콘텐츠의 구현 규격
+     * @param location 오류 메시지에 표시할 콘텐츠 위치
+     */
     private void validateSlidingWindow(JsonNode step, JsonNode contract, String location) {
         JsonNode values = step.path("values");
         requireArray(values, "int", location, "슬라이딩 윈도 배열");
@@ -393,7 +403,12 @@ public class ExerciseLearningValidator {
         }
     }
 
-    /** 정렬 순서·포인터 범위·합 비교 결과 확인 */
+    /**
+     * 정렬 순서·포인터 범위·합 비교 결과 확인
+     * @param step 검증할 학습 단계
+     * @param contract 콘텐츠의 구현 규격
+     * @param location 오류 메시지에 표시할 콘텐츠 위치
+     */
     private void validateTwoPointer(JsonNode step, JsonNode contract, String location) {
         JsonNode values = step.path("values");
         requireArray(values, "int", location, "투 포인터 배열");
@@ -433,7 +448,12 @@ public class ExerciseLearningValidator {
         }
     }
 
-    /** 피보나치의 저장값·호출 스택 확인 */
+    /**
+     * 피보나치의 저장값·호출 스택 확인
+     * @param step 검증할 학습 단계
+     * @param contract 콘텐츠의 구현 규격
+     * @param location 오류 메시지에 표시할 콘텐츠 위치
+     */
     private void validateFibonacci(JsonNode step, JsonNode contract, String location) {
         require(!step.has("problem") || step.path("problem").asString().equals("fibonacci"), location, "피보나치 단계 종류");
         require(step.path("method").isString() && Set.of("memoization", "tabulation").contains(step.path("method").asString()), location, "피보나치 계산 방식");
@@ -472,7 +492,12 @@ public class ExerciseLearningValidator {
         }
     }
 
-    /** 배낭 표의 계산 범위·이전 행 참조·선택 비교 확인 */
+    /**
+     * 배낭 표의 계산 범위·이전 행 참조·선택 비교 확인
+     * @param step 검증할 학습 단계
+     * @param contract 콘텐츠의 구현 규격
+     * @param location 오류 메시지에 표시할 콘텐츠 위치
+     */
     private void validateKnapsack(JsonNode step, JsonNode contract, String location) {
         require(step.path("problem").asString().equals("knapsack"), location, "배낭 단계 종류");
         require(contract.path("maxItems").isInt() && contract.path("maxItems").asInt() >= 0
@@ -538,7 +563,12 @@ public class ExerciseLearningValidator {
         }
     }
 
-    /** 두 접두사의 LCS 길이와 계산 순서 확인 */
+    /**
+     * 두 접두사의 LCS 길이와 계산 순서 확인
+     * @param step 검증할 학습 단계
+     * @param contract 콘텐츠의 구현 규격
+     * @param location 오류 메시지에 표시할 콘텐츠 위치
+     */
     private void validateLcs(JsonNode step, JsonNode contract, String location) {
         require(step.path("problem").asString().equals("lcs"), location, "LCS 단계 종류");
         require(contract.path("capacity").isInt() && contract.path("capacity").asInt() >= 0, location, "LCS 길이 한도");
@@ -580,7 +610,13 @@ public class ExerciseLearningValidator {
         }
     }
 
-    /** 가중치 행렬과 선택 간선·비용의 일치 확인 */
+    /**
+     * 가중치 행렬과 선택 간선·비용의 일치 확인
+     * @param step 검증할 학습 단계
+     * @param edges 정점 간 간선 연결 여부
+     * @param directed 방향 그래프 여부
+     * @param location 오류 메시지에 표시할 콘텐츠 위치
+     */
     private void validateWeightedGraph(JsonNode step, boolean[][] edges, boolean directed, String location) {
         int size = edges.length;
         JsonNode weights = step.path("weights");
@@ -659,6 +695,13 @@ public class ExerciseLearningValidator {
         }
     }
 
+    /**
+     * 학습 단계의 정점 인덱스 범위와 트리 노드 존재 확인
+     * @param step 검증할 학습 단계
+     * @param size 검증할 정점 인덱스의 상한
+     * @param tree 노드 존재 여부를 확인할 트리 배열
+     * @param location 오류 메시지에 표시할 콘텐츠 위치
+     */
     private void validateNodeIndexes(JsonNode step, int size, JsonNode tree, String location) {
         if (step.has("activeNode")) {
             JsonNode active = step.path("activeNode");
@@ -674,6 +717,13 @@ public class ExerciseLearningValidator {
         }
     }
 
+    /**
+     * 학습 배열과 원소의 자료형 확인
+     * @param values 검증할 배열 데이터
+     * @param type 허용할 원소 자료형 구분
+     * @param location 오류 메시지에 표시할 콘텐츠 위치
+     * @param field 검증할 필드 이름
+     */
     private void requireArray(JsonNode values, String type, String location, String field) {
         require(values.isArray(), location, field);
         for (JsonNode value : values) {
@@ -686,6 +736,12 @@ public class ExerciseLearningValidator {
         }
     }
 
+    /**
+     * 학습 콘텐츠 검증 실패의 위치와 항목 표시
+     * @param valid 검증 조건 충족 여부
+     * @param location 오류 메시지에 표시할 콘텐츠 위치
+     * @param field 검증할 항목 이름
+     */
     private void require(boolean valid, String location, String field) {
         if (!valid) {
             throw new IllegalStateException("학습 콘텐츠를 확인해 주세요: " + location + " · " + field);

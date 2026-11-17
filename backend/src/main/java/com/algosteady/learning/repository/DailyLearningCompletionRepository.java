@@ -12,7 +12,12 @@ import java.util.Optional;
 import java.util.List;
 import java.util.UUID;
 
-/** 회원별 하루 한 번의 학습 완료 저장 및 조회 */
+/**
+ * 회원별 하루 한 번의 학습 완료 저장 및 조회
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public interface DailyLearningCompletionRepository extends JpaRepository<DailyLearningCompletion, Long> {
 
     /**

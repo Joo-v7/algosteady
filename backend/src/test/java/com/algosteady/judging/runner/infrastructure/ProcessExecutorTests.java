@@ -14,7 +14,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** 외부 명령 출력 수집 및 실행 제한 검증 */
+/**
+ * 외부 명령 출력 수집 및 실행 제한 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 class ProcessExecutorTests {
 
     private final ProcessExecutor processExecutor = new ProcessExecutor();

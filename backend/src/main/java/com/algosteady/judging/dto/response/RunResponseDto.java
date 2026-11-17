@@ -7,11 +7,17 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-/** 공개 예시 실행 작업 ID */
+/**
+ * 공개 예시 실행 작업 ID
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RunResponseDto {
 
+    /** 실행·채점 작업 ID */
     private UUID jobId;
 }

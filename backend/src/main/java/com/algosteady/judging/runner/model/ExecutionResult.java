@@ -3,7 +3,12 @@ package com.algosteady.judging.runner.model;
 import java.util.List;
 import java.util.Objects;
 
-/** 컴파일 및 테스트별 실행 결과 */
+/**
+ * 컴파일 및 테스트별 실행 결과
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public record ExecutionResult(
         PreparationResult preparation,
         List<TestExecutionResult> tests

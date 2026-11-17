@@ -3,7 +3,12 @@ package com.algosteady;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/** Algosteady 백엔드 시작점 */
+/**
+ * Algosteady 백엔드 시작점
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @SpringBootApplication
 public class BackendApplication {
 

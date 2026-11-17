@@ -4,7 +4,7 @@ import com.algosteady.exercise.dto.response.ExerciseDetailsResponseDto;
 import com.algosteady.exercise.dto.response.ExerciseCategoryResponseDto;
 import com.algosteady.exercise.dto.response.ExerciseSummaryResponseDto;
 import com.algosteady.exercise.dto.response.ReferenceResponseDto;
-import com.algosteady.exercise.service.ExerciseQueryService;
+import com.algosteady.exercise.service.ExerciseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,13 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/** 과제 콘텐츠 조회 API */
+/**
+ * 과제 콘텐츠 조회 API
+ *
+ * @author Joo
+ * @since 2026.11
+ */
 @RestController
 @RequestMapping("/api/exercises")
 @RequiredArgsConstructor
-public class ExerciseQueryController {
+public class ExerciseController {
 
-    private final ExerciseQueryService exerciseQueryService;
+    private final ExerciseService exerciseService;
 
     /**
      * 등록된 과제 목록 조회
@@ -28,7 +33,7 @@ public class ExerciseQueryController {
      */
     @GetMapping
     public List<ExerciseSummaryResponseDto> findAll() {
-        return exerciseQueryService.findAll();
+        return exerciseService.findAll();
     }
 
     /**
@@ -37,7 +42,7 @@ public class ExerciseQueryController {
      */
     @GetMapping("/categories")
     public List<ExerciseCategoryResponseDto> findCategories() {
-        return exerciseQueryService.findCategories();
+        return exerciseService.findCategories();
     }
 
     /**
@@ -48,7 +53,7 @@ public class ExerciseQueryController {
      */
     @GetMapping("/{id}")
     public ExerciseDetailsResponseDto findDetails(@PathVariable String id, @RequestParam String language) {
-        return exerciseQueryService.findDetails(id, language);
+        return exerciseService.findDetails(id, language);
     }
 
     /**
@@ -60,6 +65,6 @@ public class ExerciseQueryController {
      */
     @GetMapping("/{id}/reference")
     public ReferenceResponseDto findReference(@PathVariable String id, @RequestParam String language, @RequestParam String contentVersion) {
-        return exerciseQueryService.findReference(id, contentVersion, language);
+        return exerciseService.findReference(id, contentVersion, language);
     }
 }

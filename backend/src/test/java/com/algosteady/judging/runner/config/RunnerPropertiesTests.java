@@ -15,7 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-/** 실행 설정 바인딩 및 의존성 연결 검증 */
+/**
+ * 실행 설정 바인딩 및 의존성 연결 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 class RunnerPropertiesTests {
     @Test
     @DisplayName("DB 없이 실행 설정을 바인딩하고 실행부를 연결합니다.")

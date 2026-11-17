@@ -6,7 +6,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-/** 학습 목록 분류 조회 */
+/**
+ * 학습 목록 분류 조회
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public interface ExerciseCategoryRepository extends JpaRepository<ExerciseCategory, String> {
 
     /**

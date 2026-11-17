@@ -12,7 +12,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.time.Instant;
 
-/** 제출 원본 저장 및 조회 */
+/**
+ * 제출 원본 저장 및 조회
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
 
     /**
@@ -40,7 +45,9 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
             """)
     List<SubmissionLink> findLinksByMemberIdAndJobIds(@Param("memberId") UUID memberId, @Param("jobIds") List<UUID> jobIds);
 
-    /** 학습 기록에서 제출 상세로 이동하기 위한 식별 정보 */
+    /**
+     * 학습 기록에서 제출 상세로 이동하기 위한 식별 정보
+     */
     interface SubmissionLink {
         UUID getJobId();
 

@@ -15,7 +15,12 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/** 외부 명령 실행 및 시간·출력 제한 관리 */
+/**
+ * 외부 명령 실행 및 시간·출력 제한 관리
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Component
 public class ProcessExecutor {
 
@@ -93,14 +98,18 @@ public class ProcessExecutor {
         }
     }
 
-    /** 외부 명령 완료 및 제한 상태 */
+    /**
+     * 외부 명령 완료 및 제한 상태
+     */
     public enum Status {
         COMPLETED,
         OUTPUT_LIMIT_EXCEEDED,
         RESPONSE_TIMEOUT
     }
 
-    /** 외부 명령 상태·종료 코드·출력 */
+    /**
+     * 외부 명령 상태·종료 코드·출력
+     */
     public record Result(
             Status status,
             int exitCode,
@@ -128,7 +137,9 @@ public class ProcessExecutor {
         }
     }
 
-    /** 실행 제한 도달 시 종료 처리 */
+    /**
+     * 실행 제한 도달 시 종료 처리
+     */
     @FunctionalInterface
     public interface TerminationAction {
         /**
@@ -137,6 +148,9 @@ public class ProcessExecutor {
         void terminate() throws IOException, InterruptedException;
     }
 
+    /**
+     * 출력 제한을 적용한 프로세스 스트림 수집
+     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static class OutputCollector {
         private final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
@@ -151,6 +165,11 @@ public class ProcessExecutor {
 
         private volatile IOException readFailure;
 
+        /**
+         * 공유 출력 한도 내에서 프로세스 스트림 수집
+         * @param stream 읽을 프로세스 출력 스트림
+         * @param destination 수집한 바이트를 저장할 버퍼
+         */
         private void read(InputStream stream, ByteArrayOutputStream destination) {
             try (stream) {
                 byte[] buffer = new byte[8192];
@@ -171,6 +190,11 @@ public class ProcessExecutor {
             }
         }
 
+        /**
+         * 수집한 출력의 불완전한 문자를 제외한 UTF-8 변환
+         * @param stream 출력 바이트를 저장한 버퍼
+         * @return 디코딩한 출력 문자열
+         */
         private String text(ByteArrayOutputStream stream) throws IOException {
             return StandardCharsets.UTF_8.newDecoder()
                     .onMalformedInput(CodingErrorAction.IGNORE)

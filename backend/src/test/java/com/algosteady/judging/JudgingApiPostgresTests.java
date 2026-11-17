@@ -1,6 +1,6 @@
 package com.algosteady.judging;
 
-import com.algosteady.exercise.service.ExerciseQueryService;
+import com.algosteady.exercise.service.ExerciseService;
 import com.algosteady.judging.domain.ExecutionJob;
 import com.algosteady.judging.dto.request.RunRequestDto;
 import com.algosteady.judging.repository.ExecutionJobRepository;
@@ -9,14 +9,14 @@ import com.algosteady.judging.runner.model.ExecutionResult;
 import com.algosteady.judging.runner.model.PreparationResult;
 import com.algosteady.judging.runner.model.TestExecutionResult;
 import com.algosteady.judging.service.ExecutionWorker;
-import com.algosteady.judging.service.JudgingCommandService;
+import com.algosteady.judging.service.JudgingService;
 import com.algosteady.training.domain.Submission;
 import com.algosteady.training.dto.request.SubmissionRequestDto;
 import com.algosteady.training.dto.response.SubmissionResponseDto;
 import com.algosteady.training.repository.SubmissionRepository;
-import com.algosteady.training.service.SubmissionCommandService;
+import com.algosteady.training.service.SubmissionService;
 import jakarta.persistence.EntityManager;
-import com.algosteady.member.service.MemberCommandService;
+import com.algosteady.member.service.MemberService;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.junit.jupiter.api.Assertions;
@@ -56,7 +56,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** PostgreSQL 기반 API 바인딩·저장·재조회 검증 */
+/**
+ * PostgreSQL 기반 API 바인딩·저장·재조회 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @SpringBootTest
 @Transactional
 @EnabledIfSystemProperty(named = "algosteady.postgres.tests", matches = "true")
@@ -75,7 +80,7 @@ class JudgingApiPostgresTests {
     private ExecutionTestResultRepository executionTestResultRepository;
 
     @Autowired
-    private JudgingCommandService judgingCommandService;
+    private JudgingService judgingService;
 
     @Autowired
     private EntityManager entityManager;
@@ -87,16 +92,16 @@ class JudgingApiPostgresTests {
     private SubmissionRepository submissionRepository;
 
     @Autowired
-    private SubmissionCommandService submissionCommandService;
+    private SubmissionService submissionService;
 
     @Autowired
-    private ExerciseQueryService exerciseQueryService;
+    private ExerciseService exerciseService;
 
     @Autowired
     private PlatformTransactionManager transactionManager;
 
     @Autowired
-    private MemberCommandService memberCommandService;
+    private MemberService memberService;
 
     private UUID memberId;
 
@@ -105,13 +110,13 @@ class JudgingApiPostgresTests {
 
     @BeforeEach
     void setUp() {
-        memberId = memberCommandService.login("test", UUID.randomUUID().toString(), "test@example.com", "기록 검증 회원").getId();
+        memberId = memberService.login("test", UUID.randomUUID().toString(), "test@example.com", "기록 검증 회원").getId();
         DefaultOAuth2User principal = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority("OIDC_USER")), Map.of("member_id", memberId.toString()), "member_id");
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .defaultRequest(get("/").with(oauth2Login().oauth2User(principal)).with(csrf()))
                 .apply(springSecurity())
                 .build();
-        stackContentVersion = exerciseQueryService.findDetails("stack-array", "c").getVersion();
+        stackContentVersion = exerciseService.findDetails("stack-array", "c").getVersion();
     }
 
     @ParameterizedTest
@@ -144,8 +149,8 @@ class JudgingApiPostgresTests {
 
         // given
         TestExecutionResult testResult = new TestExecutionResult(exampleId, TestExecutionResult.Status.NOT_EXECUTED, "", "", null, null, "컴파일 실패");
-        judgingCommandService.saveTest(jobId, testResult, detail.path("publicExamples").get(0).path("expected"));
-        judgingCommandService.complete(jobId, new ExecutionResult(new PreparationResult(PreparationResult.Status.FAILED, "", "compiler error", 1, "컴파일 실패"), List.of(testResult)));
+        judgingService.saveTest(jobId, testResult, detail.path("publicExamples").get(0).path("expected"));
+        judgingService.complete(jobId, new ExecutionResult(new PreparationResult(PreparationResult.Status.FAILED, "", "compiler error", 1, "컴파일 실패"), List.of(testResult)));
         entityManager.flush();
         entityManager.clear();
 
@@ -203,7 +208,7 @@ class JudgingApiPostgresTests {
         entityManager.clear();
 
         // when
-        judgingCommandService.recoverInterrupted();
+        judgingService.recoverInterrupted();
         entityManager.flush();
         entityManager.clear();
 
@@ -247,7 +252,7 @@ class JudgingApiPostgresTests {
 
         // then
         JsonNode queuedResponse = jsonMapper.readTree(queuedJob.andReturn().getResponse().getContentAsString());
-        JsonNode snapshot = exerciseQueryService.findSnapshot(exerciseId, contentVersion, "c");
+        JsonNode snapshot = exerciseService.findSnapshot(exerciseId, contentVersion, "c");
         Assertions.assertEquals(snapshot.path("exercise").path("criteria").size(), queuedResponse.path("criteria").size());
         Assertions.assertTrue(queuedResponse.path("tests").isEmpty());
         Assertions.assertNull(executionJobRepository.findById(jobId).orElseThrow().getExampleId());
@@ -258,10 +263,10 @@ class JudgingApiPostgresTests {
             JsonNode expected = test.path("expected");
             TestExecutionResult actual = new TestExecutionResult(test.path("id").asString(), TestExecutionResult.Status.COMPLETED,
                     expected.path("stdout").asString(), expected.path("stderrRequired").asBoolean() ? "오류" : "", expected.path("exitCode").asInt(), 1000L, null);
-            judgingCommandService.saveTest(jobId, actual, expected);
+            judgingService.saveTest(jobId, actual, expected);
             actualResults.add(actual);
         }
-        judgingCommandService.complete(jobId, new ExecutionResult(new PreparationResult(PreparationResult.Status.SUCCEEDED, "", "", 0, null), actualResults));
+        judgingService.complete(jobId, new ExecutionResult(new PreparationResult(PreparationResult.Status.SUCCEEDED, "", "", 0, null), actualResults));
         entityManager.flush();
         entityManager.clear();
 
@@ -302,7 +307,7 @@ class JudgingApiPostgresTests {
 
         // when / then
         Assertions.assertThrows(IllegalStateException.class, () -> new TransactionTemplate(transactionManager).execute(status -> {
-            SubmissionResponseDto response = submissionCommandService.register(memberId, request);
+            SubmissionResponseDto response = submissionService.register(memberId, request);
             submissionId.set(response.getSubmissionId());
             jobId.set(response.getJobId());
             entityManager.flush();

@@ -14,7 +14,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
-/** 회원별 일일 학습 완료와 통과한 채점 작업 */
+/**
+ * 회원별 일일 학습 완료와 통과한 채점 작업
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity

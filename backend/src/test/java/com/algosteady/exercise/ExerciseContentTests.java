@@ -2,9 +2,8 @@ package com.algosteady.exercise;
 
 import com.algosteady.exercise.domain.ExerciseContent;
 import com.algosteady.exercise.repository.ExerciseContentRepository;
-import com.algosteady.exercise.service.ExerciseCommandService;
+import com.algosteady.exercise.service.ExerciseService;
 import com.algosteady.exercise.service.ExerciseLearningValidator;
-import com.algosteady.exercise.service.ExerciseQueryService;
 import com.algosteady.support.ExerciseContentSource;
 import org.springframework.core.io.Resource;
 import org.junit.jupiter.api.Assertions;
@@ -29,15 +28,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** 콘텐츠 리소스 및 공개 범위 검증 */
+/**
+ * 콘텐츠 리소스 및 공개 범위 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @ExtendWith(MockitoExtension.class)
 class ExerciseContentTests {
 
     @InjectMocks
-    private ExerciseCommandService exerciseCommandService;
-
-    @InjectMocks
-    private ExerciseQueryService exerciseQueryService;
+    private ExerciseService exerciseService;
 
     @Mock
     private ExerciseContentRepository exerciseContentRepository;
@@ -55,7 +56,7 @@ class ExerciseContentTests {
         Mockito.doThrow(new IllegalStateException("학습 콘텐츠 오류")).when(exerciseLearningValidator).validate(Mockito.any());
 
         // when / then
-        Assertions.assertThrows(IllegalStateException.class, () -> exerciseCommandService.run(new DefaultApplicationArguments()));
+        Assertions.assertThrows(IllegalStateException.class, () -> exerciseService.run(new DefaultApplicationArguments()));
         Mockito.verifyNoInteractions(exerciseContentRepository);
     }
 
@@ -64,7 +65,7 @@ class ExerciseContentTests {
     void register_sameVersionIsImmutable() throws Exception {
         // given
         List<Resource> resources = ExerciseContentSource.contents();
-        exerciseCommandService.run(new DefaultApplicationArguments());
+        exerciseService.run(new DefaultApplicationArguments());
         ArgumentCaptor<ExerciseContent> captured = ArgumentCaptor.forClass(ExerciseContent.class);
         Mockito.verify(exerciseContentRepository, Mockito.times(resources.size())).save(captured.capture());
         Set<List<String>> expectedVersions = new HashSet<>();
@@ -80,7 +81,7 @@ class ExerciseContentTests {
         }
 
         // when
-        exerciseCommandService.run(new DefaultApplicationArguments());
+        exerciseService.run(new DefaultApplicationArguments());
 
         // then
         Mockito.verify(exerciseContentRepository, Mockito.times(resources.size())).save(Mockito.any());
@@ -91,7 +92,7 @@ class ExerciseContentTests {
         Mockito.when(exerciseContentRepository.findByExerciseIdAndContentVersion(original.getExerciseId(), original.getContentVersion())).thenReturn(Optional.of(changed));
 
         // when / then
-        IllegalStateException failure = Assertions.assertThrows(IllegalStateException.class, () -> exerciseCommandService.run(new DefaultApplicationArguments()));
+        IllegalStateException failure = Assertions.assertThrows(IllegalStateException.class, () -> exerciseService.run(new DefaultApplicationArguments()));
         Assertions.assertTrue(failure.getMessage().contains("버전을 올려"));
     }
 
@@ -100,7 +101,7 @@ class ExerciseContentTests {
     void findDetails_hidesPrivateContent() throws Exception {
         // given
         List<Resource> resources = ExerciseContentSource.contents();
-        exerciseCommandService.run(new DefaultApplicationArguments());
+        exerciseService.run(new DefaultApplicationArguments());
         ArgumentCaptor<ExerciseContent> captured = ArgumentCaptor.forClass(ExerciseContent.class);
         Mockito.verify(exerciseContentRepository, Mockito.times(resources.size())).save(captured.capture());
         for (ExerciseContent content : captured.getAllValues()) {
@@ -110,7 +111,7 @@ class ExerciseContentTests {
             Mockito.when(exerciseContentRepository.findByExerciseIdAndContentVersion(exerciseId, version)).thenReturn(Optional.of(content));
 
             // when
-            JsonNode details = jsonMapper.valueToTree(exerciseQueryService.findDetails(exerciseId, "c"));
+            JsonNode details = jsonMapper.valueToTree(exerciseService.findDetails(exerciseId, "c"));
 
             // then
             Assertions.assertFalse(details.has("reference"));
@@ -122,7 +123,7 @@ class ExerciseContentTests {
             Assertions.assertEquals(original.path("exercise").path("learning"), details.path("learning"));
             Assertions.assertEquals(original.path("sources").path("c").path("tests").valueStream()
                     .filter(test -> test.path("public").asBoolean()).count(), details.path("publicExamples").size());
-            Assertions.assertEquals(original.path("sources").path("c").path("reference").asString(), exerciseQueryService.findReference(exerciseId, version, "c").getCode());
+            Assertions.assertEquals(original.path("sources").path("c").path("reference").asString(), exerciseService.findReference(exerciseId, version, "c").getCode());
             if (exerciseId.startsWith("recursion-")) {
                 Assertions.assertEquals("recursion", details.path("category").asString());
                 Assertions.assertEquals(1, details.path("contract").path("functions").size());
@@ -201,12 +202,12 @@ class ExerciseContentTests {
             }
 
             // when / then
-            JsonNode snapshot = exerciseQueryService.findSnapshot(exerciseId, version, "c");
+            JsonNode snapshot = exerciseService.findSnapshot(exerciseId, version, "c");
             snapshot.path("sources").path("c").path("tests").valueStream()
                     .filter(test -> !test.path("public").asBoolean())
                     .forEach(test -> Assertions.assertThrows(ResponseStatusException.class,
-                            () -> exerciseQueryService.findPublicExample(snapshot, "c", test.path("id").asString())));
-            Assertions.assertThrows(ResponseStatusException.class, () -> exerciseQueryService.findSnapshot(exerciseId, null, "java"));
+                            () -> exerciseService.findPublicExample(snapshot, "c", test.path("id").asString())));
+            Assertions.assertThrows(ResponseStatusException.class, () -> exerciseService.findSnapshot(exerciseId, null, "java"));
         }
     }
 }

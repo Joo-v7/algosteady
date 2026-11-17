@@ -27,7 +27,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** 테스트 실행 순서·결과 전달·오류 시 정리 검증 */
+/**
+ * 테스트 실행 순서·결과 전달·오류 시 정리 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 class CodeExecutionServiceTests {
 
     private final DockerContainerManager dockerContainerManager = mock(DockerContainerManager.class);
@@ -135,10 +140,20 @@ class CodeExecutionServiceTests {
         }
     }
 
+    /**
+     * 준비에 성공한 실행 결과 구성
+     * @return 성공 상태의 준비 결과
+     */
     private PreparationResult prepared() {
         return new PreparationResult(PreparationResult.Status.SUCCEEDED, "", "", 0, "");
     }
 
+    /**
+     * 지정한 상태의 테스트 실행 결과 구성
+     * @param id 테스트 ID
+     * @param status 구성할 테스트 실행 상태
+     * @return 테스트 실행 결과
+     */
     private TestExecutionResult result(String id, TestExecutionResult.Status status) {
         return new TestExecutionResult(id, status, "", "", 0, 1L, "");
     }

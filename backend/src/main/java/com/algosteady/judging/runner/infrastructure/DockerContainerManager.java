@@ -15,14 +15,18 @@ import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.UUID;
 
-/** 작업 공간 및 Docker 컨테이너 생성 */
+/**
+ * 작업 공간 및 Docker 컨테이너 생성
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Component
 @RequiredArgsConstructor
 @EnableConfigurationProperties(RunnerProperties.class)
 public class DockerContainerManager {
 
     private final ProcessExecutor processExecutor;
-
     private final RunnerProperties runnerProperties;
 
     /**
@@ -69,6 +73,11 @@ public class DockerContainerManager {
         }
     }
 
+    /**
+     * 작업 공간에 소스 파일 저장
+     * @param file 저장할 파일 경로
+     * @param content 파일에 기록할 소스 내용
+     */
     private void writeSource(Path file, String content) throws IOException {
         Files.writeString(file, content, StandardCharsets.UTF_8);
         Files.setPosixFilePermissions(file, PosixFilePermissions.fromString("rw-r--r--"));

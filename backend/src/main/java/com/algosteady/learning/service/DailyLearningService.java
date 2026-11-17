@@ -1,18 +1,16 @@
 package com.algosteady.learning.service;
 
+import com.algosteady.exercise.dto.response.ExerciseSummaryResponseDto;
+import com.algosteady.exercise.service.ExerciseService;
+import com.algosteady.judging.domain.GradingPassedEvent;
 import com.algosteady.learning.domain.DailyLearning;
 import com.algosteady.learning.domain.DailyLearningCompletion;
 import com.algosteady.learning.dto.response.DailyLearningResponseDto;
-import com.algosteady.learning.dto.response.LearningHistoryResponseDto;
 import com.algosteady.learning.dto.response.LearningHistoryDayResponseDto;
+import com.algosteady.learning.dto.response.LearningHistoryResponseDto;
 import com.algosteady.learning.repository.DailyLearningCompletionRepository;
+import com.algosteady.learning.repository.DailyLearningRepository;
 import com.algosteady.training.repository.SubmissionRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -20,18 +18,70 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
-/** 오늘의 학습과 회원별 학습 현황·기록 조회 */
+/**
+ * 오늘의 학습 배정 및 회원별 완료·기록 관리
+ *
+ * @author Joo
+ * @since 2026.11
+ */
 @Service
 @RequiredArgsConstructor
-public class DailyLearningQueryService {
+@Transactional(readOnly = true)
+public class DailyLearningService {
 
-    private final DailyLearningCommandService dailyLearningCommandService;
-
+    private final DailyLearningRepository dailyLearningRepository;
     private final DailyLearningCompletionRepository dailyLearningCompletionRepository;
-
+    private final ExerciseService exerciseService;
     private final SubmissionRepository submissionRepository;
+
+    /**
+     * 날짜별 공통 학습을 최초 한 번 배정
+     * @param learningDate 배정할 학습 날짜
+     * @return 기존 또는 새로 저장한 배정
+     */
+    @Transactional
+    public DailyLearning assign(LocalDate learningDate) {
+        Optional<DailyLearning> existing = dailyLearningRepository.findById(learningDate);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        List<String> exerciseIds = exerciseService.findAll().stream()
+                .map(ExerciseSummaryResponseDto::getId)
+                .toList();
+        if (exerciseIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "등록된 학습이 없습니다.");
+        }
+
+        String exerciseId = DailyLearning.selectExerciseId(learningDate, exerciseIds);
+        dailyLearningRepository.assign(learningDate, exerciseId);
+        return dailyLearningRepository.findById(learningDate).orElseThrow();
+    }
+
+    /**
+     * 채점 상태와 같은 트랜잭션에서 접수 날짜의 오늘의 학습 완료 저장
+     * @param event 전체 채점 기준을 통과한 회원 작업
+     */
+    @EventListener
+    @Transactional
+    public void recordCompletion(GradingPassedEvent event) {
+        LocalDate learningDate = DailyLearning.learningDateAt(event.acceptedAt());
+        Optional<DailyLearning> dailyLearning = dailyLearningRepository.findById(learningDate);
+        if (dailyLearning.isEmpty() || !dailyLearning.get().getExerciseId().equals(event.exerciseId())) {
+            return;
+        }
+
+        dailyLearningCompletionRepository.complete(event.memberId(), learningDate, event.jobId(), event.completedAt());
+    }
 
     /**
      * 서버 학습 날짜 기준 현황과 선택 연도의 완료 기록 조회
@@ -39,7 +89,6 @@ public class DailyLearningQueryService {
      * @param year 조회 연도, 생략하면 현재 학습 연도
      * @return 누적·연속 완료 일수와 날짜별 최초 통과 제출
      */
-    @Transactional(readOnly = true)
     public LearningHistoryResponseDto findHistory(UUID memberId, Integer year) {
         if (memberId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
@@ -105,7 +154,7 @@ public class DailyLearningQueryService {
     @Transactional
     public DailyLearningResponseDto findToday(UUID memberId) {
         LocalDate learningDate = DailyLearning.learningDateAt(Instant.now());
-        DailyLearning dailyLearning = dailyLearningCommandService.assign(learningDate);
+        DailyLearning dailyLearning = assign(learningDate);
         boolean completed = memberId != null && dailyLearningCompletionRepository.findByMemberIdAndLearningDate(memberId, learningDate).isPresent();
         Instant start = learningDate.atTime(6, 0).atZone(ZoneId.of("Asia/Seoul")).toInstant();
         Instant end = learningDate.plusDays(1).atTime(6, 0).atZone(ZoneId.of("Asia/Seoul")).toInstant();

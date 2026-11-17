@@ -1,7 +1,7 @@
 package com.algosteady.auth.config;
 
 import com.algosteady.auth.security.SecurityExceptionHandler;
-import com.algosteady.auth.service.OAuthLoginService;
+import com.algosteady.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,20 +15,24 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
-/** OAuth 로그인·세션·API 접근 설정 */
+/**
+ * OAuth 로그인·세션·API 접근 설정
+ *
+ * @author Joo
+ * @since 2026.01
+ */
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-    private final OAuthLoginService oauthLoginService;
-
-    private final SecurityExceptionHandler securityExceptionHandler;
 
     @Value("${algosteady.frontend-url}")
     private String frontendUrl;
 
     @Value("${server.servlet.session.cookie.name}")
     private String sessionCookieName;
+
+    private final AuthService oauthLoginService;
+    private final SecurityExceptionHandler securityExceptionHandler;
 
     /**
      * OAuth2·OIDC 로그인과 세션 기반 API 보안 구성
@@ -76,13 +80,17 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /** 로그인 세션의 회원별 조회와 탈퇴 시 만료 처리 */
+    /**
+     * 로그인 세션의 회원별 조회와 탈퇴 시 만료 처리
+     */
     @Bean
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
     }
 
-    /** 세션 종료 시 등록된 세션 정보 정리 */
+    /**
+     * 세션 종료 시 등록된 세션 정보 정리
+     */
     @Bean
     public HttpSessionEventPublisher httpSessionEventPublisher() {
         return new HttpSessionEventPublisher();

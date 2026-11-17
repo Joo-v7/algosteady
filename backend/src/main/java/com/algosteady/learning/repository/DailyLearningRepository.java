@@ -8,7 +8,12 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 
-/** 날짜별 학습 배정 조회 및 최초 배정 보존 */
+/**
+ * 날짜별 학습 배정 조회 및 최초 배정 보존
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public interface DailyLearningRepository extends JpaRepository<DailyLearning, LocalDate> {
 
     /**

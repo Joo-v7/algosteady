@@ -5,7 +5,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.time.Duration;
 import java.util.Map;
 
-/** 실행 이미지 및 시간·출력·자원 제한 설정 */
+/**
+ * 실행 이미지 및 시간·출력·자원 제한 설정
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @ConfigurationProperties("algosteady.runner")
 public record RunnerProperties(
         Map<String, String> images,

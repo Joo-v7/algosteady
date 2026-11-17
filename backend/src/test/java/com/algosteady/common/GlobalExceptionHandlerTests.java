@@ -33,7 +33,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** 연결 종료의 응답 재작성 방지 및 실제 서버 오류 보존 검증 */
+/**
+ * 연결 종료의 응답 재작성 방지 및 실제 서버 오류 보존 검증
+ *
+ * @author Joo
+ * @since 2026.11
+ */
 class GlobalExceptionHandlerTests {
 
     private final GlobalExceptionHandler globalExceptionHandler = new GlobalExceptionHandler();
@@ -117,6 +122,10 @@ class GlobalExceptionHandlerTests {
                 .andExpect(jsonPath("$.message").value("서버 처리 중 오류가 발생했습니다."));
     }
 
+    /**
+     * 클라이언트 연결 종료로 분류할 예외 구성
+     * @return 연결 종료 예외 테스트 입력
+     */
     private static Stream<Exception> disconnectedExceptions() {
         return Stream.of(
                 new IOException("Broken pipe"),
@@ -128,6 +137,10 @@ class GlobalExceptionHandlerTests {
         );
     }
 
+    /**
+     * 서버 오류로 유지할 예외 구성
+     * @return 서버 오류 예외 테스트 입력
+     */
     private static Stream<Exception> serverExceptions() {
         return Stream.of(
                 new IllegalStateException("내부 처리 실패"),
@@ -137,9 +150,16 @@ class GlobalExceptionHandlerTests {
         );
     }
 
+    /**
+     * 응답 전송 중 연결 종료와 직렬화 실패 재현용 API
+     */
     @RestController
     private static class FailureController {
 
+        /**
+         * 응답 커밋 후 클라이언트 연결 종료 예외 재현
+         * @param response 일부 JSON을 전송할 HTTP 응답
+         */
         @GetMapping("/test/disconnected")
         public void disconnected(HttpServletResponse response) throws IOException {
             response.setContentType("application/json");
@@ -148,12 +168,19 @@ class GlobalExceptionHandlerTests {
             throw new HttpMessageNotWritableException("목록 응답 전송 실패", new ClientAbortException(new IOException("Broken pipe")));
         }
 
+        /**
+         * 직렬화 실패를 재현할 응답 반환
+         * @return 변환 과정에서 예외를 발생시키는 응답
+         */
         @GetMapping("/test/serialization-error")
         public BrokenPayload serializationError() {
             return new BrokenPayload();
         }
     }
 
+    /**
+     * JSON 변환 중 예외를 발생시키는 테스트 응답
+     */
     private static class BrokenPayload {
 
         public String getValue() {

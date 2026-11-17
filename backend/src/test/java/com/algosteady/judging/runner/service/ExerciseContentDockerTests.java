@@ -25,7 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/** 콘텐츠 기준 코드와 대표 오답의 실제 실행 검증 */
+/**
+ * 콘텐츠 기준 코드와 대표 오답의 실제 실행 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @EnabledIfSystemProperty(named = "algosteady.docker.tests", matches = "true")
 class ExerciseContentDockerTests {
 

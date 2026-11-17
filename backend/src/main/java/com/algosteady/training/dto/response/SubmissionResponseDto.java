@@ -8,14 +8,20 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-/** 제출 ID 및 채점 작업 ID */
+/**
+ * 제출 ID 및 채점 작업 ID
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SubmissionResponseDto {
 
+    /** 제출 ID */
     private UUID submissionId;
-
+    /** 실행·채점 작업 ID */
     private UUID jobId;
 
     /**

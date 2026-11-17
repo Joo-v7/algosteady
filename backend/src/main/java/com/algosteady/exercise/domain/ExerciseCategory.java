@@ -13,7 +13,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
-/** 학습 목록 분류와 콘텐츠 분류 연결 */
+/**
+ * 학습 목록 분류와 콘텐츠 분류 연결
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity

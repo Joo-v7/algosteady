@@ -5,7 +5,7 @@ import com.algosteady.judging.repository.ExecutionJobRepository;
 import com.algosteady.judging.service.ExecutionWorker;
 import com.algosteady.learning.repository.DailyLearningCompletionRepository;
 import com.algosteady.learning.repository.DailyLearningRepository;
-import com.algosteady.member.service.MemberCommandService;
+import com.algosteady.member.service.MemberService;
 import com.algosteady.training.domain.Submission;
 import com.algosteady.training.repository.SubmissionRepository;
 import jakarta.persistence.EntityManager;
@@ -41,7 +41,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** 실제 PostgreSQL 기반 학습 현황·연도별 기록·회원 격리 검증 */
+/**
+ * 실제 PostgreSQL 기반 학습 현황·연도별 기록·회원 격리 검증
+ *
+ * @author Joo
+ * @since 2026.11
+ */
 @SpringBootTest
 @Transactional
 @EnabledIfSystemProperty(named = "algosteady.postgres.tests", matches = "true")
@@ -66,7 +71,7 @@ class LearningHistoryPostgresTests {
     private SubmissionRepository submissionRepository;
 
     @Autowired
-    private MemberCommandService memberCommandService;
+    private MemberService memberService;
 
     @Autowired
     private EntityManager entityManager;
@@ -78,8 +83,8 @@ class LearningHistoryPostgresTests {
 
     @BeforeEach
     void setUp() {
-        memberId = memberCommandService.login("test", UUID.randomUUID().toString(), "history@example.com", "학습 기록 회원").getId();
-        otherMemberId = memberCommandService.login("test", UUID.randomUUID().toString(), "other@example.com", "다른 회원").getId();
+        memberId = memberService.login("test", UUID.randomUUID().toString(), "history@example.com", "학습 기록 회원").getId();
+        otherMemberId = memberService.login("test", UUID.randomUUID().toString(), "other@example.com", "다른 회원").getId();
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(springSecurity())
                 .build();
@@ -223,6 +228,12 @@ class LearningHistoryPostgresTests {
         }
     }
 
+    /**
+     * 서버 시각을 고정한 회원 학습 기록 조회
+     * @param timestamp 고정할 서버 시각
+     * @param query 조회 URL에 붙일 쿼리 문자열
+     * @return 학습 기록 HTTP 응답 검증 대상
+     */
     private ResultActions findHistory(Instant timestamp, String query) throws Exception {
         DefaultOAuth2User user = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority("ROLE_USER")), Map.of("member_id", memberId.toString()), "member_id");
         try (MockedStatic<Instant> clock = Mockito.mockStatic(Instant.class, Mockito.CALLS_REAL_METHODS)) {
@@ -231,6 +242,12 @@ class LearningHistoryPostgresTests {
         }
     }
 
+    /**
+     * 회원의 지정 학습 날짜에 최초 통과 제출과 완료 기록 저장
+     * @param ownerId 기록을 소유할 회원 ID
+     * @param date 완료 처리할 학습 날짜
+     * @return 통과 제출 ID
+     */
     private UUID saveCompletion(UUID ownerId, LocalDate date) {
         Instant acceptedAt = date.atTime(6, 0).atZone(ZoneId.of("Asia/Seoul")).toInstant();
         dailyLearningRepository.assign(date, "recursion-factorial");

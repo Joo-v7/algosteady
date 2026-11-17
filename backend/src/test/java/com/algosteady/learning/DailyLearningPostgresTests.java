@@ -1,6 +1,6 @@
 package com.algosteady.learning;
 
-import com.algosteady.exercise.service.ExerciseQueryService;
+import com.algosteady.exercise.service.ExerciseService;
 import com.algosteady.judging.domain.ExecutionJob;
 import com.algosteady.judging.domain.ExecutionTestResult;
 import com.algosteady.judging.repository.ExecutionJobRepository;
@@ -9,17 +9,17 @@ import com.algosteady.judging.runner.model.ExecutionResult;
 import com.algosteady.judging.runner.model.PreparationResult;
 import com.algosteady.judging.runner.model.TestExecutionResult;
 import com.algosteady.judging.service.ExecutionWorker;
-import com.algosteady.judging.service.JudgingCommandService;
+import com.algosteady.judging.service.JudgingService;
 import com.algosteady.learning.domain.DailyLearning;
 import com.algosteady.learning.domain.DailyLearningCompletion;
 import com.algosteady.learning.repository.DailyLearningCompletionRepository;
 import com.algosteady.learning.repository.DailyLearningRepository;
-import com.algosteady.learning.service.DailyLearningCommandService;
-import com.algosteady.member.service.MemberCommandService;
+import com.algosteady.learning.service.DailyLearningService;
+import com.algosteady.member.service.MemberService;
 import com.algosteady.training.dto.request.SubmissionRequestDto;
 import com.algosteady.training.dto.response.SubmissionResponseDto;
 import com.algosteady.training.repository.SubmissionRepository;
-import com.algosteady.training.service.SubmissionCommandService;
+import com.algosteady.training.service.SubmissionService;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +58,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** PostgreSQL 기반 일일 배정·채점 통과·중복·접수 날짜 검증 */
+/**
+ * PostgreSQL 기반 일일 배정·채점 통과·중복·접수 날짜 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @SpringBootTest
 @Transactional
 @EnabledIfSystemProperty(named = "algosteady.postgres.tests", matches = "true")
@@ -77,16 +82,16 @@ class DailyLearningPostgresTests {
     private DailyLearningCompletionRepository dailyLearningCompletionRepository;
 
     @Autowired
-    private DailyLearningCommandService dailyLearningCommandService;
+    private DailyLearningService dailyLearningService;
 
     @Autowired
-    private MemberCommandService memberCommandService;
+    private MemberService memberService;
 
     @Autowired
-    private ExerciseQueryService exerciseQueryService;
+    private ExerciseService exerciseService;
 
     @Autowired
-    private JudgingCommandService judgingCommandService;
+    private JudgingService judgingService;
 
     @Autowired
     private ExecutionJobRepository executionJobRepository;
@@ -95,7 +100,7 @@ class DailyLearningPostgresTests {
     private ExecutionTestResultRepository executionTestResultRepository;
 
     @Autowired
-    private SubmissionCommandService submissionCommandService;
+    private SubmissionService submissionService;
 
     @Autowired
     private SubmissionRepository submissionRepository;
@@ -122,7 +127,7 @@ class DailyLearningPostgresTests {
     @BeforeEach
     void setUp() {
         new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
-            memberId = memberCommandService.login("test", UUID.randomUUID().toString(), "daily@example.com", "완료 검증 회원").getId();
+            memberId = memberService.login("test", UUID.randomUUID().toString(), "daily@example.com", "완료 검증 회원").getId();
             createdLearningDate = !dailyLearningRepository.existsById(learningDate);
             dailyLearningRepository.assign(learningDate, "recursion-factorial");
         });
@@ -142,7 +147,7 @@ class DailyLearningPostgresTests {
         List<TestExecutionResult> results = savePassingTests(job);
 
         // when
-        judgingCommandService.complete(job.getId(), new ExecutionResult(successfulPreparation, results));
+        judgingService.complete(job.getId(), new ExecutionResult(successfulPreparation, results));
         entityManager.flush();
         entityManager.clear();
 
@@ -159,19 +164,19 @@ class DailyLearningPostgresTests {
     @DisplayName("재통과·중복 완료·이후 실패에도 최초 기록을 유지하고 다른 회원은 따로 기록합니다.")
     void complete_success_oncePerMemberAndDay() {
         // given
-        UUID otherMemberId = memberCommandService.login("test", UUID.randomUUID().toString(), "other@example.com", "다른 회원").getId();
+        UUID otherMemberId = memberService.login("test", UUID.randomUUID().toString(), "other@example.com", "다른 회원").getId();
         long countBefore = dailyLearningCompletionRepository.count();
         ExecutionJob first = createGradingJob(memberId, "recursion-factorial", acceptedAt);
         ExecutionJob repeated = createGradingJob(memberId, "recursion-factorial", acceptedAt);
         ExecutionJob other = createGradingJob(otherMemberId, "recursion-factorial", acceptedAt);
 
         // when
-        judgingCommandService.complete(first.getId(), new ExecutionResult(successfulPreparation, savePassingTests(first)));
-        judgingCommandService.complete(first.getId(), new ExecutionResult(successfulPreparation, List.of()));
-        judgingCommandService.complete(repeated.getId(), new ExecutionResult(successfulPreparation, savePassingTests(repeated)));
-        judgingCommandService.complete(other.getId(), new ExecutionResult(successfulPreparation, savePassingTests(other)));
+        judgingService.complete(first.getId(), new ExecutionResult(successfulPreparation, savePassingTests(first)));
+        judgingService.complete(first.getId(), new ExecutionResult(successfulPreparation, List.of()));
+        judgingService.complete(repeated.getId(), new ExecutionResult(successfulPreparation, savePassingTests(repeated)));
+        judgingService.complete(other.getId(), new ExecutionResult(successfulPreparation, savePassingTests(other)));
         ExecutionJob failed = createGradingJob(memberId, "recursion-factorial", acceptedAt);
-        judgingCommandService.complete(failed.getId(), new ExecutionResult(new PreparationResult(PreparationResult.Status.FAILED, "", "compile error", 1, null), List.of()));
+        judgingService.complete(failed.getId(), new ExecutionResult(new PreparationResult(PreparationResult.Status.FAILED, "", "compile error", 1, null), List.of()));
         entityManager.flush();
         entityManager.clear();
 
@@ -190,7 +195,7 @@ class DailyLearningPostgresTests {
         PreparationResult preparation = new PreparationResult(preparationStatus, "", "failure", null, "failure");
 
         // when
-        judgingCommandService.complete(job.getId(), new ExecutionResult(preparation, List.of()));
+        judgingService.complete(job.getId(), new ExecutionResult(preparation, List.of()));
 
         // then
         Assertions.assertTrue(dailyLearningCompletionRepository.findByMemberIdAndLearningDate(memberId, learningDate).isEmpty());
@@ -208,12 +213,12 @@ class DailyLearningPostgresTests {
             if (results.isEmpty()) {
                 actual = new TestExecutionResult(actual.testId(), failureStatus, actual.stdout() + "wrong", actual.stderr(), actual.exitCode(), 1L, "failure");
             }
-            judgingCommandService.saveTest(job.getId(), actual, test.path("expected"));
+            judgingService.saveTest(job.getId(), actual, test.path("expected"));
             results.add(actual);
         }
 
         // when
-        judgingCommandService.complete(job.getId(), new ExecutionResult(successfulPreparation, results));
+        judgingService.complete(job.getId(), new ExecutionResult(successfulPreparation, results));
 
         // then
         Assertions.assertTrue(dailyLearningCompletionRepository.findByMemberIdAndLearningDate(memberId, learningDate).isEmpty());
@@ -229,13 +234,13 @@ class DailyLearningPostgresTests {
         for (int index = 0; index < tests.size() - 1; index++) {
             JsonNode test = tests.get(index);
             TestExecutionResult actual = passingResult(test);
-            judgingCommandService.saveTest(job.getId(), actual, test.path("expected"));
+            judgingService.saveTest(job.getId(), actual, test.path("expected"));
             results.add(actual);
         }
         executionTestResultRepository.save(ExecutionTestResult.create(job.getId(), "unregistered-test", "{}", true));
 
         // when
-        judgingCommandService.complete(job.getId(), new ExecutionResult(successfulPreparation, results));
+        judgingService.complete(job.getId(), new ExecutionResult(successfulPreparation, results));
 
         // then
         Assertions.assertTrue(dailyLearningCompletionRepository.findByMemberIdAndLearningDate(memberId, learningDate).isEmpty());
@@ -246,12 +251,12 @@ class DailyLearningPostgresTests {
     void complete_fail_withOtherExerciseOrExampleRun() {
         // given
         ExecutionJob other = createGradingJob(memberId, "stack-array", acceptedAt);
-        String version = exerciseQueryService.findDetails("recursion-factorial", "c").getVersion();
+        String version = exerciseService.findDetails("recursion-factorial", "c").getVersion();
         ExecutionJob run = executionJobRepository.save(ExecutionJob.create("recursion-factorial", version, "c", "code", "example"));
 
         // when
-        judgingCommandService.complete(other.getId(), new ExecutionResult(successfulPreparation, savePassingTests(other)));
-        judgingCommandService.complete(run.getId(), new ExecutionResult(successfulPreparation, List.of()));
+        judgingService.complete(other.getId(), new ExecutionResult(successfulPreparation, savePassingTests(other)));
+        judgingService.complete(run.getId(), new ExecutionResult(successfulPreparation, List.of()));
 
         // then
         Assertions.assertTrue(dailyLearningCompletionRepository.findByMemberIdAndLearningDate(memberId, learningDate).isEmpty());
@@ -262,7 +267,7 @@ class DailyLearningPostgresTests {
     void assign_success_preservesFirstAssignment() {
         // when
         dailyLearningRepository.assign(learningDate, "stack-array");
-        DailyLearning dailyLearning = dailyLearningCommandService.assign(learningDate);
+        DailyLearning dailyLearning = dailyLearningService.assign(learningDate);
 
         // then
         Assertions.assertEquals("recursion-factorial", dailyLearning.getExerciseId());
@@ -272,7 +277,7 @@ class DailyLearningPostgresTests {
     @DisplayName("홈 진입 없이 제출해도 접수 날짜의 배정을 저장하고 제출·작업 시각을 일치시킵니다.")
     void register_success_usesSameAcceptedAt() {
         // given
-        String version = exerciseQueryService.findDetails("recursion-factorial", "c").getVersion();
+        String version = exerciseService.findDetails("recursion-factorial", "c").getVersion();
         SubmissionRequestDto request = SubmissionRequestDto.builder()
                 .exerciseId("recursion-factorial")
                 .contentVersion(version)
@@ -282,7 +287,7 @@ class DailyLearningPostgresTests {
                 .build();
 
         // when
-        SubmissionResponseDto response = submissionCommandService.register(memberId, request);
+        SubmissionResponseDto response = submissionService.register(memberId, request);
         entityManager.flush();
         entityManager.clear();
 
@@ -297,9 +302,9 @@ class DailyLearningPostgresTests {
     void findToday_success_withMemberCompletion() throws Exception {
         // given
         LocalDate today = DailyLearning.learningDateAt(Instant.now());
-        DailyLearning dailyLearning = dailyLearningCommandService.assign(today);
+        DailyLearning dailyLearning = dailyLearningService.assign(today);
         ExecutionJob job = createGradingJob(memberId, dailyLearning.getExerciseId(), Instant.now());
-        judgingCommandService.complete(job.getId(), new ExecutionResult(successfulPreparation, savePassingTests(job)));
+        judgingService.complete(job.getId(), new ExecutionResult(successfulPreparation, savePassingTests(job)));
         DefaultOAuth2User principal = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority("OIDC_USER")), Map.of("member_id", memberId.toString()), "member_id");
 
         // when / then
@@ -323,7 +328,7 @@ class DailyLearningPostgresTests {
         try {
             // when
             new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
-                judgingCommandService.complete(job.getId(), new ExecutionResult(successfulPreparation, results));
+                judgingService.complete(job.getId(), new ExecutionResult(successfulPreparation, results));
                 status.setRollbackOnly();
             });
 
@@ -344,26 +349,48 @@ class DailyLearningPostgresTests {
         }
     }
 
+    /**
+     * 지정한 회원·실습·접수 시각으로 채점 작업 등록
+     * @param ownerId 제출한 회원 ID
+     * @param exerciseId 채점할 실습 ID
+     * @param receivedAt 제출 접수 시각
+     * @return 저장된 채점 작업
+     */
     private ExecutionJob createGradingJob(UUID ownerId, String exerciseId, Instant receivedAt) {
-        String version = exerciseQueryService.findDetails(exerciseId, "c").getVersion();
-        UUID jobId = judgingCommandService.registerGrading(ownerId, exerciseId, version, "c", "code", receivedAt);
+        String version = exerciseService.findDetails(exerciseId, "c").getVersion();
+        UUID jobId = judgingService.registerGrading(ownerId, exerciseId, version, "c", "code", receivedAt);
         return executionJobRepository.findById(jobId).orElseThrow();
     }
 
+    /**
+     * 작업에 지정된 콘텐츠 버전의 테스트 조회
+     * @param job 테스트를 조회할 채점 작업
+     * @return 해당 작업의 전체 테스트 정의
+     */
     private JsonNode testsFor(ExecutionJob job) {
-        return exerciseQueryService.findSnapshot(job.getExerciseId(), job.getContentVersion(), "c").path("sources").path("c").path("tests");
+        return exerciseService.findSnapshot(job.getExerciseId(), job.getContentVersion(), "c").path("sources").path("c").path("tests");
     }
 
+    /**
+     * 전체 테스트의 통과 결과 저장
+     * @param job 테스트 결과를 저장할 채점 작업
+     * @return 저장한 테스트 실행 결과 목록
+     */
     private List<TestExecutionResult> savePassingTests(ExecutionJob job) {
         List<TestExecutionResult> results = new ArrayList<>();
         for (JsonNode test : testsFor(job)) {
             TestExecutionResult actual = passingResult(test);
-            judgingCommandService.saveTest(job.getId(), actual, test.path("expected"));
+            judgingService.saveTest(job.getId(), actual, test.path("expected"));
             results.add(actual);
         }
         return results;
     }
 
+    /**
+     * 콘텐츠 기대값과 일치하는 테스트 실행 결과 구성
+     * @param test 입력과 기대값을 포함한 테스트 정의
+     * @return 통과 조건을 만족하는 실행 결과
+     */
     private TestExecutionResult passingResult(JsonNode test) {
         JsonNode expected = test.path("expected");
         return new TestExecutionResult(test.path("id").asString(), TestExecutionResult.Status.COMPLETED, expected.path("stdout").asString(), expected.path("stderrRequired").asBoolean() ? "expected error" : "", expected.path("exitCode").asInt(), 1L, null);

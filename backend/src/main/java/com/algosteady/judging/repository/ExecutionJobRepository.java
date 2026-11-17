@@ -9,7 +9,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/** 대기 작업의 등록순 조회 */
+/**
+ * 대기 작업의 등록순 조회
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public interface ExecutionJobRepository extends JpaRepository<ExecutionJob, UUID> {
 
     /**

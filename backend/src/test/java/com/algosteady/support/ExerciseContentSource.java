@@ -17,7 +17,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-/** 콘텐츠 파일 기반 공통 테스트 대상 조회 */
+/**
+ * 콘텐츠 파일 기반 공통 테스트 대상 조회
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 public final class ExerciseContentSource {
 
     private ExerciseContentSource() {

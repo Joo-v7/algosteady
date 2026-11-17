@@ -16,7 +16,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-/** 제출 코드 컴파일 및 테스트 순차 실행 */
+/**
+ * 제출 코드 컴파일 및 테스트 순차 실행
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Service
 @RequiredArgsConstructor
 public class CodeExecutionService {

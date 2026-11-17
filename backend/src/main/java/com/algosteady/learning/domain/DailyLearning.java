@@ -13,7 +13,12 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
-/** 학습 날짜별 공통 학습 배정 */
+/**
+ * 학습 날짜별 공통 학습 배정
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity

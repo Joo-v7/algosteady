@@ -2,19 +2,19 @@ package com.algosteady.training;
 
 import com.algosteady.exercise.domain.ExerciseContent;
 import com.algosteady.exercise.repository.ExerciseContentRepository;
-import com.algosteady.exercise.service.ExerciseQueryService;
+import com.algosteady.exercise.service.ExerciseService;
 import com.algosteady.judging.repository.ExecutionJobRepository;
 import com.algosteady.judging.runner.model.ExecutionResult;
 import com.algosteady.judging.runner.model.PreparationResult;
 import com.algosteady.judging.runner.model.TestExecutionResult;
 import com.algosteady.judging.service.ExecutionWorker;
-import com.algosteady.judging.service.JudgingCommandService;
+import com.algosteady.judging.service.JudgingService;
 import com.algosteady.training.dto.request.SubmissionRequestDto;
 import com.algosteady.training.dto.response.SubmissionResponseDto;
 import com.algosteady.training.repository.SubmissionRepository;
-import com.algosteady.training.service.SubmissionCommandService;
+import com.algosteady.training.service.SubmissionService;
 import jakarta.persistence.EntityManager;
-import com.algosteady.member.service.MemberCommandService;
+import com.algosteady.member.service.MemberService;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.assertj.core.api.Assertions;
@@ -46,11 +46,16 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** PostgreSQL 기반 제출 조회·페이지·요약·원본 보존 검증 */
+/**
+ * PostgreSQL 기반 제출 조회·페이지·요약·원본 보존 검증
+ *
+ * @author Joo
+ * @since 2026.11
+ */
 @SpringBootTest
 @Transactional
 @EnabledIfSystemProperty(named = "algosteady.postgres.tests", matches = "true")
-class SubmissionQueryPostgresTests {
+class SubmissionPostgresTests {
 
     @MockitoBean
     private ExecutionWorker executionWorker;
@@ -62,13 +67,13 @@ class SubmissionQueryPostgresTests {
     private ExerciseContentRepository exerciseContentRepository;
 
     @Autowired
-    private ExerciseQueryService exerciseQueryService;
+    private ExerciseService exerciseService;
 
     @Autowired
-    private SubmissionCommandService submissionCommandService;
+    private SubmissionService submissionService;
 
     @Autowired
-    private JudgingCommandService judgingCommandService;
+    private JudgingService judgingService;
 
     @Autowired
     private SubmissionRepository submissionRepository;
@@ -83,7 +88,7 @@ class SubmissionQueryPostgresTests {
     private JsonMapper jsonMapper;
 
     @Autowired
-    private MemberCommandService memberCommandService;
+    private MemberService memberService;
 
     private UUID memberId;
 
@@ -93,7 +98,7 @@ class SubmissionQueryPostgresTests {
 
     @BeforeEach
     void setUp() {
-        memberId = memberCommandService.login("test", UUID.randomUUID().toString(), "test@example.com", "기록 검증 회원").getId();
+        memberId = memberService.login("test", UUID.randomUUID().toString(), "test@example.com", "기록 검증 회원").getId();
         DefaultOAuth2User principal = new DefaultOAuth2User(List.of(new SimpleGrantedAuthority("OIDC_USER")), Map.of("member_id", memberId.toString()), "member_id");
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .defaultRequest(get("/").with(oauth2Login().oauth2User(principal)).with(csrf()))
@@ -113,16 +118,16 @@ class SubmissionQueryPostgresTests {
         // given
         SubmissionResponseDto older = registerSubmission("older original", false);
         SubmissionResponseDto latest = registerSubmission("latest original", true);
-        JsonNode snapshot = exerciseQueryService.findSnapshot(exerciseId, contentVersion, "c");
+        JsonNode snapshot = exerciseService.findSnapshot(exerciseId, contentVersion, "c");
         ArrayList<TestExecutionResult> testResults = new ArrayList<>();
         for (JsonNode test : snapshot.path("sources").path("c").path("tests")) {
             JsonNode expected = test.path("expected");
             TestExecutionResult result = new TestExecutionResult(test.path("id").asString(), TestExecutionResult.Status.COMPLETED,
                     expected.path("stdout").asString(), expected.path("stderrRequired").asBoolean() ? "오류" : "", expected.path("exitCode").asInt(), 1000L, null);
-            judgingCommandService.saveTest(latest.getJobId(), result, expected);
+            judgingService.saveTest(latest.getJobId(), result, expected);
             testResults.add(result);
         }
-        judgingCommandService.complete(latest.getJobId(), new ExecutionResult(new PreparationResult(PreparationResult.Status.SUCCEEDED, "", "", 0, null), testResults));
+        judgingService.complete(latest.getJobId(), new ExecutionResult(new PreparationResult(PreparationResult.Status.SUCCEEDED, "", "", 0, null), testResults));
         entityManager.flush();
         entityManager.clear();
 
@@ -177,6 +182,40 @@ class SubmissionQueryPostgresTests {
     }
 
     @Test
+    @DisplayName("기본 페이지는 20건으로 나누고 1~20건의 조회 크기를 허용합니다.")
+    void findAll_success_withAllowedPageSizes() throws Exception {
+        // given
+        for (int index = 0; index < 21; index++) {
+            registerSubmission("original " + index, false);
+        }
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        ResultActions firstPage = mockMvc.perform(get("/api/submissions").param("exerciseId", exerciseId).param("language", "c"));
+        ResultActions secondPage = mockMvc.perform(get("/api/submissions").param("exerciseId", exerciseId).param("language", "c").param("page", "1"));
+        ResultActions tenItems = mockMvc.perform(get("/api/submissions").param("exerciseId", exerciseId).param("language", "c").param("size", "10"));
+        ResultActions twentyItems = mockMvc.perform(get("/api/submissions").param("exerciseId", exerciseId).param("language", "c").param("size", "20"));
+
+        // then
+        firstPage.andExpect(status().isOk())
+                .andExpect(jsonPath("$.size").value(20))
+                .andExpect(jsonPath("$.totalElements").value(21))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.content.length()").value(20));
+        secondPage.andExpect(status().isOk())
+                .andExpect(jsonPath("$.page").value(1))
+                .andExpect(jsonPath("$.content.length()").value(1));
+        tenItems.andExpect(status().isOk())
+                .andExpect(jsonPath("$.size").value(10))
+                .andExpect(jsonPath("$.totalPages").value(3))
+                .andExpect(jsonPath("$.content.length()").value(10));
+        twentyItems.andExpect(status().isOk())
+                .andExpect(jsonPath("$.size").value(20))
+                .andExpect(jsonPath("$.content.length()").value(20));
+    }
+
+    @Test
     @DisplayName("잘못된 조회 조건과 없는 제출을 한국어 오류로 반환하며 데이터를 변경하지 않습니다.")
     void findAll_fail_withInvalidQueries() throws Exception {
         // given
@@ -186,6 +225,9 @@ class SubmissionQueryPostgresTests {
         ResultActions invalidLanguage = mockMvc.perform(get("/api/submissions").param("exerciseId", exerciseId).param("language", "java"));
         ResultActions negativePage = mockMvc.perform(get("/api/submissions").param("exerciseId", exerciseId).param("language", "c").param("page", "-1"));
         ResultActions zeroSize = mockMvc.perform(get("/api/submissions").param("exerciseId", exerciseId).param("language", "c").param("size", "0"));
+        ResultActions negativeSize = mockMvc.perform(get("/api/submissions").param("exerciseId", exerciseId).param("language", "c").param("size", "-1"));
+        ResultActions excessiveSize = mockMvc.perform(get("/api/submissions").param("exerciseId", exerciseId).param("language", "c").param("size", "21"));
+        ResultActions hugeSize = mockMvc.perform(get("/api/submissions").param("exerciseId", exerciseId).param("language", "c").param("size", "100000"));
         ResultActions invalidPage = mockMvc.perform(get("/api/submissions").param("exerciseId", exerciseId).param("language", "c").param("page", "invalid"));
         ResultActions invalidSubmissionId = mockMvc.perform(get("/api/submissions/invalid"));
         ResultActions missingSubmission = mockMvc.perform(get("/api/submissions/" + UUID.randomUUID()));
@@ -194,6 +236,10 @@ class SubmissionQueryPostgresTests {
         invalidLanguage.andExpect(status().isBadRequest());
         negativePage.andExpect(status().isBadRequest());
         zeroSize.andExpect(status().isBadRequest());
+        negativeSize.andExpect(status().isBadRequest());
+        excessiveSize.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("페이지는 0 이상, 한 페이지의 건수는 1~20이어야 합니다."));
+        hugeSize.andExpect(status().isBadRequest());
         invalidPage.andExpect(status().isBadRequest());
         invalidSubmissionId.andExpect(status().isBadRequest());
         missingSubmission.andExpect(status().isNotFound())
@@ -201,8 +247,14 @@ class SubmissionQueryPostgresTests {
         Assertions.assertThat(executionJobRepository.count()).isEqualTo(jobsBefore);
     }
 
+    /**
+     * 현재 테스트 회원의 코드 제출 등록
+     * @param code 제출할 코드
+     * @param referenceViewed 기준 코드 열람 여부
+     * @return 제출 ID와 채점 작업 ID
+     */
     private SubmissionResponseDto registerSubmission(String code, boolean referenceViewed) {
-        return submissionCommandService.register(memberId, SubmissionRequestDto.builder()
+        return submissionService.register(memberId, SubmissionRequestDto.builder()
                 .exerciseId(exerciseId)
                 .contentVersion(contentVersion)
                 .language("c")

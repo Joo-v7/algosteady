@@ -28,7 +28,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** PostgreSQL 기반 학습 분류·표시 순서 검증 */
+/**
+ * PostgreSQL 기반 학습 분류·표시 순서 검증
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @SpringBootTest
 @Transactional
 @EnabledIfSystemProperty(named = "algosteady.postgres.tests", matches = "true")

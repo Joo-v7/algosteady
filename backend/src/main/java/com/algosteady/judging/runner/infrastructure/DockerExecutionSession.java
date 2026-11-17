@@ -18,7 +18,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
-/** Docker 실행 세션 및 자원 관리 */
+/**
+ * Docker 실행 세션 및 자원 관리
+ *
+ * @author Joo
+ * @since 2026.10
+ */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class DockerExecutionSession implements AutoCloseable {
 
@@ -38,6 +43,10 @@ public class DockerExecutionSession implements AutoCloseable {
 
     private boolean closed;
 
+    /**
+     * 컨테이너 생성과 실행 세션 시작
+     * @param imageName 사용할 실행 이미지 이름
+     */
     void start(String imageName) throws IOException, InterruptedException {
         // 생성 도중 실패한 컨테이너도 정리할 수 있도록 생성 시도 기록
         creationAttempted = true;
@@ -91,6 +100,12 @@ public class DockerExecutionSession implements AutoCloseable {
                 stageResult.elapsedNanos(), stageResult.message());
     }
 
+    /**
+     * 컨테이너 내부 명령 실행과 단계 결과 해석
+     * @param executionCommand 컨테이너 내부에서 실행할 명령과 인자
+     * @param timeout 해당 단계의 실행 제한 시간
+     * @return 단계 실행 상태와 출력·종료 정보
+     */
     private StageResult runCommand(List<String> executionCommand, Duration timeout) throws IOException, InterruptedException {
         List<String> dockerArguments = new ArrayList<>(List.of("docker", "exec", "-i", containerName, "sh", "/input/stage.sh",
                 Double.toString(timeout.toNanos() / 1_000_000_000.0)));
@@ -139,6 +154,9 @@ public class DockerExecutionSession implements AutoCloseable {
         }
     }
 
+    /**
+     * 시간 제한을 초과한 컨테이너 내부 프로세스 그룹 종료
+     */
     private void stopCommand() throws IOException, InterruptedException {
         ProcessExecutor.Result stopResult = executeDockerCommand(List.of("docker", "exec", containerName, "sh", "-c",
                 "pid=$(cat /work/timeout.pid) && /bin/kill -KILL -- -\"$pid\""));
@@ -148,10 +166,21 @@ public class DockerExecutionSession implements AutoCloseable {
         }
     }
 
+    /**
+     * Docker 명령에 응답 시간·출력 제한 적용
+     * @param executionCommand 실행할 Docker 명령과 인자
+     * @return Docker 명령 실행 결과
+     */
     private ProcessExecutor.Result executeDockerCommand(List<String> executionCommand) throws IOException, InterruptedException {
         return processExecutor.execute(executionCommand, null, runnerProperties.dockerTimeout(), runnerProperties.outputLimitBytes(), () -> {});
     }
 
+    /**
+     * 명령 결과의 출력을 보존한 실행 환경 오류 구성
+     * @param commandResult 오류가 발생한 명령 실행 결과
+     * @param message 실행 환경 오류 사유
+     * @return 실행 환경 오류 상태의 단계 결과
+     */
     private StageResult createEnvironmentError(ProcessExecutor.Result commandResult, String message) {
         return new StageResult(TestExecutionResult.Status.ENVIRONMENT_ERROR, commandResult.stdout(), commandResult.stderr(),
                 null, null, message);
@@ -208,6 +237,9 @@ public class DockerExecutionSession implements AutoCloseable {
         }
     }
 
+    /**
+     * 컨테이너 내 준비·실행 단계의 프로세스 결과
+     */
     private record StageResult(
             TestExecutionResult.Status status,
             String stdout,

@@ -8,13 +8,13 @@ export default defineConfig({
         strictPort: true, // 포트가 사용 중이면 다른 포트로 전환하지 않는다.
         proxy: {
             '/api': {
-                target: 'http://localhost:8090',
+                target: 'http://localhost:9090',
             },
             '/oauth2': {
-                target: 'http://localhost:8090',
+                target: 'http://localhost:9090',
             },
             '/login/oauth2': {
-                target: 'http://localhost:8090',
+                target: 'http://localhost:9090',
             },
         },
     },

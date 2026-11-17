@@ -145,10 +145,10 @@ function ExerciseListPage() {
                         </span>
                     </label>
                     <label className="catalog-search">
-                        <span className="sr-only">학습 이름 검색</span>
+                        <span className="sr-only">학습명을 입력하세요.</span>
                         <input
                             type="search"
-                            placeholder="학습 이름 검색"
+                            placeholder="학습명을 입력하세요."
                             value={searchInput}
                             onChange={event => setSearchInput(event.target.value)}
                             onCompositionStart={() => {
@@ -167,7 +167,7 @@ function ExerciseListPage() {
                     </label>
                     <button className="primary-button catalog-query" type="submit">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
-                        조회
+                        검색
                     </button>
                 </form>
                 {!error && exercises !== null && filtered.length === 0 && <p className="home-message" role="status">검색 결과가 없습니다.</p>}
